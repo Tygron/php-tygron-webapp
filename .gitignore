@@ -1,0 +1,8 @@
+docker-compose-override.yaml
+
+/credentials/*
+/workspace/*
+/cron/*
+
+!sample-*
+!.gitkeep

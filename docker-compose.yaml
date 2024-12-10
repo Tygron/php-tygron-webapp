@@ -1,0 +1,12 @@
+    version: "3.1"
+
+    services:
+      app:
+        build : ./docker
+        restart: always
+        #user: www-data
+        volumes:
+          - ./app:/var/www/html/
+          - ./cron:/var/cron/
+          - ./scripts:/var/scripts/
+          - ./workspace:/var/workspace
