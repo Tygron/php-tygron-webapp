@@ -30,12 +30,13 @@
 		}
 
 		public function setUrl( string $url = '' ) {
-			$split = explode('?',$url);
+			$split = explode('?',$url,2);
 			$this->url = $split[0];
 			if ( count($split)>1 ) {
-				foreach ( array_slice($split) as $key => $value ) {
+				$query = explode('&',$split[1]);
+				foreach ( $query as $key => $value ) {
 					$keyValue = explode('=',$value,2);
-					$this->setParameters($keyValue);
+					$this->setParameters([$keyValue[0]=>$keyValue[1]]);
 				}
 			}
 			return $this;
