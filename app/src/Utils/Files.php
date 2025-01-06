@@ -34,7 +34,11 @@
 
 			$contents = @file_get_contents($path);
 			if ( $contents === false ) {
-				throw new \Exception('Could not read file at \''.$path.'\', caused by '.error_get_last());
+				$lastError = error_get_last()['message'];
+				if ( str_contains( $lastError, 'No such file or directory')) {
+					throw new \Exception('Could not read file at \''.$path.'\', no such file or directory.');
+				}
+				throw new \Exception('Could not read file at \''.$path.'\'');
 			}
 			return $contents;
 		}
