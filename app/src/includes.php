@@ -6,6 +6,5 @@
 	include_once 'config.php';
 	include_once 'input.php';
 	include_once 'texts.php';
-
-
+	include_once 'logging.php';
 ?>
