@@ -14,12 +14,15 @@
 					'taskName'=>'',
 					'credentialsFile'=>'',
 					'templateName'=>'',
+					'platform'=>'engine',
 					'location'=>[0,0],
 					'size'=>[500,500],
 
 					'apiToken'=>'',
 					'operations'=>[],
-					'currentOperation'=>''
+					'currentOperation'=>'',
+					'startedOperation'=>'',
+					'completed'=>false
 				];
 			$this->setData($parameters);
 		}
@@ -36,6 +39,9 @@
 					case 'templateName':
 						$this->setTemplateName($value);
 						break;
+					case 'platform':
+						$this->setPlatform($value);
+						break;
 					case 'location':
 						$this->setLocation($value);
 						break;
@@ -50,6 +56,14 @@
 					case 'operations':
 						$this->setOperations($value);
 						break;
+					case 'currentOperation':
+						$this->setCurrentOperation($value);
+						break;
+					case 'startedOperation':
+						$this->setStartedOperation($value);
+						break;
+					case 'completed':
+						$this->setCompleted($value);
 
 					default:
 						$this->data[$key] = $value;
@@ -58,15 +72,17 @@
 			}
 		}
 
-		public function setCredentialsFile( string $credentialsFile ) {
-			$this->data['credentialsFile'] = $credentialsFile;
-		}
-
 		public function setTaskName( string $taskName ) {
 			$this->data['taskName'] = $taskName;
 		}
+		public function setCredentialsFile( string $credentialsFile ) {
+			$this->data['credentialsFile'] = $credentialsFile;
+		}
 		public function setTemplateName( string $templateName ) {
 			$this->data['templateName'] = $templateName;
+		}
+		public function setPlatform( string $platform ) {
+			$this->data['platform'] = $platform;
 		}
 		public function setLocation( array $location ) {
 			$this->data['location'] = $location;
@@ -74,19 +90,86 @@
 		public function setSize( array $size ) {
 			$this->data['size'] = $size;
 		}
+		public function setApiToken( string $token ) {
+			$this->data['apiToken'] = $token;
+		}
 
-		public function setOperation( array $operations ) {
+		public function setOperations( array $operations ) {
 			$this->data['operations'] = $operations;
 		}
+		public function setToNextOperation() {
+			$operationIndex = array_search($this->getCurrentOperation(), $this->getOperations());
+			if ( ++$operationIndex >= count($this->getOperations()) ) {
+				$this->setCompleted(true);
+				return;
+			}
+			$this->setCurrentOperation($this->getOperations()[$operationIndex]);
+		}
+		public function setCurrentOperation( string $operation ) {
+			$this->data['currentOperation'] = $operation;
+		}
+		public function setStartedOperation( string $operation ) {
+			$this->data['startedOperation'] = $operation;
+		}
+		public function setCompleted( string|bool $completed ) {
+			if ( is_string($completed) ) {
+				$completed = $completed==='false' ? false : $completed=='true';
+			}
+			$this->data['completed'] = $completed;
+		}
+
 
 		public function getData() {
 			return $this->data;
 		}
+
+
 		public function getTaskName() {
 			return $this->data['taskName'];
 		}
 		public function getTaskFileName() {
 			return self::generateTaskFileName($this->getTaskName());
+		}
+		public function getPlatform() {
+			return $this->data['platform'];
+		}
+		public function getCredentialsFileName() {
+			return $this->data['credentialsFile'];
+		}
+		public function getTemplateName() {
+			return $this->data['templateName'];
+		}
+		public function getLocation() {
+			return $this->data['location'];
+		}
+		public function getSize() {
+			return $this->data['size'];
+		}
+		public function getApiToken() {
+			return $this->data['apiToken'];
+		}
+
+		public function getOperations() {
+			return $this->data['operations'];
+		}
+		public function getFirstOperation() {
+			return (count($this->getOperations())>0) ? $this->getOperations()[0] : null;
+		}
+		public function getCurrentOperation() {
+			if ( $this->getCompleted() ) {
+				return null;
+			}
+			$found = $this->data['currentOperation'];
+			if ( empty($found) ) {
+				$found = $this->getFirstOperation();
+			}
+			return $found;
+		}
+		public function getStartedOperation() {
+			return $this->data['startedOperation'];
+		}
+		public function getCompleted() {
+			return $this->data['completed'];
 		}
 
 
@@ -98,12 +181,14 @@
 		}
 
 		public static function generateTask($parameters) {
-
 			$task = new Task([]);
 			$task->setTaskName( 		self::generateTaskNameFromParameters($parameters) );
 			$task->setTemplateName( 	self::generateTemplateNameFromParameters($parameters) );
+			$task->setPlatform(		$parameters['platform'] ?? 'engine');
 			$task->setLocation(		self::generateLocationFromParameters($parameters) );
 			$task->setSize( 		self::generateSizeFromParameters($parameters) );
+
+			$task->setOperations(		self::generateOperationsFromParameters($parameters) );
 
 			$task->setCredentialsFile(	self::generateCredentialsFileFromParameters($task->getTaskName(), $parameters) );
 
@@ -137,6 +222,9 @@
 					case 'sizeY':
 						$cleanedParameters[$key] = (int) clean_user_input($value, '[0-9]');
 						break;
+					case 'operations':
+						$cleanedParameters[$key] = get_clean_user_input($key, '[\[\]\,\.\-"_a-zA-Z0-9]');
+						break;
 					default:
 						$cleanedParameters[$key] = clean_user_input($value);
 				}
@@ -147,9 +235,15 @@
 
 
 		private static function generateTaskFileName(string $taskName) {
+			if (str_ends_with($taskName, self::$TASKFILE_POSTFIX)) {
+				return $taskName;
+			}
 			return $taskName.self::$TASKFILE_POSTFIX;
 		}
 		private static function generateCredentialsFileName(string $taskName) {
+			if (str_ends_with($taskName, self::$CREDENTIALSFILE_POSTFIX)) {
+				return $taskName;
+			}
 			return $taskName.self::$CREDENTIALSFILE_POSTFIX;
 		}
 
@@ -191,28 +285,44 @@
 			global $CREDENTIALS_FILE_DEFAULT;
 
 			$useDefaultCredentials = true;
-			if ( array_key_exists('username', $parameters) && array_key_exists('password', $parameters) ) {
+			if ( array_key_exists('platform', $parameters) && array_key_exists('username', $parameters) && array_key_exists('password', $parameters) ) {
 				$useDefaultCredentials=false;
 			}
-			if ( array_key_exists('useDefaultCredentials', $parameters) ) {
+			if ( array_key_exists('useDefaultCredentials', $parameters) && !$useDefaultCredentials ) {
 				$useDefaultCredentials = ($parameters['useDefaultCredentials'] != false && $parameters['useDefaultCredentials'] != 'false');
 			}
 
 			if ( $useDefaultCredentials ) {
 				return $CREDENTIALS_FILE_DEFAULT;
 			}
-			return self::generateCredentialsFile($taskName, $parameters['username'],$parameters['password']);
+			return self::generateCredentialsFile($taskName, $platform['platform'],$parameters['username'],$parameters['password']);
 		}
-		private static function generateCredentialsFile(string $taskName, string $username, string $password) {
+		private static function generateCredentialsFile(string $taskName, string $platform, string $username, string $password) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
 			$fileName = self::generateCredentialsFileName($taskName);
 			\Utils\Files::WriteJsonFile([$WORKSPACE_CREDENTIALS_DIR, self::generateCredentialsFileName($taskName)], [
+					'platform' => $platform,
 					'username' => $username,
 					'password' => $password,
 					'created' => \Utils\Strings::dateTimeString(),
 				]);
 			return $fileName;
+		}
+
+		private static function generateOperationsFromParameters($parameters) {
+			return self::generateOperations($parameters['operations']);
+		}
+
+		private static function generateOperations(string|array $operations) {
+			if (is_string($operations) && str_starts_with($operations, '[') ) {
+				$operations = json_decode($operations);
+				return $operations;
+			}
+			if (is_array($operations)) {
+				return $operations;
+			}
+			return [$operations];
 		}
 	}
 ?>
