@@ -22,7 +22,9 @@
 					'operations'=>[],
 					'currentOperation'=>'',
 					'startedOperation'=>'',
-					'completed'=>false
+					'completed'=>false,
+
+					'output'=>[]
 				];
 			$this->setData($parameters);
 		}
@@ -64,6 +66,9 @@
 						break;
 					case 'completed':
 						$this->setCompleted($value);
+
+					case 'output':
+						$this->setOutput($value);
 
 					default:
 						$this->data[$key] = $value;
@@ -116,6 +121,13 @@
 				$completed = $completed==='false' ? false : $completed=='true';
 			}
 			$this->data['completed'] = $completed;
+		}
+		public function setOutput( string|array $key, $value = null ) {
+			if ( is_array($key) ) {
+				$this->data['output'] = array_merge($this->data['output'], $key);
+			} else if ( is_string($key) ) {
+				$this->data['output'][$key] = $value;
+			}
 		}
 
 
@@ -170,6 +182,15 @@
 		}
 		public function getCompleted() {
 			return $this->data['completed'];
+		}
+		public function getOutput( string $key = null, $defaultValue = null ) {
+			if ( $key === null ) {
+				return $this->data['output'];
+			}
+			if ( !array_key_exists($key, $this->data['output']) ) {
+				return $defaultValue;
+			}
+			return $this->data['output'][$key];
 		}
 
 

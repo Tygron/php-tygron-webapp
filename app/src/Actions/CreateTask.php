@@ -10,7 +10,7 @@
 			$cleanedParameters = $parameters ?? \Tasks\Task::cleanParameters($_INPUTS);
 
 			$task = \Tasks\Task::generateTask($cleanedParameters);
-			return $task->getTaskName();
+			return get_text('<meta http-equiv="refresh" content="0; url=/?action=OutputFromTask&task=%s" />',[$task->getTaskName()]);
 		}
 	}
 
