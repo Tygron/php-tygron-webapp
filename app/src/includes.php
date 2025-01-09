@@ -1,6 +1,6 @@
 <?php
 
-	include_once './src/AutoLoader/SimpleAutoLoader.php';
+	include_once __DIR__.DIRECTORY_SEPARATOR.'AutoLoader/SimpleAutoLoader.php';
 	SimpleAutoloaderAddSourceDirectory( __DIR__ );
 
 	include_once 'config.php';
