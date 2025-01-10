@@ -226,6 +226,17 @@
 			return $task;
 		}
 
+		public static function list() {
+			global $WORKSPACE_TASK_DIR;
+			$tasksDir = $WORKSPACE_TASK_DIR;
+
+			$fileNamesFull = glob($tasksDir . DIRECTORY_SEPARATOR .'*'.self::$TASKFILE_POSTFIX);
+			$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $fileNamesFull);
+			$taskNames = str_replace(self::$TASKFILE_POSTFIX, '', $fileNames);
+
+			return $taskNames;
+		}
+
 
 
 		public static function cleanParameters( array $parameters ) {
