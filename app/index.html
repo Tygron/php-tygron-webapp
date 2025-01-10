@@ -1,9 +1,35 @@
 <html>
 
 <head>
+<style>
+	body {
+		margin: 0px;
+		padding: 1em 1em;
+	}
+	img.logo {
+		max-height:100px;
+	}
+	form div label span {
+		display: inline-block;
+		width: 15em;
+	}
+	div.logos {
+		width: 100%;
+	}
+	div.logosBottom {
+		position: absolute;
+		bottom: 1em;
+	}
+</style>
 </head>
 
 <body>
+
+<div class='logos logosTop'>
+	<hr>
+</div>
+
+
 	<form method='GET' action='index.php'>
 
 	<div><label><span>Action:</span><input name='action' value='CreateTask' /></label></div>
@@ -24,13 +50,18 @@
 
 	<div><hr></div>
 
-	<div><label><span>Operations:</span><input name='operations' value='["CreateNewProject","GenerateProject","KeepAlive"]' /></label></div>
+	<div><label><span>Operations:</span><input name='operations' value='["CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"]' /></label></div>
 	<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
 
 
 
 	</form>
 
+<div class='logos logosBottom'>
+	<hr>
+	<p>Powered by: </p>
+	<img class='logo' src='https://www.tygron.com/wp-content/uploads/2023/02/Tygron_logo.gif'>
+</div>
 
 </body>
 
