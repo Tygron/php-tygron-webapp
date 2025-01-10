@@ -14,7 +14,7 @@
 				echo get_text('Task currently waiting for: %s',[$task->getCurrentOperation()]);
 				echo '</body></html>';
 			} else {
-				echo '<html><head><style>body{height:100%;width:100%;padding:0px;margin:0px;} iframe {position:absolute;width:100%;height:100%;}</style></head><body>';
+				echo '<html><head><style>body{height:100%;width:100%;padding:0px;margin:0px;} iframe {position:absolute;width:100%;height:100%;border:0px;}</style></head><body>';
 				echo get_text('<iframe src="%s">',[$task->getOutput('webViewer3DHtml')]);
 				echo '</body></html>';
 			}
