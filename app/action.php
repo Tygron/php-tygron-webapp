@@ -2,11 +2,15 @@
 <?php
 
 	$action = get_clean_user_input('action');
-	$className = '\\Actions\\'.$action;
 
-	if ( empty($action) ) {
-		throw new Exception(get_text('Required parameter missing: action'));
+	if ( empty($action) && !isset($DEFAULT_ACTION)) {
+		if (!isset($DEFAULT_ACTION)) {
+			throw new Exception(get_text('Required parameter missing: action'));
+		}
 	}
+	$action = $action ?? $DEFAULT_ACTION;
+
+	$className = '\\Actions\\'.$action;
 
 	if ( !class_exists($className) ) {
 		throw new Exception(get_text('Unknown action: %s',[$action]));
