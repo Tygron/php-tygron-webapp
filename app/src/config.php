@@ -8,5 +8,8 @@
 
 	$SAFE_CHARACTERS = '[a-zA-Z0-9\-_]';
 
+	$DEFAULT_ACTION = 'CreateTaskForm';
+	$AUTHENTICATION_TOKEN = 'Welcome123';
+
 	$LANGUAGE_DEFAULT = 'EN'
 ?>
