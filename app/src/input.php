@@ -30,13 +30,13 @@
 		}
 	}
 
-	foreach ( array_merge( [], $_REQUEST ) as $key => $value ) {
+	foreach ( array_merge( [], $_COOKIE, $_POST, $_GET ) as $key => $value ) {
 		$_INPUTS[$key] = $value;
-		$_INPUTS_CLEANED = get_clean_user_input($key);
+		$_INPUTS_CLEANED[$key] = get_clean_user_input($key);
 	}
 
 	foreach ( array_merge( [], $_ENV ) as $key => $value ) {
 		$_INPUTS[$key] = $value;
-		$_INPUTS_CLEANED = get_clean_user_input($key);
+		$_INPUTS_CLEANED[$key] = get_clean_user_input($key);
 	}
 ?>
