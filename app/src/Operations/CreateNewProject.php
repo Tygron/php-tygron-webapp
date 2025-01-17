@@ -10,6 +10,7 @@
 
 		public static function run($task) {
 			global $WORKSPACE_CREDENTIALS_DIR;
+
 			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
 
 			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/start', ['EDITOR', $task->getTemplateName()])->run();
@@ -17,7 +18,7 @@
 			$task->log(get_text('Started template: %s',[$task->getTemplateName()]));
 
 		        $curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/join', [$sessionId, 'EDITOR'])->run();
-		        $token = $curlTask->getContent()['apiToken'];
+			$token = $curlTask->getContent()['apiToken'];
 			$task->log(get_text('Connected to session with id: %s',[$sessionId]));
 
 			$task->setApiToken($token);

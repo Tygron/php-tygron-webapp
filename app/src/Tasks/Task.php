@@ -315,6 +315,22 @@
 			return $taskNames;
 		}
 
+		public static function loadCredentials( string $credentialsFileName = null ) {
+			global $WORKSPACE_CREDENTIALS_DIR;
+
+			if ( is_string($credentialsFileName) && !empty($credentialsFileName) ) {
+				try {
+					$credentials = \Utils\Files::readFile([$WORKSPACE_CREDENTIALS_DIR, $credentialsFileName]);
+					if (!empty($credentials)) {
+						return $credentials;
+					}
+				} catch (\Throwable $e) {
+				}
+			}
+			return null;
+		}
+
+
 
 
 		public static function cleanParameters( array $parameters ) {
@@ -405,13 +421,28 @@
 
 		private static function generateCredentialsFileFromParameters($taskName, $parameters) {
 			$useDefaultCredentials = true;
-			if ( array_key_exists('platform', $parameters) && array_key_exists('username', $parameters) && array_key_exists('password', $parameters) ) {
-				$useDefaultCredentials=false;
-			}
-			if ( array_key_exists('useDefaultCredentials', $parameters) && !$useDefaultCredentials ) {
-				$useDefaultCredentials = ($parameters['useDefaultCredentials'] != false && $parameters['useDefaultCredentials'] != 'false');
-			}
 
+			$parameterUserPresent = ( array_key_exists('platform', $parameters) && array_key_exists('username', $parameters) && array_key_exists('password', $parameters) );
+			$parameterUser = ( $parameterUserPresent ? ( !(empty($parameters['platform']) || empty($parameters['username']) || empty($parameters['password']) ) ) : false );
+			$parameterSettingPresent = array_key_exists('useDefaultCredentials', $parameters);
+			$parameterSetting = ( $parameterSettingPresent ? ($parameters['useDefaultCredentials'] != false && $parameters['useDefaultCredentials'] != 'false') : false );
+			$defaultFileExists = ( !is_null(self::loadCredentials(self::getDefaultCredentialsFile())) );
+
+			if ( $parameterUserPresent && $parameterUser ) {
+				$useDefaultCredentials = false;
+			} else if ( $defaultFileExists ) {
+				$useDefaultCredentials = true;
+			} else {
+				if ( $parameterSettingPresent ) {
+					if ( $parameterSetting ) {
+						throw new \Exception(get_text('No default credentials available'));
+					} else {
+						throw new \Exception(get_text('Credentials required: username, password, platform'));
+					}
+				} else {
+					throw new \Exception(get_text('Credentials required: username, password, platform'));
+				}
+			}
 			if ( $useDefaultCredentials ) {
 				return self::getDefaultCredentialsFile();
 			}
