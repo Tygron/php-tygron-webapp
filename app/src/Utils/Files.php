@@ -79,7 +79,7 @@
 				$file = array_pop($pathParts);
 			}
 			$dir = '';
-			foreach($pathParts as $part) {
+			foreach ($pathParts as $part) {
 				$dir = $dir . DIRECTORY_SEPARATOR . $part;
 				if ( is_file($dir) ) {
 					throw new Exception('Could not ensure directory for \''.$path.'\', because \''.$dir.'\' is a file');
@@ -87,6 +87,31 @@
 				if ( !is_dir($dir) ) {
 					mkdir($dir);
 				}
+			}
+		}
+
+		public static function deleteFile( string|array $files, string $directory = '' ) {
+			if ( is_string($files) ) {
+				$files = [$files];
+			}
+			foreach ($files as $index => $file) {
+				if (empty($file)) {
+					continue;
+				}
+				$filePath = empty($directory) ? $file : implode(DIRECTORY_SEPARATOR, [$directory,$file]);
+				if (!file_exists($filePath)) {
+					throw new \Exception('File does not exist, and as such cannot be deleted: '.$file);
+				}
+				if (!is_file($filePath)) {
+					throw new \Exception('Expected a file but is a directory: '.$file);
+				}
+			}
+			foreach ($files as $index => $file) {
+				if (empty($file)) {
+					continue;
+				}
+				$filePath = empty($directory) ? $file : implode(DIRECTORY_SEPARATOR, [$directory,$file]);
+				unlink($filePath);
 			}
 		}
 	}
