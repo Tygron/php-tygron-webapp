@@ -9,23 +9,29 @@
 
 		private array $data = [];
 
+		public static array $DEFAULT_DATA = [
+				'taskName'=>'',
+				'credentialsFile'=>'',
+				'templateName'=>'',
+				'platform'=>'engine',
+				'location'=>[0,0],
+				'size'=>[500,500],
+
+				'apiToken'=>'',
+				'taskOperations'=>[],
+				'cleanupOperations'=>[],
+				'currentOperation'=>'',
+				'startedOperation'=>'',
+				'taskCompleted'=>false,
+				'completed'=>false,
+
+				'output'=>[],
+				'log'=>[],
+			];
+
+
 		public function __construct( $parameters ) {
-			$this->data = [
-					'taskName'=>'',
-					'credentialsFile'=>'',
-					'templateName'=>'',
-					'platform'=>'engine',
-					'location'=>[0,0],
-					'size'=>[500,500],
-
-					'apiToken'=>'',
-					'operations'=>[],
-					'currentOperation'=>'',
-					'startedOperation'=>'',
-					'completed'=>false,
-
-					'output'=>[]
-				];
+			$this->data = self::$DEFAULT_DATA;
 			$this->setData($parameters);
 		}
 
@@ -55,20 +61,31 @@
 						$this->setApiToken($value);
 						break;
 
-					case 'operations':
-						$this->setOperations($value);
+					case 'taskOperations':
+						$this->setTaskOperations($value);
 						break;
+					case 'cleanupOperations':
+						$this->setCleanupOperations($value);
+						break;
+
 					case 'currentOperation':
 						$this->setCurrentOperation($value);
 						break;
 					case 'startedOperation':
 						$this->setStartedOperation($value);
 						break;
+
 					case 'completed':
 						$this->setCompleted($value);
+						break;
 
 					case 'output':
 						$this->setOutput($value);
+						break;
+
+					case 'log':
+						$this->setLog($value);
+						break;
 
 					default:
 						$this->data[$key] = $value;
@@ -99,8 +116,11 @@
 			$this->data['apiToken'] = $token;
 		}
 
-		public function setOperations( array $operations ) {
-			$this->data['operations'] = $operations;
+		public function setTaskOperations( array $operations ) {
+			$this->data['taskOperations'] = $operations;
+		}
+		public function setCleanupOperations( array $operations ) {
+			$this->data['cleanupOperations'] = $operations;
 		}
 		public function setToNextOperation() {
 			$operationIndex = array_search($this->getCurrentOperation(), $this->getOperations());
@@ -129,12 +149,27 @@
 				$this->data['output'][$key] = $value;
 			}
 		}
+		public function setLog( string|array $value ) {
+			if ( !is_array($value) ) {
+				$value = [$value];
+			}
+			$this->data['log'] = $value;
+		}
+
+
+
+		public function log( string|array $value ) {
+			if (!is_array($value) ) {
+				$value = [$value];
+			}
+			$this->data['log'] = array_merge($this->data['log'], $value);
+		}
+
 
 
 		public function getData() {
 			return $this->data;
 		}
-
 
 		public function getTaskName() {
 			return $this->data['taskName'];
@@ -162,7 +197,13 @@
 		}
 
 		public function getOperations() {
-			return $this->data['operations'];
+			return array_merge($this->getTaskOperations(), $this->getCleanupOperations());
+		}
+		public function getTaskOperations() {
+			return $this->data['taskOperations'];
+		}
+		public function getcleanupOperations() {
+			return $this->data['cleanupOperations'];
 		}
 		public function getFirstOperation() {
 			return (count($this->getOperations())>0) ? $this->getOperations()[0] : null;
@@ -192,6 +233,9 @@
 			}
 			return $this->data['output'][$key];
 		}
+		public function getLog() {
+			return $this->data['log'];
+		}
 
 
 
@@ -199,6 +243,38 @@
 			global $WORKSPACE_TASK_DIR;
 
 			\Utils\Files::writeJsonFile([$WORKSPACE_TASK_DIR, $this->getTaskFileName()], $this->getData());
+		}
+		public function delete() {
+			global $WORKSPACE_TASK_DIR;
+
+			try {
+				$this->deleteCredentials();
+			} catch (\Throwable $e) {
+				return false;
+			}
+			try {
+				$file = $this->getTaskFileName();
+				\Utils\Files::deleteFile($file, $WORKSPACE_TASK_DIR);
+			} catch (\Throwable $e) {
+				return false;
+			}
+			return true;
+		}
+
+		public function deleteCredentials() {
+			global $WORKSPACE_CREDENTIALS_DIR;
+
+			if ( $this->getCredentialsFileName() == $this->getDefaultCredentialsFile() ) {
+				$this->log('Will not delete default credentials file. Only remove reference.');
+			} else {
+				$file = $this->getCredentialsFileName();
+				try {
+					\Utils\Files::deleteFile($file, $WORKSPACE_CREDENTIALS_DIR);
+				} catch (\Throwable $e) {
+					$this->log('Could not delete '.$file.': '.$e->getMessage());
+				}
+			}
+			$this->setCredentialsFile('');
 		}
 
 		public static function generateTask($parameters) {
@@ -209,13 +285,15 @@
 			$task->setLocation(		self::generateLocationFromParameters($parameters) );
 			$task->setSize( 		self::generateSizeFromParameters($parameters) );
 
-			$task->setOperations(		self::generateOperationsFromParameters($parameters) );
+			$task->setTaskOperations(	self::generateTaskOperationsFromParameters($parameters) );
+			$task->setCleanupOperations(	self::generateCleanupOperationsFromParameters($parameters) );
 
 			$task->setCredentialsFile(	self::generateCredentialsFileFromParameters($task->getTaskName(), $parameters) );
 
 			$task->save();
 			return $task;
 		}
+
 
 		public static function load( string $taskName ) {
 			global $WORKSPACE_TASK_DIR;
@@ -255,6 +333,8 @@
 						$cleanedParameters[$key] = (int) clean_user_input($value, '[0-9]');
 						break;
 					case 'operations':
+					case 'taskOperations':
+					case 'cleanupOperations':
 						$cleanedParameters[$key] = get_clean_user_input($key, '[\[\]\,\.\-"_a-zA-Z0-9]');
 						break;
 					default:
@@ -262,6 +342,13 @@
 				}
 			}
 			return $cleanedParameters;
+		}
+
+
+
+		public static function getDefaultCredentialsFile() {
+			global $CREDENTIALS_FILE_DEFAULT;
+			return $CREDENTIALS_FILE_DEFAULT;
 		}
 
 
@@ -299,6 +386,9 @@
 			return $template;
 		}
 
+		private static function generatePlatformFromParameters($parameters) {
+			return $parameters['platform'] ?? 'engine';
+		}
 		private static function generateLocationFromParameters($parameters) {
 			return self::generateLocation( $parameters['locationX'], $parameters['locationY'] );
 		}
@@ -314,8 +404,6 @@
 		}
 
 		private static function generateCredentialsFileFromParameters($taskName, $parameters) {
-			global $CREDENTIALS_FILE_DEFAULT;
-
 			$useDefaultCredentials = true;
 			if ( array_key_exists('platform', $parameters) && array_key_exists('username', $parameters) && array_key_exists('password', $parameters) ) {
 				$useDefaultCredentials=false;
@@ -325,9 +413,9 @@
 			}
 
 			if ( $useDefaultCredentials ) {
-				return $CREDENTIALS_FILE_DEFAULT;
+				return self::getDefaultCredentialsFile();
 			}
-			return self::generateCredentialsFile($taskName, $platform['platform'],$parameters['username'],$parameters['password']);
+			return self::generateCredentialsFile($taskName, $parameters['platform'],$parameters['username'],$parameters['password']);
 		}
 		private static function generateCredentialsFile(string $taskName, string $platform, string $username, string $password) {
 			global $WORKSPACE_CREDENTIALS_DIR;
@@ -342,8 +430,11 @@
 			return $fileName;
 		}
 
-		private static function generateOperationsFromParameters($parameters) {
-			return self::generateOperations($parameters['operations']);
+		private static function generateTaskOperationsFromParameters($parameters) {
+			return self::generateOperations($parameters['taskOperations']);
+		}
+		private static function generatecleanupOperationsFromParameters($parameters) {
+			return self::generateOperations($parameters['cleanupOperations']);
 		}
 
 		private static function generateOperations(string|array $operations) {

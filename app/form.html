@@ -31,7 +31,7 @@
 </div>
 
 
-	<form method='GET' action='index.php'>
+	<form method='POST' action='index.php'>
 
 	<div><label><span>Action:</span><input name='action' value='CreateTask' /></label></div>
 	<div><label><span>Name:</span><input name='name' value='Task' /></label></div>
@@ -51,7 +51,8 @@
 
 	<div><hr></div>
 
-	<div><label><span>Operations:</span><input name='operations' value='["CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"]' /></label></div>
+	<div><label><span>Task Operations:</span><input name='taskOperations' value='["CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"]' /></label></div>
+	<div><label><span>Cleanup Operations:</span><input name='cleanupOperations' value='["DeleteCredentialsFile","DeleteTaskFile"]' /></label></div>
 	<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
 
 

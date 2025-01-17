@@ -9,7 +9,12 @@
 
 			$cleanedParameters = $parameters ?? \Tasks\Task::cleanParameters($_INPUTS);
 
-			$task = \Tasks\Task::generateTask($cleanedParameters);
+			$taskData = \Tasks\Task::$DEFAULT_DATA;
+			$taskData = array_merge($taskData, $cleanedParameters);
+
+			//TODO: Add config parameters
+
+			$task = \Tasks\Task::generateTask($taskData);
 			return get_text('<meta http-equiv="refresh" content="0; url=/?action=OutputFromTask&task=%s" />',[$task->getTaskName()]);
 		}
 	}
