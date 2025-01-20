@@ -2,7 +2,7 @@ docker-compose-override.yaml
 
 /credentials/*
 /workspace/*
-/cron/*
+!/cron/*
 
 !sample-*
 !.gitkeep
