@@ -6,7 +6,7 @@
 
 		public function run( array $parameters = null ) {
 
-			return \Utils\Files::readFile([__DIR__,'..','..','form.html']);
+			return \get_html('form.html');
 		}
 	}
 
