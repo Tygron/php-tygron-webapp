@@ -1,10 +1,10 @@
 docker-compose-override.yaml
 
 /app/config/*
+/app/html/*
 
 /credentials/*
 /workspace/*
-/html/*
 !/cron/*
 
 !sample-*
