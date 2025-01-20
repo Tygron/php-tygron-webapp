@@ -9,10 +9,16 @@
 		}
 
 		public static function run($task) {
+			global $KEEP_TASKS_WITH_ERROR;
 
+			if ( !empty($task->getError()) ) {
+				if ($KEEP_TASKS_WITH_ERROR) {
+					return true;
+				}
+			}
 			$task->delete();
 
-			return;
+			return null;
 		}
 
 
@@ -21,7 +27,7 @@
 		}
 
 		public static function checkOperationComplete($task, bool $thrown = true) {
-			return false;
+			return $task->getOperationResult();
 		}
 	}
 

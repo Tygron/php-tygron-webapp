@@ -13,4 +13,6 @@
 	//The (default) language to use for texts and messages.
 	$LANGUAGE_DEFAULT = 'EN';
 
+	//Whether to keep task files of tasks which have resulted in an error.
+	$KEEP_TASKS_WITH_ERROR = true;
 ?>
