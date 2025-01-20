@@ -402,11 +402,15 @@
 					case 'taskOperations':
 					case 'cleanupOperations':
 						$cleanedParameters[$key] = get_clean_user_input($key, '[\[\]\,\.\-"_a-zA-Z0-9]');
+						if ( is_null($cleanedParameters[$key]) ) {
+							$cleanedParameters[$key] = $value;
+						}
 						break;
 					default:
 						$cleanedParameters[$key] = clean_user_input($value);
 				}
 			}
+
 			return $cleanedParameters;
 		}
 
