@@ -435,12 +435,12 @@
 			} else {
 				if ( $parameterSettingPresent ) {
 					if ( $parameterSetting ) {
-						throw new \Exception(get_text('No default credentials available'));
+						throw new \Exception('No default credentials available');
 					} else {
-						throw new \Exception(get_text('Credentials required: username, password, platform'));
+						throw new \Exception('Credentials required: username, password, platform');
 					}
 				} else {
-					throw new \Exception(get_text('Credentials required: username, password, platform'));
+					throw new \Exception('Credentials required: username, password, platform');
 				}
 			}
 			if ( $useDefaultCredentials ) {

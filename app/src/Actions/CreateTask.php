@@ -14,7 +14,14 @@
 
 			//TODO: Add config parameters
 
-			$task = \Tasks\Task::generateTask($taskData);
+			try {
+				$task = \Tasks\Task::generateTask($taskData);
+			} catch ( \Throwable $e ) {
+				$message  = '<p>'.get_text('Something went wrong').':</p>';
+				$message .= '<p>'.get_text($e->getMessage()).'</p>';
+				return $message;
+			}
+
 			return get_text('<meta http-equiv="refresh" content="0; url=/?action=OutputFromTask&task=%s" />',[$task->getTaskName()]);
 		}
 	}
