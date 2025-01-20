@@ -5,14 +5,15 @@
 	class CreateTask extends AbstractAction {
 
 		public function run( array $parameters = null ) {
-			global $_INPUTS;
 
-			$cleanedParameters = $parameters ?? \Tasks\Task::cleanParameters($_INPUTS);
+			$cleanedParameters = \Tasks\Task::cleanParameters($parameters);
+			//operations are not in the inputs, so parameters are not cleaned
 
 			$taskData = \Tasks\Task::$DEFAULT_DATA;
-			$taskData = array_merge($taskData, $cleanedParameters);
-
-			//TODO: Add config parameters
+			$taskData = array_merge(
+					$taskData,
+					$cleanedParameters,
+				);
 
 			try {
 				$task = \Tasks\Task::generateTask($taskData);

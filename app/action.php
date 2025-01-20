@@ -23,7 +23,7 @@
 		throw new Exception( get_text('Could not load action %s',[$action]), previous:$e);
 	}
 
-	echo $actionObject->run();
+	echo $actionObject->startAction($_INPUTS);
 
 
 	// Get provided parameters
