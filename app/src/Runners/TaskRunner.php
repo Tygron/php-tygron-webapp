@@ -107,7 +107,11 @@
 			$task->setStartedOperation($currentOperation);
 			$task->save();
 			log_message(get_text('The current operation is %s, and is now starting',[$currentOperation]));
-			$operation::run($task);
+			$result = $operation::run($task);
+			if ( isset($result) ) {
+				$task->setOperationResult($result);
+				$task->save();
+			}
 			return true;
 		}
 	}

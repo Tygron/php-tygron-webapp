@@ -22,6 +22,8 @@
 				'cleanupOperations'=>[],
 				'currentOperation'=>'',
 				'startedOperation'=>'',
+				'operationResult'=>null,
+
 				'taskCompleted'=>false,
 				'completed'=>false,
 
@@ -73,6 +75,9 @@
 						break;
 					case 'startedOperation':
 						$this->setStartedOperation($value);
+						break;
+					case 'operationResult':
+						$this->setOperationResult($value);
 						break;
 
 					case 'completed':
@@ -132,10 +137,15 @@
 		}
 		public function setCurrentOperation( string $operation ) {
 			$this->data['currentOperation'] = $operation;
+			$this->setOperationResult(null);
 		}
 		public function setStartedOperation( string $operation ) {
 			$this->data['startedOperation'] = $operation;
 		}
+		public function setOperationResult( $result ) {
+			$this->data['operationResult'] = $result;
+		}
+
 		public function setCompleted( string|bool $completed ) {
 			if ( is_string($completed) ) {
 				$completed = $completed==='false' ? false : $completed=='true';
@@ -221,6 +231,10 @@
 		public function getStartedOperation() {
 			return $this->data['startedOperation'];
 		}
+		public function getOperationResult() {
+			return $this->data['operationResult'];
+		}
+
 		public function getCompleted() {
 			return $this->data['completed'];
 		}
@@ -320,7 +334,7 @@
 
 			if ( is_string($credentialsFileName) && !empty($credentialsFileName) ) {
 				try {
-					$credentials = \Utils\Files::readFile([$WORKSPACE_CREDENTIALS_DIR, $credentialsFileName]);
+					$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $credentialsFileName]);
 					if (!empty($credentials)) {
 						return $credentials;
 					}
@@ -362,7 +376,7 @@
 
 
 
-		public static function getDefaultCredentialsFile() {
+		public static function getDefaultCredentialsFileName() {
 			global $CREDENTIALS_FILE_DEFAULT;
 			return $CREDENTIALS_FILE_DEFAULT;
 		}
@@ -426,7 +440,7 @@
 			$parameterUser = ( $parameterUserPresent ? ( !(empty($parameters['platform']) || empty($parameters['username']) || empty($parameters['password']) ) ) : false );
 			$parameterSettingPresent = array_key_exists('useDefaultCredentials', $parameters);
 			$parameterSetting = ( $parameterSettingPresent ? ($parameters['useDefaultCredentials'] != false && $parameters['useDefaultCredentials'] != 'false') : false );
-			$defaultFileExists = ( !is_null(self::loadCredentials(self::getDefaultCredentialsFile())) );
+			$defaultFileExists = ( !is_null(self::loadCredentials(self::getDefaultCredentialsFileName())) );
 
 			if ( $parameterUserPresent && $parameterUser ) {
 				$useDefaultCredentials = false;
@@ -444,7 +458,7 @@
 				}
 			}
 			if ( $useDefaultCredentials ) {
-				return self::getDefaultCredentialsFile();
+				return self::getDefaultCredentialsFileName();
 			}
 			return self::generateCredentialsFile($taskName, $parameters['platform'],$parameters['username'],$parameters['password']);
 		}
