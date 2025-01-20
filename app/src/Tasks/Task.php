@@ -488,7 +488,9 @@
 
 			if ( $parameterUserPresent && $parameterUser ) {
 				$useDefaultCredentials = false;
-			} else if ( $defaultFileExists ) {
+			} else if ( $defaultFileExists && (!$parameterSettingPresent) ) {
+				$useDefaultCredentials = true;
+			} else if ( $defaultFileExists && $parameterSettingPresent && $parameterSetting ) {
 				$useDefaultCredentials = true;
 			} else {
 				if ( $parameterSettingPresent ) {
