@@ -83,13 +83,17 @@
 			$currentOperation = $task->getCurrentOperation();
 			$startedOperation = $task->getStartedOperation();
 			if ($currentOperation == $startedOperation) {
-				if ( $operation::checkOperationComplete($task, false) ) {
-					log_message(get_text('The current operation %s has completed, switching to next operation',[$currentOperation]));
-					$task->setToNextOperation();
-					$task->save();
-				}
-				if ( $task->getCompleted() ) {
-					log_message(get_text('The task has reached completion'));
+				try {
+					if ( $operation::checkOperationComplete($task, false) ) {
+						log_message(get_text('The current operation %s has completed, switching to next operation',[$currentOperation]));
+						$task->setToNextOperation();
+						$task->save();
+					}
+					if ( $task->getCompleted() ) {
+						log_message(get_text('The task has reached completion'));
+					}
+				} catch (\Throwable $e) {
+					$this->handleOperationException($task, $operation, $e);
 				}
 			}
 		}
@@ -107,12 +111,22 @@
 			$task->setStartedOperation($currentOperation);
 			$task->save();
 			log_message(get_text('The current operation is %s, and is now starting',[$currentOperation]));
-			$result = $operation::run($task);
-			if ( isset($result) ) {
-				$task->setOperationResult($result);
-				$task->save();
+			try {
+				$result = $operation::run($task);
+				if ( isset($result) ) {
+					$task->setOperationResult($result);
+					$task->save();
+				}
+			} catch (\Throwable $e) {
+				$this->handleOperationException($task, $operation, $e);
 			}
 			return true;
+		}
+
+		protected function handleOperationException( $task, $operation, $exception ) {
+				$task->setError($exception);
+				$task->startCleanup();
+				$task->save();
 		}
 	}
 

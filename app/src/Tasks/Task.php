@@ -28,6 +28,7 @@
 				'completed'=>false,
 
 				'output'=>[],
+				'error'=>null,
 				'log'=>[],
 			];
 
@@ -87,6 +88,9 @@
 					case 'output':
 						$this->setOutput($value);
 						break;
+					case 'error':
+						$this->setError($value);
+						break;
 
 					case 'log':
 						$this->setLog($value);
@@ -135,6 +139,16 @@
 			}
 			$this->setCurrentOperation($this->getOperations()[$operationIndex]);
 		}
+		public function startCleanup() {
+			if ( count($this->getCleanupOperations()) > 0 ) {
+				$operationIndex = array_search($this->getCurrentOperation(), $this->getCleanupOperations());
+				if ($operationIndex===false) {
+					$this->setCurrentOperation($this->getCleanupOperations()[0]);
+				}
+			} else {
+				throw new \Exception('No cleanup operations defined');
+			}
+		}
 		public function setCurrentOperation( string $operation ) {
 			$this->data['currentOperation'] = $operation;
 			$this->setOperationResult(null);
@@ -157,6 +171,25 @@
 				$this->data['output'] = array_merge($this->data['output'], $key);
 			} else if ( is_string($key) ) {
 				$this->data['output'][$key] = $value;
+			}
+		}
+		public function setError( \Throwable|array|string|null $e ) {
+			if ( is_null($e) ) {
+				$this->data['error'] = null;
+			}else if ( is_array($e) ) {
+				$this->data['error'] = $e;
+			} else if ( is_string($e) ) {
+				$this->data['error'] = [
+					'message'=>$e,
+					'file'=>'',
+					'line'=>''
+				];
+			} else {
+				$this->data['error'] = [
+					'message'=>$e->getMessage(),
+					'file'=>$e->getFile(),
+					'line'=>$e->getLine()
+				];
 			}
 		}
 		public function setLog( string|array $value ) {
@@ -212,7 +245,7 @@
 		public function getTaskOperations() {
 			return $this->data['taskOperations'];
 		}
-		public function getcleanupOperations() {
+		public function getCleanupOperations() {
 			return $this->data['cleanupOperations'];
 		}
 		public function getFirstOperation() {
@@ -247,6 +280,9 @@
 			}
 			return $this->data['output'][$key];
 		}
+		public function getError() {
+			return $this->data['error'];
+		}
 		public function getLog() {
 			return $this->data['log'];
 		}
@@ -278,7 +314,7 @@
 		public function deleteCredentials() {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
-			if ( $this->getCredentialsFileName() == $this->getDefaultCredentialsFile() ) {
+			if ( $this->getCredentialsFileName() == $this->getDefaultCredentialsFileName() ) {
 				$this->log('Will not delete default credentials file. Only remove reference.');
 			} else {
 				$file = $this->getCredentialsFileName();
