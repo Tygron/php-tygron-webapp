@@ -107,6 +107,9 @@
 			return $this->result;
 		}
 
+		public function getResponseIsSuccess() {
+			return $this->statusCode>=200 && $this->statusCode<300;
+		}
 
 
 		public function run() {
