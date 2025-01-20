@@ -4,6 +4,7 @@ docker-compose-override.yaml
 
 /credentials/*
 /workspace/*
+/html/*
 !/cron/*
 
 !sample-*

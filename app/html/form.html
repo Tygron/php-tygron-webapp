@@ -1,0 +1,69 @@
+<html>
+
+<head>
+<style>
+	body {
+		margin: 0px;
+		padding: 1em 1em;
+	}
+	img.logo {
+		max-height:100px;
+	}
+	form div label span {
+		display: inline-block;
+		width: 15em;
+	}
+	div.logos {
+		width: 100%;
+	}
+	div.logosBottom {
+		position: absolute;
+		bottom: 1em;
+	}
+</style>
+</head>
+
+<body>
+
+<div class='logos logosTop'>
+	<img class='logo' src='https://urbansync.nl/wp-content/uploads/2020/08/urban_sync_logo.svg'>
+	<hr>
+</div>
+
+
+	<form method='POST' action=''>
+
+	<div style='display:none;'><label><span>Action:</span><input name='action' value='CreateTask' /></label></div>
+	<!--div><label><span>Name:</span><input name='name' value='Task' /></label></div-->
+	<!--div><label><span>Template:</span><input name='template' value='demo_heat_stress' /></label></div-->
+
+	<!--div><hr></div-->
+
+	<div><label><span>Location:</span><input name='locationX' value='479967'/><input name='locationY' value='6814662' /></label></div>
+	<div><label><span>Size:</span><input name='sizeX' value='500'/><input name='sizeY' value='500' /></label></div>
+
+	<div><hr></div>
+
+	<div><label><span>Platform:</span><input name='platform' value='engine' /></label></div>
+	<div><label><span>Username:</span><input name='username' value='' /></label></div>
+	<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+
+	<div><hr></div>
+
+	<!--div><label><span>Task Operations:</span><input name='taskOperations' value='["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"]' /></label></div-->
+	<!--div><label><span>Cleanup Operations:</span><input name='cleanupOperations' value='["DeleteCredentialsFile","DeleteTaskFile"]' /></label></div-->
+	<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
+
+
+
+	</form>
+
+<div class='logos logosBottom'>
+	<hr>
+	<p>Powered by: </p>
+	<img class='logo' src='https://www.tygron.com/wp-content/uploads/2023/02/Tygron_logo.gif'>
+</div>
+
+</body>
+
+</html>

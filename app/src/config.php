@@ -1,9 +1,13 @@
 <?php
 
 	$CONFIG_OVERRIDE_FILE = implode(DIRECTORY_SEPARATOR,[__DIR__,'..','config','config.php']);
+
+
 	if (file_exists($CONFIG_OVERRIDE_FILE)) {
 		include_once($CONFIG_OVERRIDE_FILE);
 	}
+
+
 
 	//Some of the variables below can be overwritten, others should not.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
@@ -12,6 +16,8 @@
 	$WORKSPACE_TASK_DIR =				implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
 	$WORKSPACE_CREDENTIALS_DIR = 			implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'credentials']);
 
+	$HTML_DIR = $HTML_DIR			??	implode(DIRECTORY_SEPARATOR, [__DIR__, '..','html']);
+
 	$CREDENTIALS_FILE_DEFAULT = $CREDENTIALS_FILE_DEFAULT ?? 'credentials-default.json';
 	$LANGUAGE_DEFAULT = $DEFAULT_LANGUAGE 	?? 	'EN';
 
@@ -19,4 +25,6 @@
 
 	$SAFE_CHARACTERS = $SAFE_CHARACTER 	?? 	'[a-zA-Z0-9\-_]';
 	$DEFAULT_ACTION = $DEFAULT_ACTION 	?? 	'CreateTaskForm';
+
+
 ?>
