@@ -1,5 +1,7 @@
 docker-compose-override.yaml
 
+/app/config/*
+
 /credentials/*
 /workspace/*
 !/cron/*
