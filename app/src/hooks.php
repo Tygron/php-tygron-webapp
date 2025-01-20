@@ -7,7 +7,7 @@
 	}
 
 	if ( !empty($AUTHENTICATION_TOKEN) && $authenticationToken != $AUTHENTICATION_TOKEN ) {
-		echo \Utils\Files::readFile([__DIR__,'..','login.html']);
+		echo get_html('login.html');
 		exit();
 	}
 
