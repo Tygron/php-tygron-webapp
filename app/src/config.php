@@ -29,26 +29,28 @@
 		'AuthenticationToken',
 	];
 
-	//When an action is performed, these parameters are injected based on the submission of other values.
-	$ACTION_PARAMETERS_INJECTION ??= [];
-	$ACTION_PARAMETERS_INJECTION['CreateTask'] ??= [];
-	$ACTION_PARAMETERS_INJECTION['CreateTask']['size'] ??= [
-			'small'	=> [
-					'name'			=>      'small',
-					'size'			=>	[1000,1000],
-				],
-			'large'	=> [
-					'name'			=>      'large',
-					'size'			=>	[2500,2500],
-				],
-		];
-
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ACTION_PARAMETERS_FIXED ??= [];
 	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [
-			'name'			=>	'task',
-			'template'		=>	'demo_heat_stress',
-			'taskOperations'	=>	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"],
-			'cleanupOperations'	=>	["DeleteCredentialsFile","DeleteTaskFile"],
-		];
+		'name'			=>	'task',
+		'template'		=>	'demo_heat_stress',
+		'taskOperations'	=>	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"],
+		'cleanupOperations'	=>	["DeleteCredentialsFile","DeleteTaskFile"],
+	];
+
+	//When an action is performed, these parameters are injected based on the submission of other values.
+	$ACTION_PARAMETERS_INJECTION ??= [
+		'CreateTask' => [
+			'size' => [ //If a "size" parameter is sent...
+				'small'	=> [ // And the value of "size" is "small"...
+					'name'			=>      'small',
+					'size'			=>	[1000,1000],
+				],
+				'large'	=> [ // And the value of "size" is "large"...
+					'name'			=>      'large',
+					'size'			=>	[2500,2500],
+				],
+			],
+		],
+	];
 ?>
