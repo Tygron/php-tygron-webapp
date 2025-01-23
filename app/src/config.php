@@ -24,6 +24,11 @@
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
 
+	//Hooks are run upon each request, and allow for authentication checks, parameter translations, request logging, etc
+	$HOOKS ??= [
+		'AuthenticationToken',
+	];
+
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ACTION_PARAMETERS_FIXED ??= [];
 	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [
