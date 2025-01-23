@@ -27,4 +27,17 @@
 	$ACTION_PARAMETERS_DEFAULT['CreateTask'] ??= [];
 	$ACTION_PARAMETERS_DEFAULT['CreateTask']['platform'] = 'engine';
 
+	//When an action is performed, and one of these parameters has a specified value, the parameters provided are injected (overwriting fixed where applicable).
+	$ACTION_PARAMETERS_INJECTION ??= [];
+	$ACTION_PARAMETERS_INJECTION['CreateTask'] ??= [];
+	$ACTION_PARAMETERS_INJECTION['CreateTask']['size'] ??= [
+		'small' => [
+			'name'                  =>      'small',
+			'size'                  =>      [1000,1000],
+		],
+		'large' => [
+			'name'                  =>      'large',
+			'size'                  =>      [2500,2500],
+		],
+	];
 ?>
