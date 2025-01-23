@@ -36,7 +36,7 @@
 						try {
 							$credentials = $parameters['credentials']??null;
 							$credentials ??= self::normalizeCredentials(
-									$parameters['useDefaultParameters']??null,
+									$parameters['useDefaultCredentials']??null,
 									$parameters['username']??null,
 									$parameters['password']??null,
 									$parameters['platform']??null
