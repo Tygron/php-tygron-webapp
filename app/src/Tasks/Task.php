@@ -36,6 +36,7 @@
 		public function __construct( $parameters ) {
 			$this->data = self::$DEFAULT_DATA;
 			$this->setData($parameters);
+			$this->validate();
 		}
 
 		public function setData( array $parameters ) {
@@ -108,6 +109,9 @@
 		}
 		public function setCredentialsFile( string $credentialsFile ) {
 			$this->data['credentialsFile'] = $credentialsFile;
+		}
+		public function setCredentials( array|null $credentials ) {
+			$this->data['credentials'] = $credentials;
 		}
 		public function setTemplateName( string $templateName ) {
 			$this->data['templateName'] = $templateName;
@@ -226,6 +230,13 @@
 		public function getCredentialsFileName() {
 			return $this->data['credentialsFile'];
 		}
+		public function getCredentials() {
+			$taskDataCredentials = $this->data['credentials'] ?? null;
+			if (!empty($taskDataCredentials)) {
+				return $taskDataCredentials;
+			}
+			return \Tasks\TaskCredentials::loadCredentialsFile($this->getCredentialsFileName());
+		}
 		public function getTemplateName() {
 			return $this->data['templateName'];
 		}
@@ -287,10 +298,32 @@
 			return $this->data['log'];
 		}
 
+		public function validate() {
+
+		}
 
 
+
+		private static function generateTaskFileName(string $taskName) {
+			if (str_ends_with($taskName, self::$TASKFILE_POSTFIX)) {
+				return $taskName;
+			}
+			return $taskName.self::$TASKFILE_POSTFIX;
+		}
+
+
+		public static function load( string $taskName ) {
+			global $WORKSPACE_TASK_DIR;
+
+			$fileName = self::generateTaskFileName($taskName);
+			$taskData = \Utils\Files::readJsonFile([$WORKSPACE_TASK_DIR,$fileName]);
+			$task = new Task($taskData);
+			return $task;
+		}
 		public function save() {
 			global $WORKSPACE_TASK_DIR;
+
+			$this->saveCredentials();
 
 			\Utils\Files::writeJsonFile([$WORKSPACE_TASK_DIR, $this->getTaskFileName()], $this->getData());
 		}
@@ -310,50 +343,6 @@
 			}
 			return true;
 		}
-
-		public function deleteCredentials() {
-			global $WORKSPACE_CREDENTIALS_DIR;
-
-			if ( $this->getCredentialsFileName() == $this->getDefaultCredentialsFileName() ) {
-				$this->log('Will not delete default credentials file. Only remove reference.');
-			} else {
-				$file = $this->getCredentialsFileName();
-				try {
-					\Utils\Files::deleteFile($file, $WORKSPACE_CREDENTIALS_DIR);
-				} catch (\Throwable $e) {
-					$this->log('Could not delete '.$file.': '.$e->getMessage());
-				}
-			}
-			$this->setCredentialsFile('');
-		}
-
-		public static function generateTask($parameters) {
-			$task = new Task([]);
-			$task->setTaskName( 		self::generateTaskNameFromParameters($parameters) );
-			$task->setTemplateName( 	self::generateTemplateNameFromParameters($parameters) );
-			$task->setPlatform(		$parameters['platform'] ?? 'engine');
-			$task->setLocation(		self::generateLocationFromParameters($parameters) );
-			$task->setSize( 		self::generateSizeFromParameters($parameters) );
-
-			$task->setTaskOperations(	self::generateTaskOperationsFromParameters($parameters) );
-			$task->setCleanupOperations(	self::generateCleanupOperationsFromParameters($parameters) );
-
-			$task->setCredentialsFile(	self::generateCredentialsFileFromParameters($task->getTaskName(), $parameters) );
-
-			$task->save();
-			return $task;
-		}
-
-
-		public static function load( string $taskName ) {
-			global $WORKSPACE_TASK_DIR;
-
-			$fileName = self::generateTaskFileName($taskName);
-			$taskData = \Utils\Files::readJsonFile([$WORKSPACE_TASK_DIR,$fileName]);
-			$task = new Task($taskData);
-			return $task;
-		}
-
 		public static function list() {
 			global $WORKSPACE_TASK_DIR;
 			$tasksDir = $WORKSPACE_TASK_DIR;
@@ -365,178 +354,42 @@
 			return $taskNames;
 		}
 
-		public static function loadCredentials( string $credentialsFileName = null ) {
+		public function saveCredentials() {
+			if ( empty($this->getCredentialsFileName()) && (!empty($this->getCredentials())) ) {
+				$credentials = $this->getCredentials();
+				$credentialsFile = \Tasks\TaskCredentials::credentialsToFile(
+						$this->getTaskName(),
+						$this->getCredentials()['useDefaultCredentials']??false,
+						$this->getCredentials()['platform']??null,
+						$this->getCredentials()['username']??null,
+						$this->getCredentials()['password']??null
+					);
+
+				$this->setCredentialsFile($credentialsFile);
+				$this->setCredentials(null);
+			}
+		}
+
+		public function deleteCredentials() {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
-			if ( is_string($credentialsFileName) && !empty($credentialsFileName) ) {
-				try {
-					$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $credentialsFileName]);
-					if (!empty($credentials)) {
-						return $credentials;
-					}
-				} catch (\Throwable $e) {
-				}
-			}
-			return null;
-		}
 
-
-
-
-		public static function cleanParameters( array $parameters ) {
-			$cleanedParameters = [];
-			foreach( $parameters as $key=> $value ) {
-				switch($key) {
-					case 'username':
-						$cleanedParameters[$key] = clean_user_input($value, '[\.\-_@+a-zA-Z0-9]');
-						break;
-					case 'locationX':
-					case 'locationY':
-						$cleanedParameters[$key] = (float) clean_user_input($value, '[0-9\-\.]');
-						break;
-					case 'sizeX':
-					case 'sizeY':
-						$cleanedParameters[$key] = (int) clean_user_input($value, '[0-9]');
-						break;
-					case 'operations':
-					case 'taskOperations':
-					case 'cleanupOperations':
-						if ( is_array($value) ) {
-							$cleanedParameters[$key] = $value;
-						} else {
-							$cleanedParameters[$key] = get_clean_user_input($key, '[\[\]\,\.\-"_a-zA-Z0-9]');
-							if ( is_null($cleanedParameters[$key]) ) {
-								$cleanedParameters[$key] = $value;
-							}
-						}
-						break;
-					default:
-						$cleanedParameters[$key] = clean_user_input($value);
-				}
-			}
-
-			return $cleanedParameters;
-		}
-
-
-
-		public static function getDefaultCredentialsFileName() {
-			global $CREDENTIALS_FILE_DEFAULT;
-			return $CREDENTIALS_FILE_DEFAULT;
-		}
-
-
-
-		private static function generateTaskFileName(string $taskName) {
-			if (str_ends_with($taskName, self::$TASKFILE_POSTFIX)) {
-				return $taskName;
-			}
-			return $taskName.self::$TASKFILE_POSTFIX;
-		}
-		private static function generateCredentialsFileName(string $taskName) {
-			if (str_ends_with($taskName, self::$CREDENTIALSFILE_POSTFIX)) {
-				return $taskName;
-			}
-			return $taskName.self::$CREDENTIALSFILE_POSTFIX;
-		}
-
-
-
-		private static function generateTaskNameFromParameters($parameters) {
-			return self::generateTaskName($parameters['name']);
-		}
-		private static function generateTaskName(string $providedName = null) {
-			$name = \Utils\Strings::dateTimeString();
-			if ( !is_null($providedName) ) {
-				return $name.'-'.$providedName;
-			}
-			return $name;
-		}
-
-		private static function generateTemplateNameFromParameters($parameters) {
-			return self::generateTemplateName($parameters['template']);
-		}
-		private static function generateTemplateName(string $template) {
-			return $template;
-		}
-
-		private static function generatePlatformFromParameters($parameters) {
-			return $parameters['platform'] ?? 'engine';
-		}
-		private static function generateLocationFromParameters($parameters) {
-			return self::generateLocation( $parameters['locationX'], $parameters['locationY'] );
-		}
-		private static function generateLocation($x, $y) {
-			return [$x, $y];
-		}
-
-		private static function generateSizeFromParameters($parameters) {
-			return self::generateSize( $parameters['sizeX'], $parameters['sizeY'] );
-		}
-		private static function generateSize(int $width, int $height) {
-			return [$width, $height];
-		}
-
-		private static function generateCredentialsFileFromParameters($taskName, $parameters) {
-			$useDefaultCredentials = true;
-
-			$parameterUserPresent = ( array_key_exists('platform', $parameters) && array_key_exists('username', $parameters) && array_key_exists('password', $parameters) );
-			$parameterUser = ( $parameterUserPresent ? ( !(empty($parameters['platform']) || empty($parameters['username']) || empty($parameters['password']) ) ) : false );
-			$parameterSettingPresent = array_key_exists('useDefaultCredentials', $parameters);
-			$parameterSetting = ( $parameterSettingPresent ? ($parameters['useDefaultCredentials'] != false && $parameters['useDefaultCredentials'] != 'false') : false );
-			$defaultFileExists = ( !is_null(self::loadCredentials(self::getDefaultCredentialsFileName())) );
-
-			if ( $parameterUserPresent && $parameterUser ) {
-				$useDefaultCredentials = false;
-			} else if ( $defaultFileExists && (!$parameterSettingPresent) ) {
-				$useDefaultCredentials = true;
-			} else if ( $defaultFileExists && $parameterSettingPresent && $parameterSetting ) {
-				$useDefaultCredentials = true;
+			if ( \Tasks\TaskCredentials::isDefaultCredentialsFile($this->getCredentialsFileName()) ) {
+				$this->log('Will not delete default credentials file. Only remove reference.');
 			} else {
-				if ( $parameterSettingPresent ) {
-					if ( $parameterSetting ) {
-						throw new \Exception('No default credentials available');
-					} else {
-						throw new \Exception('Credentials required: username, password, platform');
-					}
-				} else {
-					throw new \Exception('Credentials required: username, password, platform');
+
+				try {
+					$fileName = $this->getCredentialsFileName();
+					\Tasks\TaskCredentials::deleteCredentialsFile( $fileName );
+				} catch ( \Throwable $e ) {
+					$this->log('Could not delete '.$fileName);
+					throw $e;
 				}
-			}
-			if ( $useDefaultCredentials ) {
-				return self::getDefaultCredentialsFileName();
-			}
-			return self::generateCredentialsFile($taskName, $parameters['platform'],$parameters['username'],$parameters['password']);
-		}
-		private static function generateCredentialsFile(string $taskName, string $platform, string $username, string $password) {
-			global $WORKSPACE_CREDENTIALS_DIR;
 
-			$fileName = self::generateCredentialsFileName($taskName);
-			\Utils\Files::WriteJsonFile([$WORKSPACE_CREDENTIALS_DIR, self::generateCredentialsFileName($taskName)], [
-					'platform' => $platform,
-					'username' => $username,
-					'password' => $password,
-					'created' => \Utils\Strings::dateTimeString(),
-				]);
-			return $fileName;
+			}
+			$this->setCredentialsFile('');
 		}
 
-		private static function generateTaskOperationsFromParameters($parameters) {
-			return self::generateOperations($parameters['taskOperations']);
-		}
-		private static function generatecleanupOperationsFromParameters($parameters) {
-			return self::generateOperations($parameters['cleanupOperations']);
-		}
 
-		private static function generateOperations(string|array $operations) {
-			if (is_string($operations) && str_starts_with($operations, '[') ) {
-				$operations = json_decode($operations);
-				return $operations;
-			}
-			if (is_array($operations)) {
-				return $operations;
-			}
-			return [$operations];
-		}
 	}
 ?>

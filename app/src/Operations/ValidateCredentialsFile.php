@@ -12,11 +12,11 @@
 			global $WORKSPACE_CREDENTIALS_DIR;
 
 			$credentialsFileName = $task->getCredentialsFileName();
-			if ($credentialsFileName == $task->getDefaultCredentialsFileName()) {
+			if ( \Tasks\TaskCredentials::isDefaultCredentialsFile($credentialsFileName) ) {
 				return true;
 			}
 
-			$credentials = \Tasks\Task::loadCredentials($credentialsFileName);
+			$credentials = $task->getCredentials();
 			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/user/get_my_login_key', [])->run();
 			if ( !$curlTask->getResponseIsSuccess() ) {
 				throw new \Exception('Credentials were invalid');

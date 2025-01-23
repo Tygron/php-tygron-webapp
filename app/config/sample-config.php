@@ -20,8 +20,8 @@
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [];
 	$ACTION_PARAMETERS_FIXED['CreateTask']['template'] = 'demo_heat_stress';
-	$ACTION_PARAMETERS_FIXED['CreateTask']['taskOperations'] = '["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"]';
-	$ACTION_PARAMETERS_FIXED['CreateTask']['cleanupOperations'] = '["DeleteCredentialsFile","DeleteTaskFile"]';
+	$ACTION_PARAMETERS_FIXED['CreateTask']['taskOperations'] = ["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"];
+	$ACTION_PARAMETERS_FIXED['CreateTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
 
 	//When an action is performed, the parameters defined here are offered as defaults and available for change.
 	$ACTION_PARAMETERS_DEFAULT['CreateTask'] ??= [];
