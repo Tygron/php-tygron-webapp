@@ -23,11 +23,7 @@
 		throw new Exception( get_text('Could not load action %s',[$action]), previous:$e);
 	}
 
-	echo $actionObject->startAction($_INPUTS);
+	echo $actionObject->startAction($_INPUTS_CLEANED);
 
-
-	// Get provided parameters
-	// Validate provided parameters
-	// Create task file
 
 ?>
