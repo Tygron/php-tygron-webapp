@@ -5,15 +5,6 @@
 	class CreateTask extends AbstractAction {
 
 		public function run( array $parameters = null ) {
-			global $ACTION_PARAMETERS_DEFAULT, $ACTION_PARAMETERS_FIXED;
-			echo '<pre>';
-
-			$parameters = array_merge($parameters, $this->getInputsWithSpecialCharacters() );
-			var_dump($parameters);
-
-			$parameters = $this->mergeParametersForTask( $parameters );
-
-
 			try {
 				$task = \Tasks\TaskGenerator::generate($parameters);
 			} catch ( \Throwable $e ) {
@@ -22,13 +13,9 @@
 				throw $e;
 				return $message;
 			}
-			var_dump($task);
 
 			$task->save();
 
-			var_dump($task);
-
-			return $task->getTaskName();
 			return get_text('<meta http-equiv="refresh" content="0; url=/?action=OutputFromTask&task=%s" />',[$task->getTaskName()]);
 		}
 
@@ -43,6 +30,7 @@
 
 		protected function mergeParametersForTask( array $parameters ) {
 			$flatMerge = []
+					+ \Tasks\TaskGenerator::normalizeParameters($this->getInjectedParameters())
 					+ \Tasks\TaskGenerator::normalizeParameters($this->getFixedParameters())
 					+ \Tasks\TaskGenerator::normalizeParameters($parameters)
 					+ \Tasks\TaskGenerator::normalizeParameters($this->getDefaultParameters())

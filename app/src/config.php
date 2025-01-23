@@ -29,6 +29,20 @@
 		'AuthenticationToken',
 	];
 
+	//When an action is performed, these parameters are injected based on the submission of other values.
+	$ACTION_PARAMETERS_INJECTION ??= [];
+	$ACTION_PARAMETERS_INJECTION['CreateTask'] ??= [];
+	$ACTION_PARAMETERS_INJECTION['CreateTask']['size'] ??= [
+			'small'	=> [
+					'name'			=>      'small',
+					'size'			=>	[1000,1000],
+				],
+			'large'	=> [
+					'name'			=>      'large',
+					'size'			=>	[2500,2500],
+				],
+		];
+
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ACTION_PARAMETERS_FIXED ??= [];
 	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [
