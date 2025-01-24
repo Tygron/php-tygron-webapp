@@ -30,21 +30,21 @@
 
 		protected function getDefaultParameters() {
 			global $ACTION_PARAMETERS_DEFAULT;
-			if ( array_key_exists($this->name(), $ACTION_PARAMETERS_DEFAULT ) ) {
+			if ( array_key_exists($this->name(), $ACTION_PARAMETERS_DEFAULT ?? [] ) ) {
 				return $ACTION_PARAMETERS_DEFAULT[$this->name()];
 			}
 			return [];
 		}
 		protected function getFixedParameters() {
 			global $ACTION_PARAMETERS_FIXED;
-			if ( array_key_exists($this->name(), $ACTION_PARAMETERS_FIXED ) ) {
+			if ( array_key_exists($this->name(), $ACTION_PARAMETERS_FIXED ?? [] ) ) {
 				return $ACTION_PARAMETERS_FIXED[$this->name()];
 			}
 			return [];
 		}
 		protected function getInjectedParameters() {
 			global $ACTION_PARAMETERS_INJECTION;
-			if ( !array_key_exists($this->name(), $ACTION_PARAMETERS_INJECTION ) ) {
+			if ( !array_key_exists($this->name(), $ACTION_PARAMETERS_INJECTION ?? [] ) ) {
 				return [];
 			}
 			$injectionRules = $ACTION_PARAMETERS_INJECTION[$this->name()];

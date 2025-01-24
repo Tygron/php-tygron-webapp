@@ -1,19 +1,27 @@
 <?php
 
-	$CONFIG_OVERRIDE_FILE = implode(DIRECTORY_SEPARATOR,[__DIR__,'..','config','config.php']);
+	$APP_DIR		=	implode(DIRECTORY_SEPARATOR,	[__DIR__,	'..']);
+	$CUSTOM_DIR		=	implode(DIRECTORY_SEPARATOR,    [$APP_DIR,	'..','custom']);
+
+	$CONFIG_OVERRIDE_FILE	=	implode(DIRECTORY_SEPARATOR,	[$CUSTOM_DIR,'config','config.php']);
 
 	if (file_exists($CONFIG_OVERRIDE_FILE)) {
 		include_once($CONFIG_OVERRIDE_FILE);
+		include_once($CONFIG_OVERRIDE_FILE); // In case location changed
 	}
+
+	$APP_HTML_DIR 		=	implode(DIRECTORY_SEPARATOR,	[$APP_DIR, 	'resources', 'html'] );
 
 	//Some of the variables below can be overwritten, others should not.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
+
+
+	$CUSTOM_HTML_DIR	??=	implode(DIRECTORY_SEPARATOR,	[$CUSTOM_DIR, 	'html'] );
 
 	$WORKSPACE_DIR 			??=	implode(DIRECTORY_SEPARATOR, ['','var','workspace']);
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
 	$WORKSPACE_CREDENTIALS_DIR 	??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'credentials']);
 
-	$HTML_DIR 			??=	implode(DIRECTORY_SEPARATOR, [__DIR__, '..','html']);
 
 	$CREDENTIALS_FILE_DEFAULT 	??=	'credentials-default.json';
 	$LANGUAGE_DEFAULT 		??=	'EN';

@@ -1,11 +1,10 @@
 docker-compose-override.yaml
 
-/app/config/*
-/app/html/*
+/app/custom/*
 
-/credentials/*
-/workspace/*
-!/cron/*
+/workspace/credentials/*
+/workspace/tasks/*
+/workspace/last-modified
 
 !sample-*
 !.gitkeep
