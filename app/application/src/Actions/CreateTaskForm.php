@@ -5,8 +5,7 @@
 	class CreateTaskForm extends AbstractAction {
 
 		public function run( array $parameters = null ) {
-
-			return \get_html('form.html');
+			return \Rendering\Renderer::getRendered('form.html');
 		}
 	}
 

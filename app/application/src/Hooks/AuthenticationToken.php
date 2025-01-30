@@ -13,8 +13,8 @@
 				setcookie('authenticationToken', $authenticationToken);
 			}
 
-			if (!empty($AUTHENTICATION_TOKEN && $authenticationToken != $AUTHENTICATION_TOKEN)) {
-				echo get_html('login.html');
+			if ( !empty($AUTHENTICATION_TOKEN && $authenticationToken != $AUTHENTICATION_TOKEN)) {
+				echo \Rendering\Renderer::getRendered('login.html');
 				exit();
 			}
 		}

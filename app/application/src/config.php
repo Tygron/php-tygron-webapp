@@ -16,7 +16,7 @@
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
 
 
-	$CUSTOM_HTML_DIR	??=	implode(DIRECTORY_SEPARATOR,	[$CUSTOM_DIR, 	'html'] );
+	$CUSTOM_HTML_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'html'] );
 
 	$WORKSPACE_DIR 			??=	implode(DIRECTORY_SEPARATOR, ['','var','workspace']);
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
