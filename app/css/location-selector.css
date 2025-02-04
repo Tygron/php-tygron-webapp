@@ -1,0 +1,79 @@
+
+.coverElement {
+	position:	absolute;
+	top:		0px;
+	bottom:		0px;
+	left: 		0px;
+	right:		0px;
+
+	width:		100%;
+	height:		100%;
+
+	background-color:	rgba(0, 0, 0, 0.25);
+}
+
+.locationSelector {
+	position:	absolute;
+	top:		2em;
+	bottom: 	2em;
+	left:		2em;
+	right:		2em;
+
+	background-color:	white;
+}
+
+.locationSelector .elementsContainer {
+	position:	absolute;
+	top:		1em;
+	bottom:		1em;
+	left:		1em;
+	right:		1em;
+	
+	display:	flex;
+	flex-direction:	column;
+	align-items:	stretch;
+}
+
+.locationSelector .elementsContainer > div {
+	margin-bottom: 1em;
+}
+.locationSelector .elementsContainer > div:last-child {
+	margin-bottom: unset;
+}
+
+.locationSelector .leafletContainer {
+	position:	relative;
+	width:		100%;
+	height:		10em;
+	
+	flex-grow:	1; 
+	
+	background-color:	beige;
+}
+.locationSelector .leafletMap {
+	width:100%;
+	height:100%;
+}
+
+.locationSelector .buttonsContainer {
+	width: 		100%;
+	height:		fit-content;
+
+	display:	flex;
+	flex-direction:	row;
+	justify-content:space-between;
+
+	background-color: 	lightblue;
+}
+.locationSelector .buttonsContainer .containerLeft,
+.locationSelector .buttonsContainer .containerRight {
+	display:	flex;
+	flex-direction:	row;
+	align-items: 	flex-end
+}
+.locationSelector .buttonsContainer .containerLocation,
+.locationSelector .buttonsContainer .containerSize {
+	display:	flex;
+	flex-direction:	column;
+	align-items:	flex-end;
+}

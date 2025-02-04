@@ -1,29 +1,49 @@
 <html>
 
 <head>
-<style>
-	body {
-		margin: 0px;
-		padding: 1em 1em;
-	}
-	img.logo {
-		max-height:100px;
-	}
-	form div label span {
-		display: inline-block;
-		width: 15em;
-	}
-	div.logos {
-		width: 100%;
-	}
-	div.logosBottom {
-	        position: absolute;
-	        bottom: 1em;
-	        left: 1em;
-	        right: 1em;
-	        width: unset;
-	}
-</style>
+
+	<script src='js/jquery-3.7.1.min.js'></script>
+	<script src='js/location-selector.js'></script>
+
+	<script src='js/leaflet/leaflet-src.js'></script>
+
+
+	<script>
+		var locSelector = null
+		$( function(){ 
+
+				locSelector = new LocationSelector();
+				locSelector.createLocationSelector( 'body', $('#locationSelection') );
+			});
+	</script>
+
+	<link rel='stylesheet' type='text/css' href='css/location-selector.css' />
+	<link rel='stylesheet' type='text/css' href='js/leaflet/leaflet.css' />
+
+	<style>
+		body {
+			margin: 0px;
+			padding: 1em 1em;
+		}
+		img.logo {
+			max-height:100px;
+		}
+		form div label span {
+			display: inline-block;
+			width: 15em;
+		}
+		div.logos {
+			width: 100%;
+		}
+		div.logosBottom {
+		        position: absolute;
+		        bottom: 1em;
+		        left: 1em;
+		        right: 1em;
+		        width: unset;
+		}
+	</style>
+
 </head>
 
 <body>
@@ -41,7 +61,7 @@
 
 	<div><hr></div>
 
-	<div><label><span>Location:</span><input name='locationX' value='479967'/><input name='locationY' value='6814662' /></label></div>
+	<div id='locationSelection'><label><span>Location:</span><input name='locationX' value='479967'/><input name='locationY' value='6814662' /></label></div>
 	<div>
 		<label>
 			<span>Size preset:</span>
