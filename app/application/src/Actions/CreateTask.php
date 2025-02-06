@@ -25,6 +25,12 @@
 			if ( array_key_exists('username', $_INPUTS) ) {
 				$inputs['username'] = get_clean_user_input('username', '[\.\-_@+a-zA-Z0-9]');
 			}
+			if ( array_key_exists('locationX', $_INPUTS) ) {
+				$inputs['locationX'] = get_clean_user_input('locationX', '[\.\-0-9]');
+			}
+			if ( array_key_exists('locationY', $_INPUTS) ) {
+				$inputs['locationY'] = get_clean_user_input('locationY', '[\.\-0-9]');
+			}
 			return $inputs;
 		}
 
