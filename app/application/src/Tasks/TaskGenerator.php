@@ -164,7 +164,7 @@
 			} else if ( is_numeric($sizeX) && is_numeric($sizeY) ) {
 				return [(int)$sizeX, (int)$sizeY];
 			} else if ( is_numeric($size) ) {
-				return [(int)$size), (int)$size];
+				return [(int)$size, (int)$size];
 			}
 
 			if ( !is_numeric($sizeX) || !is_numeric($sizeY) ) {
