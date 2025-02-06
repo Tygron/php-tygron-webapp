@@ -65,7 +65,11 @@
 
 					case 'size':
 						try {
-							$result[$key] = self::generateSizeParameter( $parameters['size']??null,$parameters['sizeX']??null,$parameters['sizeY']??null );
+							$result[$key] = self::generateSizeParameter(
+									$parameters['size']??null,
+									$parameters['sizeX']??null,
+									$parameters['sizeY']??null
+								);
 						} catch ( \Throwable $e ) {
 						}
 						break;
@@ -151,16 +155,20 @@
 			return [(int)$locationX, (int)$locationY];
 		}
 
-
-		public static function generateSizeParameter( array $size=null, string|int $sizeX=null, string|int $sizeY=null ) {
+		public static function generateSizeParameter( array|string|int $size=null, string|int $sizeX=null, string|int $sizeY=null ) {
 			if ( is_array($size) ) {
 				if ( (count($size)==2) && is_numeric($size[0]) && is_numeric($size[1]) ) {
 					return $size;
 				}
-				throw new \Exception(get_text('Size must be an array with 2 numeric values'));
+				throw new \Exception('Size must be an array with 2 numeric values');
+			} else if ( is_numeric($sizeX) && is_numeric($sizeY) ) {
+				return [(int)$sizeX, (int)$sizeY];
+			} else if ( is_numeric($size) ) {
+				return [int($size), int($size)];
 			}
+
 			if ( !is_numeric($sizeX) || !is_numeric($sizeY) ) {
-				throw new \Exception(get_text('SizeX must be numeric, and SizeY must be numeric'));
+				throw new \Exception('Size must be numeric, or SizeX and SizeY must be numeric');
 			}
 			return [(int)$sizeX, (int)$sizeY];
 		}
