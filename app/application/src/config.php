@@ -1,5 +1,6 @@
 <?php
 
+
 	$APP_DIR		=	implode(DIRECTORY_SEPARATOR,	[__DIR__,	'..']);
 	$CUSTOM_DIR		=	implode(DIRECTORY_SEPARATOR,    [$APP_DIR,	'..','custom']);
 
@@ -9,12 +10,11 @@
 		include_once($CONFIG_OVERRIDE_FILE);
 		include_once($CONFIG_OVERRIDE_FILE); // In case location changed
 	}
-
 	$APP_HTML_DIR 		=	implode(DIRECTORY_SEPARATOR,	[$APP_DIR, 	'resources', 'html'] );
+
 
 	//Some of the variables below can be overwritten, others should not.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
-
 
 	$CUSTOM_HTML_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'html'] );
 
@@ -40,23 +40,21 @@
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ACTION_PARAMETERS_FIXED ??= [];
 	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [
-		'name'			=>	'task',
-		'template'		=>	'demo_heat_stress',
 		'taskOperations'	=>	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"],
 		'cleanupOperations'	=>	["DeleteCredentialsFile","DeleteTaskFile"],
 	];
 
 	//When an action is performed, these parameters are injected based on the submission of other values.
 	$ACTION_PARAMETERS_INJECTION ??= [
-		'CreateTask' => [
-			'size' => [ //If a "size" parameter is sent...
-				'small'	=> [ // And the value of "size" is "small"...
-					'name'			=>      'small',
-					'size'			=>	[1000,1000],
+		'CreateTask'	=> [
+			'theme'	=> [ // If a "theme" parameter is sent...
+				'heat' => [ // If "theme" is "heat"
+					'template'	=>	'demo_heat_stress',
+					'name'		=>	'heat',
 				],
-				'large'	=> [ // And the value of "size" is "large"...
-					'name'			=>      'large',
-					'size'			=>	[2500,2500],
+				'green' => [ // If "theme" is "green"
+					'template'	=>	'demo_3-30-300',
+					'name'		=>	'green',
 				],
 			],
 		],

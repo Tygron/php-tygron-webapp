@@ -13,7 +13,8 @@
 		$( function(){ 
 
 				locSelector = new LocationSelector();
-				locSelector.createLocationSelector( 'body', $('#locationSelection') );
+				//locSelector.createLocationSelector( 'body', $('#locationSelection') );
+				locSelector.createLocationSelectorEmbedded( $('#locationSelection') );
 			});
 	</script>
 
@@ -28,10 +29,6 @@
 		img.logo {
 			max-height:100px;
 		}
-		form div label span {
-			display: inline-block;
-			width: 15em;
-		}
 		div.logos {
 			width: 100%;
 		}
@@ -42,60 +39,143 @@
 		        right: 1em;
 		        width: unset;
 		}
+
+		body {
+			margin: 	0px;
+			padding: 	0px;
+		}
+		img.logo {
+			max-height:	100px;
+		}
+		
+		div.applicationContainer {
+			display: flex;
+			flex-direction: column;
+
+			min-height:	100%;
+			width:		100%;
+		}
+		div.applicationContainer div.topBar {
+			min-height:		2em;
+		}
+		div.applicationContainer .mainSection {
+			flex-basis: 1em;
+			flex-grow: 1;
+
+			align-items: stretch;
+
+			display: flex;
+			flex-direction: row;
+
+			margin: 0px;
+		}
+		div.applicationContainer div.topBar,
+		div.applicationContainer div.bottomBar {
+			padding: 0.5em;
+
+			background-color: darkturquoise;
+			color:white;
+		}
+
+		div.applicationContainer .mainSection .settings {
+			flex-basis: 1em;
+			flex-grow: 1;
+
+			display: flex;
+			flex-direction: column;
+			
+			max-width: 25%;
+			min-width: 30em;
+
+			background-color: lightblue;
+		}
+		form div label span {
+			display: inline-block;
+			width: 10em;
+		}
+		div.applicationContainer .mainSection .settings .settingBlock {
+			padding: 1em;
+		}
+		div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
+			flex-basis: 0px;
+			flex-grow: 1;
+		}
+
+
+		div.applicationContainer .mainSection .map {
+			flex-basis: 1em;
+			flex-grow: 1;
+	
+			display: flex;
+		}
 	</style>
 
 </head>
 
 <body>
 
-<div class='logos logosTop'>
-	<hr>
-</div>
-
-
-	<form method='POST' action='index.php'>
-
-	<div><label><span>Action:</span><input name='action' value='CreateTask' /></label></div>
-	<div><label><span>Name:</span><input name='name' value='Task' /></label></div>
-	<div><label><span>Template:</span><input name='template' value='demo_heat_stress' /></label></div>
-
-	<div><hr></div>
-
-	<div id='locationSelection'><label><span>Location:</span><input name='locationX' value='479967'/><input name='locationY' value='6814662' /></label></div>
-	<div>
-		<label>
-			<span>Size preset:</span>
-			<select name='size'>
-				<option value='small'>Small</option>
-				<option value='large'>Large</option>
-				<option value='custom'>Custom</option>
-			</select>
-		</label>
+<div class='applicationContainer'>
+	<div class='topbar'>
+		<h2>
+			Web Application
+		</h2>
 	</div>
-	<div><label><span>Size (only when custom):</span><input name='sizeX' value='500'/><input name='sizeY' value='500' /></label></div>
 
-	<div><hr></div>
+	
+	<form class='mainSection' method='POST' action='index.php'>
+	
+		<div class='settings'>
+			<input type = 'hidden' name='action' value='CreateTask' />
+			
+			<div class='settingBlock'>
+				<h4>Application:</h4>
+				<div><label>
+					<span>Theme:</span>
+					<select name='theme'>
+						<option value='heat' selected>Heat</option>
+						<option value='green'>Green</option>
+					</select>
+				</label></div>
+			</div>
 
-	<div><label><span>useDefaultCredentials:</span><input name='useDefaultCredentials' value='true' /></label></div>
-	<div><label><span>Platform:</span><input name='platform' value='engine' /></label></div>
-	<div><label><span>Username:</span><input name='username' value='' /></label></div>
-	<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+			<div class='settingBlock'>
+				<h4>Credentials:</h4>
+				<div><label>
+					<span>Server:</span>
+					<select name='platform'>
+						<option value='engine' selected>LTS (engine)</option>
+						<option value='power'>LTS (power)</option>
+					</select>
+				</label></div>
+				<div><label><span>Username:</span><input name='username' value='' /></label></div>
+				<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+			</div>
+			<div class='settingBlock stretchBlock'>
+			</div>
+			<div class='settingBlock'>
+				<h4>Submit request:</h4>
+				<div><label><span></span><input name='submit' value='Start' type='submit'/></label></div>
+			</div>
 
-	<div><hr></div>
+		</div>
+		<div id='locationSelection' class='map locationSelection'>
+		</div>
+		</form>
 
-	<div><label><span>Task Operations:</span><input name='taskOperations' value='["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebViewer3DHtml"]' /></label></div>
-	<div><label><span>Cleanup Operations:</span><input name='cleanupOperations' value='["DeleteCredentialsFile","DeleteTaskFile"]' /></label></div>
-	<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
-
-
-
-	</form>
-
-<div class='logos logosBottom'>
-	<hr>
-	<p>Powered by: </p>
-	<img class='logo' src='https://www.tygron.com/wp-content/uploads/2023/02/Tygron_logo.gif'>
+	<div class='bottombar'>
+		<div class='logos'>
+			<p>Powered by: </p>
+			<img class='logo' src='https://www.tygron.com/wp-content/uploads/2023/02/Tygron_logo.gif'>
+		</div>
+	</div>
 </div>
+
+<div style='display:none;'><label><span>useDefaultCredentials:</span><input name='useDefaultCredentials' value='true' /></label></div>
+
+
+
+
+
 
 </body>
 

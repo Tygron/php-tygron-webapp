@@ -12,7 +12,7 @@
 	background-color:	rgba(0, 0, 0, 0.25);
 }
 
-.locationSelector {
+.coverElement .locationSelector {
 	position:	absolute;
 	top:		2em;
 	bottom: 	2em;
@@ -20,6 +20,20 @@
 	right:		2em;
 
 	background-color:	white;
+}
+
+.embedElement {
+	position:	relative;
+
+	height:		100%;
+	width:		100%;
+}
+
+.embedElement .popupOnly {
+	display:	none;
+}
+.coverElement .embedOnly {
+	display:	none;
 }
 
 .locationSelector .elementsContainer {

@@ -1,11 +1,12 @@
-class LocationSelector {
 
-	allowSetSize = true;
+class LocationSelector {
 
 	defaultCrs='3857';
 	defaultCoordinate={ x: 479967, y: 6814662 };
 	defaultZoomLevel = 13;
 	defaultSize=500;
+
+	allowMixedSize=false;
 
 	selectedCrs=null;
 	selectedCoordinate=null;
@@ -24,9 +25,18 @@ class LocationSelector {
 
 	// Construction
 
+	createLocationSelectorEmbedded( $selectorParent ) {
+		this.$domLocationMapElement = this.generateDomForMapSelectorEmbed();
+		this.$domLocationButtonElement = this.$domLocationMapElement;
+		$($selectorParent).append( this.$domLocationMapElement );
+		this.generateLeaflet();
+		this.show();
+	}
+
 	createLocationSelector( $selectorParent, $buttonParent ) {
 
-		this.$domLocationMapElement = this.generateDomForMapSelector();
+		this.$domLocationMapElement = this.generateDomForMapSelectorPopup();
+		this.hide();
 		$($selectorParent).append( this.$domLocationMapElement );
 
 		this.$domLocationButtonElement = this.generateDomForButton();
@@ -41,7 +51,9 @@ class LocationSelector {
 
 		this.$domLocationMapElement.show();
 		this.leaflet.invalidateSize(true);
-		this.setCameraLocation();
+		if (!this.setCameraToBounds()) {
+			this.setCameraLocation();
+		}
 	}
 
 	hide( save ) {
@@ -56,7 +68,8 @@ class LocationSelector {
 				null,
 				this.$domLocationButtonElement.parents('form').find('[name=\'locationX\']').val(),
 				this.$domLocationButtonElement.parents('form').find('[name=\'locationY\']').val(),
-				this.$domLocationButtonElement.parents('form').find('[name=\'sizeX\']').val(),
+				this.$domLocationButtonElement.parents('form').find('[name=\'sizeX\']').val() ??
+					this.$domLocationButtonElement.parents('form').find('[name=\'size\']').val(),
 				this.$domLocationButtonElement.parents('form').find('[name=\'sizeY\']').val(),
 			);
 
@@ -65,9 +78,9 @@ class LocationSelector {
 	save() {
 		this.$domLocationButtonElement.parents('form').find('[name=\'locationX\']').val(this.getCoordinate().x);
 		this.$domLocationButtonElement.parents('form').find('[name=\'locationY\']').val(this.getCoordinate().y);
+		this.$domLocationButtonElement.parents('form').find('[name=\'size\']').val(this.getSize().width);
 		this.$domLocationButtonElement.parents('form').find('[name=\'sizeX\']').val(this.getSize().width);
 		this.$domLocationButtonElement.parents('form').find('[name=\'sizeY\']').val(this.getSize().height);
-
 	}
 
 
@@ -83,6 +96,25 @@ class LocationSelector {
 		this.leaflet.setView( coordinate, zoomLevel );
 	}
 
+	setCameraToBounds( ) {
+                let coordinate = this.getCoordinate();
+                let crs = this.getCrs();
+                let size = this.getSize();
+                if ( coordinate == null || crs == null || size == null) {
+                        return false;
+                }
+
+                let bounds = this.computeBoundsFromCoordinate(crs, coordinate, size.width, size.height);
+		if (bounds == null) {
+			return false;
+		}
+
+		this.leaflet.fitBounds(bounds, {
+				'padding':[0,0],
+			});
+		return true;
+	}
+
 	setData( crs, x, y, width, height ) {
 		if ( crs != null ) {
 			this.selectedCrs = crs;
@@ -90,9 +122,13 @@ class LocationSelector {
 		if (x != null && y != null) {
 			this.selectedCoordinate={x:x, y:y};
 		}
-		if (width != null && height != null) {
+		if (width != null) {
 			this.selectedWidth = width;
-			this.selectedHeight = height;
+			if ( height != null ) {
+				this.selectedHeight = height;
+			} else {
+				this.selectedHeight = width;
+			}
 		}
 		this.refreshInterface();
 		this.refreshVisualization();
@@ -103,12 +139,20 @@ class LocationSelector {
 	}
 
 	setDataFromInterface() {
+		let locationX = '[name=\'locationX\']';
+		let locationY = '[name=\'locationY\']';
+		let sizeX = '[name=\'sizeX\']';
+		let sizeY = '[name=\'sizeY\']';
+		if ( this.$domLocationMapElement.find(sizeX).length == 0 ) {
+			sizeX = '[name=\'size\']';
+		}
+
 		this.setData(
 				null,
-				this.$domLocationMapElement.find('[name=\'locationX\']').val(),
-				this.$domLocationMapElement.find('[name=\'locationY\']').val(),
-				this.$domLocationMapElement.find('[name=\'sizeX\']').val(),
-				this.$domLocationMapElement.find('[name=\'sizeY\']').val(),
+				this.$domLocationMapElement.find(locationX).val(),
+				this.$domLocationMapElement.find(locationY).val(),
+				this.$domLocationMapElement.find(sizeX).val(),
+				this.$domLocationMapElement.find(sizeY).val(),
 			)
 	}
 
@@ -117,6 +161,7 @@ class LocationSelector {
 	refreshInterface() {
 		this.$domLocationMapElement.find('[name=\'locationX\']').val(this.getCoordinate().x);
 		this.$domLocationMapElement.find('[name=\'locationY\']').val(this.getCoordinate().y);
+		this.$domLocationMapElement.find('[name=\'size\']').val(this.getSize()['width']);
 		this.$domLocationMapElement.find('[name=\'sizeX\']').val(this.getSize()['width']);
 		this.$domLocationMapElement.find('[name=\'sizeY\']').val(this.getSize()['height']);
 	}
@@ -154,7 +199,7 @@ class LocationSelector {
 
 		let crs = this.getCrs();
 		let size = this.getSize();
-		let geoJSON = this.computeBoundingBoxFromCoordinate(crs, coordinate, size.width, size.height);
+		let geoJSON = this.computeGeoJSONBoundingBoxFromCoordinate(crs, coordinate, size.width, size.height);
 		let visualBounds = L.geoJSON( geoJSON );
 		this.drawElement('sizeBounds', visualBounds);
 	}
@@ -202,7 +247,11 @@ class LocationSelector {
 		return coordinate;
 	}
 
-	computeBoundingBoxFromCoordinate( crs, coordinate, width, height ) {
+	computeBoundsFromCoordinate( crs, coordinate, width, height ) {
+		if (coordinate == null || width == null || height == null) {
+			return null;
+		}
+
 		let leafletCoordinate = this.convertCoordinateToLeaflet( crs, coordinate );
 		let earthRadiusLatMeters = 40008000; //y
 		let earthRadiusLngMeters = 40075000; //x
@@ -222,6 +271,14 @@ class LocationSelector {
 				[leafletCoordinate.lat+halfLat, leafletCoordinate.lng+halfLng],
 				[leafletCoordinate.lat+halfLat, leafletCoordinate.lng-halfLng],
 			];
+		return boundsCoordinates;
+	}
+
+	computeGeoJSONBoundingBoxFromCoordinate( crs, coordinate, width, height ) {
+		let boundsCoordinates = this.computeBoundsFromCoordinate( crs, coordinate, width, height );
+		if (boundsCoordinates == null) {
+			return null;
+		}
 
 		let geoJSONCoordinates = [
 				[boundsCoordinates[0][1], boundsCoordinates[0][0]],
@@ -324,9 +381,20 @@ class LocationSelector {
 		return $buttons;
 	}
 
+	generateDomForMapSelectorEmbed() {
+		let $embed = $('<div></div>').addClass('embedElement');
+		$embed.append(this.generateDomForMapSelector());
+		return $embed;
+	}
+
+	generateDomForMapSelectorPopup() {
+		let $pageCover = $('<div></div>').addClass('coverElement');
+		$pageCover.append(this.generateDomForMapSelector());
+		return $pageCover;
+	}
+
 	generateDomForMapSelector() {
 		let self = this;
-		let $pageCover = $('<div></div>').addClass('coverElement');
 		let $outerDom = $('<div></div>').addClass('locationSelector');
 
 		let $closeButton = $('<div></div>').addClass('closeButton');
@@ -350,7 +418,7 @@ class LocationSelector {
 				this.generateInputElement( 'location X', {
 						'name'		:	'locationX',
 						'type'		:	'number',
-						'disabled'	:	true,
+						'readonly'	:	true,
 						'value'		:	this.getCoordinate().x,
 					}, 'change', function() {
 							self.setDataFromInterface();
@@ -359,35 +427,51 @@ class LocationSelector {
 				this.generateInputElement( 'location Y', {
 						'name'		:	'locationY',
 						'type'		:	'number',
-						'disabled'	:	true,
+						'readonly'	:	true,
 						'value'		:	this.getCoordinate().y,
 					}, 'change', function() {
 							self.setDataFromInterface();
 						}
 					),
 			);
-		$buttonsSize.append(
-				this.generateInputElement( 'width', {
-						'name'		:	'sizeX',
-						'type'		:	'number',
-						'min'		:	500,
-						'max'		:	5000,
-						'value'		:	this.getSize().width,
-					}, 'change', function() {
-							self.setDataFromInterface();
-						}
-					),
-				this.generateInputElement( 'height', {
-						'name'		:	'sizeY',
-						'type'		:	'number',
-						'min'		:	500,
-						'max'		:	5000,
-						'value'		:	this.getSize().height,
-					}, 'change', function() {
-							self.setDataFromInterface();
-						}
-					),
-			);
+		if (this.allowMixedSize) {
+			$buttonsSize.append(
+					this.generateInputElement( 'width', {
+							'name'		:	'sizeX',
+							'type'		:	'number',
+							'min'		:	500,
+							'max'		:	5000,
+							'value'		:	this.getSize().width,
+						}, 'change', function() {
+								self.setDataFromInterface();
+							}
+						),
+					this.generateInputElement( 'height', {
+							'name'		:	'sizeY',
+							'type'		:	'number',
+							'min'		:	500,
+							'max'		:	5000,
+							'value'		:	this.getSize().height,
+						}, 'change', function() {
+								self.setDataFromInterface();
+							}
+						),
+				);
+		} else {
+			$buttonsSize.append(
+					this.generateInputElement( 'size', {
+							'name'		:	'size',
+							'type'		:	'number',
+							'min'		:	500,
+							'max'		:	5000,
+							'value'		:	this.getSize().width,
+						}, 'change', function() {
+								self.setDataFromInterface();
+							}
+						),
+				);
+
+		}
 
 		$buttonsOutput.append(
 				this.generateInputElement( null, {
@@ -397,7 +481,7 @@ class LocationSelector {
 					}, 'click', function() {
 							self.hide(true);
 						}
-					),
+					).addClass('popupOnly'),
 			);
 
 		$leafletContainer.append($leafletMap);
@@ -408,8 +492,7 @@ class LocationSelector {
 
 		$innerDom.append($leafletContainer, $buttonsContainer);
 		$outerDom.append($innerDom, $closeButton);
-		$pageCover.append($outerDom);
-		return $pageCover;
+		return $outerDom;
 	}
 
 	generateInputElement( label, inputProperties, handleType, handler ) {
