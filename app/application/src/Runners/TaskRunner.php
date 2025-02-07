@@ -22,11 +22,12 @@
 		public function run() {
 
 			$task = $this->getTask( $this->taskName );
-			$operationsByName = $this->getOperationsByName( $task );
 
 			if (!$this->getTaskShouldBeRun( $task )) {
 				return false;
 			}
+
+			$operationsByName = $this->getOperationsByName( $task );
 			$operation = $this->getOperationToRun( $task, $operationsByName );
 			$this->processOperationCompleted($task, $operation);
 
@@ -109,6 +110,7 @@
 				throw new \Exception( get_text('Task in state to start operation, but not ready: %s',[$currentOperation]));
 			}
 			$task->setStartedOperation($currentOperation);
+			$task->setLastOperationTime( \Utils\Time::getCurrentTimestamp() );
 			$task->save();
 			log_message(get_text('The current operation is %s, and is now starting',[$currentOperation]));
 			try {

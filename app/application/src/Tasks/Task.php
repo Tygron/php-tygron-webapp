@@ -10,27 +10,31 @@
 		private array $data = [];
 
 		public static array $DEFAULT_DATA = [
-				'taskName'=>'',
-				'credentialsFile'=>'',
-				'templateName'=>'',
-				'platform'=>'engine',
-				'location'=>null,
-				'size'=>[500,500],
+				'taskName'		=>	'',
+				'credentialsFile'	=>	'',
+				'templateName'		=>	'',
+				'platform'		=>	'engine',
+				'location'		=>	null,
+				'size'			=>	[500,500],
 
-				'apiToken'=>'',
-				'taskOperations'=>[],
-				'cleanupOperations'=>[],
-				'currentOperation'=>'',
-				'startedOperation'=>'',
-				'operationResult'=>null,
+				'creationTime'		=>	null,
+				'lastOperationTime'	=>	null,
+				'completionTime'	=>	null,
 
-				'taskCompleted'=>false,
-				'completed'=>false,
+				'apiToken'		=>	'',
+				'taskOperations'	=>	[],
+				'cleanupOperations'	=>	[],
+				'currentOperation'	=>	'',
+				'startedOperation'	=>	'',
+				'operationResult'	=>	null,
 
-				'initialized'=>false,
-				'output'=>[],
-				'error'=>null,
-				'log'=>[],
+				'taskCompleted'		=>	false,
+				'completed'		=>	false,
+
+				'initialized'		=>	false,
+				'output'		=>	[],
+				'error'			=>	null,
+				'log'			=>	[],
 			];
 
 
@@ -130,6 +134,16 @@
 			$this->data['apiToken'] = $token;
 		}
 
+		public function setCreationTime( int $creationTime) {
+			$this->data['creationTime'] = $creationTime;
+		}
+		public function setLastOperationTime( int $operationTime ) {
+			$this->data['lastOperationTime'] = $operationTime;
+		}
+		public function setCompletionTime( int $completionTime) {
+			$this->data['completionTime'] = $completionTime;
+		}
+
 		public function setTaskOperations( array $operations ) {
 			$this->data['taskOperations'] = $operations;
 		}
@@ -174,6 +188,9 @@
 				$completed = $completed==='false' ? false : $completed=='true';
 			}
 			$this->data['taskCompleted'] = $completed;
+			if ($completed) {
+				$this->setCompletionTime( \Utils\Time::getCurrentTimestamp() );
+			}
 		}
 		public function setCompleted( string|bool $completed ) {
 			if ( is_string($completed) ) {
@@ -213,6 +230,18 @@
 			}
 			$this->data['log'] = $value;
 		}
+
+		public function initialize() {
+			if ($this->data['initialized']) {
+				return;
+			}
+			if ( empty($this->getCurrentOperation()) ) {
+				$this->setCurrentOperation($this->getFirstOperation());
+			}
+			$this->data['initialized'] = true;
+			$this->setCreationTime(\Utils\Time::getCurrentTimestamp());
+		}
+
 
 
 
@@ -261,6 +290,16 @@
 			return $this->data['apiToken'];
 		}
 
+		public function getCreationTime() {
+			return $this->data['creationTime'];
+		}
+		public function getLastOperationTime() {
+			return $this->data['creationTime'];
+		}
+		public function getCompletionTime() {
+			return $this->data['creationTime'];
+		}
+
 		public function getOperations() {
 			return array_merge($this->getTaskOperations(), $this->getCleanupOperations());
 		}
@@ -306,16 +345,6 @@
 		}
 		public function getLog() {
 			return $this->data['log'];
-		}
-
-		public function initialize() {
-			if ($this->data['initialized']) {
-				return;
-			}
-			if ( empty($this->getCurrentOperation()) ) {
-				$this->setCurrentOperation($this->getFirstOperation());
-			}
-			$this->data['initialized'] = true;
 		}
 
 		public function validate() {
