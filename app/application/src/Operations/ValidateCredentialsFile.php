@@ -17,6 +17,9 @@
 			}
 
 			$credentials = $task->getCredentials();
+			if ( is_null($credentials) ) {
+				throw new \Exception('No credentials provided');
+			}
 			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/user/get_my_login_key', [])->run();
 			if ( !$curlTask->getResponseIsSuccess() ) {
 				throw new \Exception('Credentials were invalid');
@@ -31,7 +34,7 @@
 
 
 		public static function checkReadyForOperation($task) {
-			return !empty($task->getCredentialsFileName());
+			return true;
 		}
 
 		public static function checkOperationComplete($task, bool $thrown = true) {
