@@ -71,6 +71,14 @@
 			return $madePath;
 		}
 
+		public static function getFileFromPath( string|array $path ) {
+			return basename(self::makePath($path));
+		}
+
+		public static function getFileExtension( string|array $path ) {
+			return pathinfo(self::getFileFromPath($path), PATHINFO_EXTENSION);
+		}
+
 		public static function ensureDirectory( string $path, bool $isFile = true ) {
 			$path = self::makePath($path);
 			$pathParts = explode(DIRECTORY_SEPARATOR, $path);
