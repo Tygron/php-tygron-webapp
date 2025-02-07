@@ -58,4 +58,17 @@
 			}
 			return $injections;
 		}
+
+		protected function getRenderable( string $asset = null, array|null $data = null ) {
+			if ( is_null($asset) ) {
+				$asset = $this->name();
+			}
+			if ( strlen(\Utils\Files::getFileExtension($asset)) == 0 ) {
+				$asset = $asset . '.html';
+			}
+			$renderable = new \Rendering\Renderable();
+			$renderable->setTemplate($asset);
+			$renderable->setData($data);
+			return $renderable;
+		}
 	}

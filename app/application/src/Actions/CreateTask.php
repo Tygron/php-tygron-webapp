@@ -7,16 +7,15 @@
 		public function run( array $parameters = null ) {
 			try {
 				$task = \Tasks\TaskGenerator::generate($parameters);
+				$task->validate();
 			} catch ( \Throwable $e ) {
-				$message  = '<p>'.get_text('Something went wrong').':</p>';
-				$message .= '<p>'.get_text($e->getMessage()).'</p>';
-				throw $e;
-				return $message;
+
+				return $this->getRenderable( 'CreateTaskError', ['message'=>$e->getMessage()] );
 			}
 
 			$task->save();
 
-			return get_text('<meta http-equiv="refresh" content="0; url=/?action=OutputFromTask&task=%s" />',[$task->getTaskName()]);
+			return $this->getRenderable( null, [ 'taskName' => $task->getTaskName() ]);
 		}
 
 		protected function getInputsWithSpecialCharacters() {

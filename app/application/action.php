@@ -8,7 +8,7 @@
 			throw new Exception(get_text('Required parameter missing: action'));
 		}
 	}
-	$action = $action ?? $DEFAULT_ACTION;
+	$action = empty($action) ? $DEFAULT_ACTION : $action;
 
 	$className = '\\Actions\\'.$action;
 

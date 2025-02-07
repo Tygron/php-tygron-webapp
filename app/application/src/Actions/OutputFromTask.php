@@ -8,30 +8,32 @@
 			global $_INPUTS;
 
 			$taskName = get_clean_user_input('task');
+
 			try {
 				$task = \Tasks\Task::load($taskName);
 			} catch (\Throwable $e) {
-				echo '<html><head></head><body>';
-				echo get_text('Task not found: %s',[$taskName]);
-				echo '</body></html>';
-				return;
+
+				$renderable = $this->getRenderable( 'TaskNotFound', ['taskName' => $taskName] );
+				return $renderable->getRendered();
+
 			}
 
 			if ( empty($task->getOutput()) ) {
-				if ( !$task->getCompleted() ) {
-					echo '<html><head><meta http-equiv="refresh" content="10"></head><body>';
-					echo get_text('Task currently waiting for: %s',[$task->getCurrentOperation()]);
-					echo '</body></html>';
-				} else {
-					echo '<html><head></head><body>';
-					echo get_text('Task completed without output',[]);
-					echo '</body></html>';
-				}
-			} else {
-				echo '<html><head><style>body{height:100%;width:100%;padding:0px;margin:0px;} iframe {position:absolute;width:100%;height:100%;border:0px;}</style></head><body>';
-				echo get_text('<iframe src="%s">',[$task->getOutput('webViewer3DHtml')]);
-				echo '</body></html>';
+
+				$renderable = $this->getRenderable( 'OutputFromTaskError', array_merge($task->getData(),[
+						'taskErrorMessage' => $task->getError()['message'] ?? ''
+					] )
+				);
+				return $renderable;
+
 			}
+
+			$renderable = $this->getRenderable( null, array_merge(
+					$task->getData(),
+					$task->getOutput()
+				) );
+			return $renderable;
+
 		}
 	}
 
