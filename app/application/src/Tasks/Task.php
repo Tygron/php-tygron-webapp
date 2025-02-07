@@ -14,7 +14,7 @@
 				'credentialsFile'=>'',
 				'templateName'=>'',
 				'platform'=>'engine',
-				'location'=>[0,0],
+				'location'=>null,
 				'size'=>[500,500],
 
 				'apiToken'=>'',
@@ -27,6 +27,7 @@
 				'taskCompleted'=>false,
 				'completed'=>false,
 
+				'initialized'=>false,
 				'output'=>[],
 				'error'=>null,
 				'log'=>[],
@@ -36,7 +37,7 @@
 		public function __construct( $parameters ) {
 			$this->data = self::$DEFAULT_DATA;
 			$this->setData($parameters);
-			$this->validate();
+			$this->initialize();
 		}
 
 		public function setData( array $parameters ) {
@@ -137,7 +138,11 @@
 		}
 		public function setToNextOperation() {
 			$operationIndex = array_search($this->getCurrentOperation(), $this->getOperations());
-			if ( ++$operationIndex >= count($this->getOperations()) ) {
+			$operationIndex+=1;
+			if ( $operationIndex >= count($this->getTaskOperations()) ) {
+				$this->setTaskCompleted(true);
+			}
+			if ( $operationIndex >= count($this->getOperations()) ) {
 				$this->setCompleted(true);
 				return;
 			}
@@ -164,6 +169,12 @@
 			$this->data['operationResult'] = $result;
 		}
 
+		public function setTaskCompleted( string|bool $completed ) {
+			if ( is_string($completed) ) {
+				$completed = $completed==='false' ? false : $completed=='true';
+			}
+			$this->data['taskCompleted'] = $completed;
+		}
 		public function setCompleted( string|bool $completed ) {
 			if ( is_string($completed) ) {
 				$completed = $completed==='false' ? false : $completed=='true';
@@ -266,11 +277,7 @@
 			if ( $this->getCompleted() ) {
 				return null;
 			}
-			$found = $this->data['currentOperation'];
-			if ( empty($found) ) {
-				$found = $this->getFirstOperation();
-			}
-			return $found;
+			return $this->data['currentOperation'];
 		}
 		public function getStartedOperation() {
 			return $this->data['startedOperation'];
@@ -279,6 +286,9 @@
 			return $this->data['operationResult'];
 		}
 
+		public function getTaskCompleted() {
+			return $this->data['taskCompleted'];
+		}
 		public function getCompleted() {
 			return $this->data['completed'];
 		}
@@ -298,8 +308,26 @@
 			return $this->data['log'];
 		}
 
-		public function validate() {
+		public function initialize() {
+			if ($this->data['initialized']) {
+				return;
+			}
+			if ( empty($this->getCurrentOperation()) ) {
+				$this->setCurrentOperation($this->getFirstOperation());
+			}
+			$this->data['initialized'] = true;
+		}
 
+		public function validate() {
+			if ( is_null($this->getCredentials()) ) {
+				throw new \Exception('No credentials provided');
+			}
+			if ( empty($this->getTemplateName()) ) {
+				throw new \Exception('No template provided');
+			}
+			if ( empty($this->getLocation()) ) {
+				throw new \Exception('No location provided');
+			}
 		}
 
 
