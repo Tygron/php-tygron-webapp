@@ -23,13 +23,13 @@
 
 			$task->setApiToken($token);
 
-			$newProjectName = \Utils\Strings::dateTimeString();
+			$newProjectName = 'a-'.preg_replace('/[^0-9]+/', '', $task->getTaskName());
 			$task->setData(['projectName'=>$newProjectName]);
 
 		        $curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/save_project_as', [$sessionId, null, $newProjectName, false])->run();
 		        $curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/session/event/editor/clear_map?token='.$token, [true])->run();
 
-			$task->log(get_text('Project created'));
+			$task->log(get_text('Project created named: %s',[$newProjectName]));
 
 			$task->save();
 		}

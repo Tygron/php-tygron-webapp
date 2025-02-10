@@ -94,7 +94,7 @@
 				'platform' => $platform,
 				'username' => $username,
 				'password' => $password,
-				'created' => \Utils\Strings::dateTimeString(),
+				'created' => \Utils\Time::getCurrentTimestamp(),
 			]);
 			return $fileName;
 		}

@@ -24,7 +24,9 @@
 
 		protected function runTasks( $taskFileNames ) {
 			$operated = false;
+			log_message(get_text('Output:'));
 			foreach ( $taskFileNames as $key => $taskFileName) {
+				log_message('<hr>');
 				log_message(get_text('Start processing file %s', [$taskFileName]));
 				$operated = $this->runTask($taskFileName);
 				if ($operated) {

@@ -101,7 +101,7 @@
 			if ( is_null($providedName) ) {
 				return null;
 			}
-			$name = \Utils\Strings::dateTimeString();
+			$name = \Utils\Time::getReadableDateTime();
 			if ( !empty($providedName) ) {
 				return $name.'-'.$providedName;
 			}
