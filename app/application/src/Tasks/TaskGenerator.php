@@ -12,6 +12,7 @@
 			'platform'=>'engine',
 			'location'=>[0,0],
 			'size'=>[500,500],
+			'areaOfInterest'=>null,
 
 			'taskOperations'=>[],
 			'cleanupOperations'=>[],
@@ -72,6 +73,10 @@
 								);
 						} catch ( \Throwable $e ) {
 						}
+						break;
+
+					case 'areaOfInterest':
+						$result[$key] = self::generateAreaOfInterestParameter($parameters[$key]??null);
 						break;
 
 					case 'taskOperations':
@@ -171,6 +176,19 @@
 				throw new \Exception('Size must be numeric, or SizeX and SizeY must be numeric');
 			}
 			return [(int)$sizeX, (int)$sizeY];
+		}
+
+		protected static function generateAreaOfInterestParameter( string|array $areaOfInterest = null ) {
+			if ( empty($areaOfInterest) ) {
+				return null;
+			}
+			if ( is_string($areaOfInterest) ) {
+				return $areaOfInterest;
+			} else if ( is_array($areaOfInterest)) {
+				return json_encode($areaOfInterest);
+			} else {
+				return null;
+			}
 		}
 
 

@@ -15,7 +15,7 @@
 
 			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/set_initial_map_size', $task->getSize())->run();
 
-			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', $task->getLocation())->run();
+			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', [$task->getLocation()[0], $task->getLocation()[1], null, $task->getAreaOfInterest(true)])->run();
 
 			$task->save();
 		}
@@ -41,6 +41,8 @@
 			try {
 				$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
 				$token = $task->getApiToken();
+
+				//TODO: Check whether project still running
 
 				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/progress')->run();
 				if ( count($curlTask->getContent())==0 ) {

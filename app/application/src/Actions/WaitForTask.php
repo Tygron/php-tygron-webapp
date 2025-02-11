@@ -11,7 +11,6 @@
 			try {
 				$task = \Tasks\Task::load($taskName);
 			} catch (\Throwable $e) {
-
 				$renderable = $this->getRenderable( 'TaskNotFound', ['taskName' => $taskName] );
 				return $renderable->getRendered();
 

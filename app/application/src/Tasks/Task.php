@@ -16,6 +16,7 @@
 				'platform'		=>	'engine',
 				'location'		=>	null,
 				'size'			=>	[500,500],
+				'areaOfInterest'	=>	null,
 
 				'creationTime'		=>	null,
 				'lastOperationTime'	=>	null,
@@ -64,6 +65,9 @@
 						break;
 					case 'size':
 						$this->setSize($value);
+						break;
+					case 'areaOfInterest':
+						$this->setAreaOfInterest($value);
 						break;
 
 					case 'apiToken':
@@ -129,6 +133,9 @@
 		}
 		public function setSize( array $size ) {
 			$this->data['size'] = $size;
+		}
+		public function setAreaOfInterest( string $areaOfInterest = null ) {
+			$this->data['areaOfInterest'] = $areaOfInterest;
 		}
 		public function setApiToken( string $token ) {
 			$this->data['apiToken'] = $token;
@@ -286,6 +293,13 @@
 		public function getSize() {
 			return $this->data['size'];
 		}
+		public function getAreaOfInterest( bool $asData = false) {
+			if ( !$asData ) {
+				return $this->data['areaOfInterest'];
+			}
+			return json_decode($this->data['areaOfInterest'], true);
+		}
+
 		public function getApiToken() {
 			return $this->data['apiToken'];
 		}

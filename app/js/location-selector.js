@@ -2,17 +2,34 @@
 class LocationSelector {
 
 	defaultCrs='3857';
-	defaultCoordinate={ x: 479967, y: 6814662 };
 	defaultZoomLevel = 13;
+
 	defaultSize=500;
+	defaultBuffer=0;
+
+	defaultCoordinate={ x: 479967, y: 6814662 };
 
 	allowMixedSize=false;
 
+	//selected:
+	//CRS
+	//Size
+	//Buffer
+	//Centre coordinate
+
+	//AOI
+	//Bounds-of-AOI
+	//Bounds-of-project (AOI+buffer)
+
 	selectedCrs=null;
-	selectedCoordinate=null;
 	selectedZoomLevel=null;
-	selectedWidth=null;
-	selectedHeight=null;
+
+	selectedSize=null;
+	selectedBuffer=0;
+
+	selectedDefiningLocation=null; // coordinate, area of interest
+	selectedCoordinate=null;
+	selectedAreaOfInterest=null;
 
 	$domLocationButtonElement = null;
 	$domLocationMapElement = null;
@@ -64,28 +81,18 @@ class LocationSelector {
 	}
 
 	load() {
-		this.setData(
-				null,
-				this.$domLocationButtonElement.parents('form').find('[name=\'locationX\']').val(),
-				this.$domLocationButtonElement.parents('form').find('[name=\'locationY\']').val(),
-				this.$domLocationButtonElement.parents('form').find('[name=\'sizeX\']').val() ??
-					this.$domLocationButtonElement.parents('form').find('[name=\'size\']').val(),
-				this.$domLocationButtonElement.parents('form').find('[name=\'sizeY\']').val(),
-			);
-
+		this.setDataFromInterface( this.$domLocationButtonElement.parents('form') );
+		this.recalculateSelected();
+		this.refresh();
 	}
 
 	save() {
-		this.$domLocationButtonElement.parents('form').find('[name=\'locationX\']').val(this.getCoordinate().x);
-		this.$domLocationButtonElement.parents('form').find('[name=\'locationY\']').val(this.getCoordinate().y);
-		this.$domLocationButtonElement.parents('form').find('[name=\'size\']').val(this.getSize().width);
-		this.$domLocationButtonElement.parents('form').find('[name=\'sizeX\']').val(this.getSize().width);
-		this.$domLocationButtonElement.parents('form').find('[name=\'sizeY\']').val(this.getSize().height);
+		this.setDataToInterface( this.$domLocationButtonElement.parents('form') );
 	}
 
 
 
-	//Outer functions
+	//Camera functions
 
 	setCameraLocation( crs, xy, zoomLevel ) {
 		crs = crs==null ? this.getCrs() : crs;
@@ -109,61 +116,126 @@ class LocationSelector {
 			return false;
 		}
 
-		this.leaflet.fitBounds(bounds, {
+		this.leaflet.fitBounds( this.convertCoordinatesToLeaflet( this.getCrs(), bounds), {
 				'padding':[0,0],
 			});
 		return true;
 	}
 
-	setData( crs, x, y, width, height ) {
+
+	// Getting selection
+
+	getCrs() {
+		return this.selectedCrs ?? this.defaultCrs;
+	}
+	getZoomlevel() {
+		return this.selectedZoomLevel ?? this.defaultZoomLevel;
+	}
+	getSize() {
+		let size = this.selectedSize ?? this.defaultSize;
+		if ( typeof size == 'number') {
+			return {width:size, height: size};
+		}
+		return size;
+	}
+	getWidth() {
+		return getSize()[0];
+	}
+	getHeight() {
+		return getHeight()[0];
+	}
+	getBuffer() {
+		return this.getSelectedBuffer ?? this.defaultBuffer;
+	}
+	getDefiningLocation() {
+		return this.selectedDefiningLocation;
+	}
+	getCoordinate() {
+		return this.selectedCoordinate ?? this.defaultCoordinate;
+	}
+	getAreaOfInterest() {
+		return this.selectedAreaOfInterest;
+	}
+
+
+
+	// Updating selection
+
+	setSelectedCrs(crs) {
 		if ( crs != null ) {
 			this.selectedCrs = crs;
 		}
+	}
+	setSelectedSize(width, height) {
+		if (width !=null) {
+			if ( height != null ) {
+				this.selectedSize = {width: width, height: height};
+			} else {
+				this.selectedSize = {width: width, height: width};
+			}
+		//} else if (this.selectedAOI != null) {
+		//	console.log('TODO: Compute Area of Interest Size')
+		}
+	}
+	setSelectedBuffer(buffer) {
+		if (buffer != null) {
+			this.selectedBuffer = buffer;
+		}
+	}
+	setSelectedDefiningLocation( location ) {
+		if (location == null) {
+			return;
+		}
+		if ( typeof location.x == 'number' && typeof location.y == 'number' ) {
+			this.selectedDefiningLocation = location;
+		} else {
+			console.log('TODO: Polygon for defining area of interest');
+		}
+	}
+
+	setComputedCoordinate(x, y) {
 		if (x != null && y != null) {
 			this.selectedCoordinate={x:x, y:y};
 		}
-		if (width != null) {
-			this.selectedWidth = width;
-			if ( height != null ) {
-				this.selectedHeight = height;
-			} else {
-				this.selectedHeight = width;
+
+	}
+	setComputedAreaOfInterest( areaOfInterest ) {
+		if (areaOfInterest == null) {
+			if ( typeof areaOfInterest == 'string' ) {
+				try {
+					areaOfInterest = JSON.parse(areaOfInterest);
+				} catch (err) {
+				}
 			}
+			this.selectedAreaOfInterest = areaOfInterest;
 		}
+	}
+
+	recalculateSelected() {
+		if ( this.selectedDefiningLocation == null ) {
+			this.selectedCoodinate = this.defaultCoordinate;
+		} else if ( typeof this.selectedDefiningLocation.x == 'number' && typeof this.selectedDefiningLocation.y == 'number' ) {
+			this.selectedCoordinate = this.selectedDefiningLocation;
+		}
+		if ( true ) { //Check whether to generate area
+			this.selectedAreaOfInterest = this.computeBoundingBoxGeometryFromCoordinate(
+					this.getCrs(),
+					this.selectedCoordinate,
+					this.getSize().width,
+					this.getSize().height,
+				);
+		}
+	}
+
+	// Refreshes after data or interface updates
+
+	refresh() {
 		this.refreshInterface();
 		this.refreshVisualization();
 	}
 
-	setSelectedCoordinate( crs, coordinate ) {
-		this.setData(crs, coordinate.x, coordinate.y)
-	}
-
-	setDataFromInterface() {
-		let locationX = '[name=\'locationX\']';
-		let locationY = '[name=\'locationY\']';
-		let sizeX = '[name=\'sizeX\']';
-		let sizeY = '[name=\'sizeY\']';
-		if ( this.$domLocationMapElement.find(sizeX).length == 0 ) {
-			sizeX = '[name=\'size\']';
-		}
-
-		this.setData(
-				null,
-				this.$domLocationMapElement.find(locationX).val(),
-				this.$domLocationMapElement.find(locationY).val(),
-				this.$domLocationMapElement.find(sizeX).val(),
-				this.$domLocationMapElement.find(sizeY).val(),
-			)
-	}
-
-	//Inner functions
-
 	refreshInterface() {
-		this.$domLocationMapElement.find('[name=\'locationX\']').val(this.getCoordinate().x);
-		this.$domLocationMapElement.find('[name=\'locationY\']').val(this.getCoordinate().y);
-		this.$domLocationMapElement.find('[name=\'size\']').val(this.getSize()['width']);
-		this.$domLocationMapElement.find('[name=\'sizeX\']').val(this.getSize()['width']);
-		this.$domLocationMapElement.find('[name=\'sizeY\']').val(this.getSize()['height']);
+		this.setDataToInterface( this.$domLocationMapElement );
 	}
 
 	refreshVisualization() {
@@ -191,6 +263,9 @@ class LocationSelector {
 		let marker = L.marker(leafletCoordinate);
 		this.drawElement('coordinate', marker);
 	}
+	drawVisualizationAreaOfInterest() {
+
+	}
 	drawVisualizationSizeBounds() {
 		let coordinate = this.selectedCoordinate;
 		if ( coordinate == null) {
@@ -199,9 +274,9 @@ class LocationSelector {
 
 		let crs = this.getCrs();
 		let size = this.getSize();
-		let geoJSON = this.computeGeoJSONBoundingBoxFromCoordinate(crs, coordinate, size.width, size.height);
-		let visualBounds = L.geoJSON( geoJSON );
-		this.drawElement('sizeBounds', visualBounds);
+		let geometry = this.computeBoundingBoxGeometryFromCoordinate(crs, coordinate, size.width, size.height);
+		geometry = L.polygon( this.convertGeometryToLeaflet(crs, geometry).coordinates );
+		this.drawElement('sizeBounds', geometry);
 	}
 	drawVisualizationInterestBounds() {
 
@@ -226,26 +301,84 @@ class LocationSelector {
 	}
 
 
+	// Geometry conversions
+
 	convertCoordinateToLeaflet( crs, coordinate ) {
 		if (crs == null) {
 			crs = this.defaultCrs;
 		}
 		let crsObj = L.CRS['EPSG'+crs];
-		coordinate = L.point(coordinate);
+		if ( Array.isArray(coordinate) ) {
+			coordinate = L.point(coordinate);
+		}
 		let leafletCoordinate = crsObj.unproject(coordinate);
 
 		return leafletCoordinate;
 	}
-
 	convertCoordinateFromLeaflet( crs, leafletCoordinate ) {
 		if (crs == null) {
 			crs = this.defaultCrs;
 		}
 		let crsObj = L.CRS['EPSG'+crs];
-		leafletCoordinate = L.latLng(leafletCoordinate.lat, leafletCoordinate.lng);
+		leafletCoordinate = L.latLng(leafletCoordinate);
 		let coordinate = crsObj.project(leafletCoordinate);
 		return coordinate;
 	}
+
+	convertCoordinatesToLeaflet( crs, coordinates) {
+		let output = [];
+		for ( let i=0; i<coordinates.length;i++ ) {
+			output[i] = this.convertCoordinateToLeaflet( crs, coordinates[i] );
+		}
+		return output;
+	}
+	convertCoordinatesFromLeaflet(crs, leafletCoordinates ) {
+		let output = [];
+		for ( let i=0; i<leafletCoordinates.length;i++ ) {
+			output[i] = this.convertCoordinateFromLeaflet( crs, leafletCoordinates[i] );
+		}
+		return output;
+	}
+
+	convertGeometryToLeaflet( crs, geometry ) {
+		let newGeometry = JSON.parse(JSON.stringify(geometry));
+//		let coords3 = [];
+//		for (let k=0; k<geometry.coordinates.length;k++) {
+		let coords2 = [];
+		for (let j=0; j<geometry.coordinates.length;j++) {
+			let coords1 = [];
+			for (let i=0; i<geometry.coordinates[j].length;i++) {
+				let newCoord = this.convertCoordinateToLeaflet( crs, geometry.coordinates[j][i] );
+				coords1.push( [newCoord.lat, newCoord.lng] );
+			}
+			coords2.push(coords1);
+		}
+		//coords3.push(coords2);
+		newGeometry.coordinates = coords2;
+//		}
+//		newGeometry.coordinates = coords3;
+
+		return newGeometry;
+	}
+	convertGeometryFromLeaflet( crs, geoJson ) {
+		let newGeoJson = JSON.parse(JSON.stringify(geoJson));
+		let newCoordinates = [];
+		for (let i=0; i<geoJson.geometry.coordinates.length;i++) {
+			let newCoordinate = this.convertCoordinateFromLeaflet( crs, geoJson.geometry.coordinates[i] );
+			newCoordinates.push( [newCoordinate.x, newCoordinate.y] );
+		}
+		newGeoJson.geometry.coordinates = newCoordinates;
+
+		return newGeoJson;
+	}
+	convertPolygonGeometryToMultiPolygon( geometry ) {
+		geometry.coordinates = [geometry.coordinates];
+		geometry.type = 'MultiPolygon';
+		return geometry;
+	}
+
+
+	// Geometry calculations
 
 	computeBoundsFromCoordinate( crs, coordinate, width, height ) {
 		if (coordinate == null || width == null || height == null) {
@@ -271,20 +404,49 @@ class LocationSelector {
 				[leafletCoordinate.lat+halfLat, leafletCoordinate.lng+halfLng],
 				[leafletCoordinate.lat+halfLat, leafletCoordinate.lng-halfLng],
 			];
+		if ( crs != null ) {
+			boundsCoordinates = this.convertCoordinatesFromLeaflet(crs, boundsCoordinates);
+		}
 		return boundsCoordinates;
 	}
 
+	computeBoundingBoxGeometryFromCoordinate( crs, coordinate, width, height ) {
+		let boundsCoordinates = this.computeBoundsFromCoordinate( crs, coordinate, width, height );
+		if (boundsCoordinates == null) {
+			return null;
+		}
+		//if ( crs != null ) {
+		//	boundsCoordinates = this.convertCoordinatesToLeaflet( crs, boundsCoordinates );
+		//}
+
+		let geoJSONCoordinates = [
+				[boundsCoordinates[0].x, boundsCoordinates[0].y],
+				[boundsCoordinates[1].x, boundsCoordinates[1].y],
+				[boundsCoordinates[2].x, boundsCoordinates[2].y],
+				[boundsCoordinates[3].x, boundsCoordinates[3].y],
+			];
+
+		let geometry = {
+				type: 'Polygon',
+				coordinates: [geoJSONCoordinates],
+			};
+
+		return geometry;
+	}
 	computeGeoJSONBoundingBoxFromCoordinate( crs, coordinate, width, height ) {
 		let boundsCoordinates = this.computeBoundsFromCoordinate( crs, coordinate, width, height );
 		if (boundsCoordinates == null) {
 			return null;
 		}
+		//if ( crs != null ) {
+		//	boundsCoordinates = this.convertCoordinatesToLeaflet( crs, boundsCoordinates );
+		//}
 
 		let geoJSONCoordinates = [
-				[boundsCoordinates[0][1], boundsCoordinates[0][0]],
-				[boundsCoordinates[1][1], boundsCoordinates[1][0]],
-				[boundsCoordinates[2][1], boundsCoordinates[2][0]],
-				[boundsCoordinates[3][1], boundsCoordinates[3][0]],
+				[boundsCoordinates[0].x, boundsCoordinates[0].y],
+				[boundsCoordinates[1].x, boundsCoordinates[1].y],
+				[boundsCoordinates[2].x, boundsCoordinates[2].y],
+				[boundsCoordinates[3].x, boundsCoordinates[3].y],
 			];
 
 		//console.log('Verify size');
@@ -304,27 +466,86 @@ class LocationSelector {
 		return geoJSONPolygon;
 	}
 
-	// Value accessors
 
-	getCrs() {
-		return this.selectedCrs ?? this.defaultCrs;
+
+
+
+
+	// Data exchange between object and interface
+	setDataFromInterface( $parent ) {
+		let locationX = '[name=\'locationX\']';
+		let locationY = '[name=\'locationY\']';
+		let sizeX = '[name=\'sizeX\']';
+		let sizeY = '[name=\'sizeY\']';
+		if ( $parent.find(sizeX).length == 0 ) {
+			sizeX = '[name=\'size\']';
+		}
+
+		let areaOfInterest = '[name=\'areaOfInterest\']';
+		let definingLocation = '[name=\'definingLocation\']';
+
+		this.setSelectedCrs(null);
+		this.setSelectedSize(
+				$parent.find(sizeX).val() ??
+					$parent.find(size).val(),
+				$parent.find(sizeY).val(),
+
+			);
+
+		this.setSelectedDefiningLocation($parent.find(definingLocation).val());
+
+		this.setComputedAreaOfInterest( $parent.find(areaOfInterest).val() );
+		this.setComputedCoordinate(
+				$parent.find(locationX).val(),
+				$parent.find(locationY).val()
+			);
+
 	}
-	getCoordinate() {
-		return this.selectedCoordinate ?? this.defaultCoordinate;
+
+	setDataToInterface ( $parent ) {
+		let locationX = '[name=\'locationX\']';
+		let locationY = '[name=\'locationY\']';
+		let sizeX = '[name=\'sizeX\']';
+		let sizeY = '[name=\'sizeY\']';
+		if ( $parent.find(sizeX).length == 0 ) {
+			sizeX = '[name=\'size\']';
+		}
+
+		let areaOfInterest = '[name=\'areaOfInterest\']';
+		let definingLocation = '[name=\'definingLocation\']';
+
+		$parent.find(locationX).val( this.getCoordinate().x );
+		$parent.find(locationY).val( this.getCoordinate().y );
+
+		$parent.find(sizeX).val( this.getSize().width );
+		$parent.find(sizeY).val( this.getSize().height );
+
+		$parent.find(definingLocation).val( this.getDefiningLocation() );
+		//$parent.find(areaOfInterest).val( this.getAreaOfInterest() );
+		$parent.find(areaOfInterest).val( JSON.stringify(this.convertPolygonGeometryToMultiPolygon(this.getAreaOfInterest())) );
 	}
-	getZoomlevel() {
-		return this.selectedZoomLevel ?? this.defaultZoomLevel;
+
+
+
+
+
+
+
+
+
+	// Application handlers
+
+	interfaceUpdateHandle() {
+		this.setDataFromInterface( this.$domLocationMapElement );
+		this.updateHandle();
 	}
-	getSize() {
-		return {
-				width: this.selectedWidth ?? this.defaultSize,
-				height: this.selectedHeight ?? this.defaultSize,
-			}
+	mapUpdateHandle() {
+		this.updateHandle();
 	}
-
-
-
-
+	updateHandle() {
+		this.recalculateSelected();
+		this.refresh();
+	}
 
 
 
@@ -355,7 +576,8 @@ class LocationSelector {
 		this.leaflet.on('click', function(e){
 			let leafletCoordinate = e.latlng;
 			let coordinate = self.convertCoordinateFromLeaflet(null, leafletCoordinate);
-			self.setSelectedCoordinate( null, coordinate, null );
+			self.setSelectedDefiningLocation( coordinate );
+			self.mapUpdateHandle();
 		});
 	}
 
@@ -411,7 +633,7 @@ class LocationSelector {
 
 		let $buttonsLocation = $('<div></div>').addClass('containerlocation');
 		let $buttonsSize = $('<div></div>').addClass('containerSize');
-
+		let $buttonsData = $('<div></div>').addClass('containerData');
 		let $buttonsOutput = $('<div></div>').addClass('containerOutput');
 
 		$buttonsLocation.append(
@@ -421,7 +643,7 @@ class LocationSelector {
 						'readonly'	:	true,
 						'value'		:	this.getCoordinate().x,
 					}, 'change', function() {
-							self.setDataFromInterface();
+							self.interfaceUpdateHandle();
 						}
 					),
 				this.generateInputElement( 'location Y', {
@@ -430,7 +652,7 @@ class LocationSelector {
 						'readonly'	:	true,
 						'value'		:	this.getCoordinate().y,
 					}, 'change', function() {
-							self.setDataFromInterface();
+							self.interfaceUpdateHandle();
 						}
 					),
 			);
@@ -443,7 +665,7 @@ class LocationSelector {
 							'max'		:	5000,
 							'value'		:	this.getSize().width,
 						}, 'change', function() {
-								self.setDataFromInterface();
+								self.interfaceUpdateHandle();
 							}
 						),
 					this.generateInputElement( 'height', {
@@ -453,7 +675,7 @@ class LocationSelector {
 							'max'		:	5000,
 							'value'		:	this.getSize().height,
 						}, 'change', function() {
-								self.setDataFromInterface();
+								self.interfaceUpdateHandle();
 							}
 						),
 				);
@@ -466,12 +688,35 @@ class LocationSelector {
 							'max'		:	5000,
 							'value'		:	this.getSize().width,
 						}, 'change', function() {
-								self.setDataFromInterface();
+								self.interfaceUpdateHandle();
 							}
 						),
 				);
 
 		}
+
+		$buttonsData.append(
+				this.generateInputElement( 'Area Of Interest', {
+						'name'		:	'areaOfInterest',
+						'type'		:	'text',
+						'readonly'	:	true,
+						'value'		:	this.getAreaOfInterest(),
+					}, 'change', function() {
+							self.interfaceUpdateHandle();
+						}
+					),
+				this.generateInputElement( 'Buffer', {
+						'name'		:	'buffer',
+						'type'		:	'number',
+						'readonly'	:	true,
+						'min'		:	0,
+						'value'		:	this.getBuffer(),
+					}, 'change', function() {
+							self.interfaceUpdateHandle();
+						}
+					),
+			);
+
 
 		$buttonsOutput.append(
 				this.generateInputElement( null, {
@@ -486,7 +731,7 @@ class LocationSelector {
 
 		$leafletContainer.append($leafletMap);
 
-		$buttonsLeft.append($buttonsLocation, $buttonsSize);
+		$buttonsLeft.append($buttonsLocation, $buttonsSize, $buttonsData);
 		$buttonsRight.append($buttonsOutput);
 		$buttonsContainer.append($buttonsLeft, $buttonsRight);
 
