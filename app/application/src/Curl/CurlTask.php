@@ -195,7 +195,7 @@
 			$this->requestHeaders = curl_getinfo($ch, CURLINFO_HEADER_OUT );
 
 			$this->result = json_decode( $result, true );
-			if ( ($this->result == null) && ($result !== 'null') ) {
+			if ( ($this->result === null) && ($result !== 'null') ) {
 				if ($result !== 'null') {
 					$this->result = $result;
 				}
