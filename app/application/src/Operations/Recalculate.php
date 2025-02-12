@@ -13,10 +13,12 @@
 		public static function run($task) {
 			$token = $task->getApiToken();
 
-			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(),
+			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(),
 					'api/session/event/editorindicator/reset_indicators',
 					[true]
 				)->run();
+
+			$task->save();
 		}
 
 
