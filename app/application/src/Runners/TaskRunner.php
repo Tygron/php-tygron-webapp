@@ -106,7 +106,10 @@
 				log_message(get_text('The current operation is %s, and should already be running',[$currentOperation]));
 				return false;
 			}
-			if ( !$operation::checkReadyForOperation($task) ) {
+			$ready = $operation::checkReadyForOperation($task);
+			if ( is_string($ready) ) {
+				throw new \Exception( get_text('Task in state to start operation, but not ready: %s. Reason: %s',[$currentOperation, $ready]));
+			} else if (!$ready) {
 				throw new \Exception( get_text('Task in state to start operation, but not ready: %s',[$currentOperation]));
 			}
 			$task->setStartedOperation($currentOperation);

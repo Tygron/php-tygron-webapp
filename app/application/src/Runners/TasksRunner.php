@@ -53,7 +53,7 @@
 			} catch( \Throwable $e ) {
 				log_message(get_text('Encountered an error while running task: %s',[$e->getMessage()]));
 				log_message(get_text('Location: %s, Line: %s',[$e->getFile(),$e->getLine()]));
-				log_message(get_text('Stacktrace: %s',[$e->getTraceAsString()]));
+				log_message(get_text('Stacktrace: %s',['<pre>'.$e->getTraceAsString().'</pre>']));
 			}
 			return $operated;
 		}
