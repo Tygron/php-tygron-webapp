@@ -32,16 +32,26 @@
 			}
 			if ( array_key_exists('areaOfInterest', $_INPUTS) ) {
 				$inputs['areaOfInterest'] = get_clean_user_input('areaOfInterest', '[\{\}\[\]\s\-\_\,\.\'\"\:a-zA-Z0-9]');
+				$inputs['areaOfInterest'] = json_decode($inputs['areaOfInterest'], true);
 			}
 			return $inputs;
 		}
 
+		protected function getAllowedExtraParameters() {
+			//TODO: Obtain dynamically from (potential) operations
+			return [
+					'areaOfInterest'		=>	null,
+					'areaOfInterestAttributes'	=>	[],
+				];
+		}
+
 		protected function mergeParametersForTask( array $parameters ) {
+			$allowed = $this->getAllowedExtraParameters();
 			$flatMerge = []
-					+ \Tasks\TaskGenerator::normalizeParameters($this->getInjectedParameters())
-					+ \Tasks\TaskGenerator::normalizeParameters($this->getFixedParameters())
-					+ \Tasks\TaskGenerator::normalizeParameters($parameters)
-					+ \Tasks\TaskGenerator::normalizeParameters($this->getDefaultParameters())
+					+ \Tasks\TaskGenerator::normalizeParameters($this->getInjectedParameters(), $allowed)
+					+ \Tasks\TaskGenerator::normalizeParameters($this->getFixedParameters(), $allowed)
+					+ \Tasks\TaskGenerator::normalizeParameters($parameters, $allowed)
+					+ \Tasks\TaskGenerator::normalizeParameters($this->getDefaultParameters(), $allowed)
 				;
 			return $flatMerge;
 		}

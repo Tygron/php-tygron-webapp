@@ -12,7 +12,6 @@
 			'platform'=>'engine',
 			'location'=>[0,0],
 			'size'=>[500,500],
-			'areaOfInterest'=>null,
 
 			'taskOperations'=>[],
 			'cleanupOperations'=>[],
@@ -25,9 +24,10 @@
 			return $task;
 		}
 
-		public static function normalizeParameters( array $parameters ) {
+		public static function normalizeParameters( array $parameters, array $allowed = [] ) {
 			$result = [];
-			foreach ( self::$DEFAULT_PARAMETERS as $key=>$value ) {
+			$defaults = array_merge($allowed, self::$DEFAULT_PARAMETERS);
+			foreach ( $defaults as $key=>$value ) {
 				switch($key) {
 					case 'taskName':
 						$result[$key] = self::generateTaskName( $parameters['name']??null );
@@ -75,17 +75,13 @@
 						}
 						break;
 
-					case 'areaOfInterest':
-						$result[$key] = self::generateAreaOfInterestParameter($parameters[$key]??null);
-						break;
-
 					case 'taskOperations':
 					case 'cleanupOperations':
 						$result[$key] = self::generateOperationsList( $parameters[$key]??null );
 						break;
 
 					default:
-						if ( array_key_exists($key, $result) ) {
+						if ( array_key_exists($key, $parameters) ) {
 							$result[$key] = $parameters[$key];
 						}
 						break;
@@ -177,20 +173,6 @@
 			}
 			return [(int)$sizeX, (int)$sizeY];
 		}
-
-		protected static function generateAreaOfInterestParameter( string|array $areaOfInterest = null ) {
-			if ( empty($areaOfInterest) ) {
-				return null;
-			}
-			if ( is_string($areaOfInterest) ) {
-				return $areaOfInterest;
-			} else if ( is_array($areaOfInterest)) {
-				return json_encode($areaOfInterest);
-			} else {
-				return null;
-			}
-		}
-
 
 		protected static function generateOperationsList( string|array $operations = null ) {
 			if (is_string($operations) && str_starts_with($operations, '[') ) {
