@@ -1,14 +1,10 @@
 <?php
 
-	namespace Operations;
+	namespace Tasks\Operations;
 
-	class OutputWebViewer3DHtml {
+	class OutputWebViewer3DHtml extends AbstractOperation {
 
-		public function __construct() {
-
-		}
-
-		public static function run($task) {
+		public function run( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
 			$token = $task->getApiToken();
@@ -28,11 +24,11 @@
 		}
 
 
-		public static function checkReadyForOperation($task) {
+		public function checkReady( \Tasks\Task $task ) {
 			return !empty($task->getApiToken());
 		}
 
-		public static function checkOperationComplete($task, bool $thrown = true) {
+		public function checkComplete( \Tasks\Task $task ) {
 			return !empty($task->getOutput('webViewer3DHtml'));
 		}
 	}

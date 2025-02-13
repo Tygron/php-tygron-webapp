@@ -1,6 +1,6 @@
 <?php
 
-	namespace Runners;
+	namespace Tasks\Runners;
 
 	class TaskRunner {
 
@@ -29,7 +29,7 @@
 
 			$operationsByName = $this->getOperationsByName( $task );
 			$operation = $this->getOperationToRun( $task, $operationsByName );
-			$this->processOperationCompleted($task, $operation);
+			$this->processOperationCompleted( $task, $operation );
 
 			if (!$this->getTaskShouldBeRun( $task )) {
 				return false;
@@ -51,7 +51,7 @@
 			$operations = [];
 			$operationNames = $task->getOperations();
 			foreach ( $operationNames as $key=>$value ) {
-				$className = '\\Operations\\'.$value;
+				$className = '\\Tasks\\Operations\\'.$value;
 				if ( empty($className) ) {
 					continue;
 				}
@@ -59,7 +59,7 @@
 					throw new \Exception(get_text('Unknown operation: %s',[$value]));
 				}
 				try {
-					$operation = new $className();
+					$operation = new $className($task);
 					$operations[$value] = $operation;
 				} catch ( \Throwable $e ) {
 					throw new \Exception( get_text('Could not load operation %s',[$value]), previous:$e);
@@ -85,7 +85,7 @@
 			$startedOperation = $task->getStartedOperation();
 			if ($currentOperation == $startedOperation) {
 				try {
-					if ( $operation::checkOperationComplete($task, false) ) {
+					if ( $operation->checkOperationComplete() ) {
 						log_message(get_text('The current operation %s has completed, switching to next operation',[$currentOperation]));
 						$task->setToNextOperation();
 						$task->save();
@@ -106,7 +106,7 @@
 				log_message(get_text('The current operation is %s, and should already be running',[$currentOperation]));
 				return false;
 			}
-			$ready = $operation::checkReadyForOperation($task);
+			$ready = $operation->checkReadyForOperation();
 			if ( is_string($ready) ) {
 				throw new \Exception( get_text('Task in state to start operation, but not ready: %s. Reason: %s',[$currentOperation, $ready]));
 			} else if (!$ready) {
@@ -117,7 +117,7 @@
 			$task->save();
 			log_message(get_text('The current operation is %s, and is now starting',[$currentOperation]));
 			try {
-				$result = $operation::run($task);
+				$result = $operation->startOperation();
 				if ( isset($result) ) {
 					$task->setOperationResult($result);
 					$task->save();

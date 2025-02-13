@@ -1,14 +1,16 @@
 <?php
 
-	namespace Operations;
+	namespace Tasks\Operations;
 
-	class AreaOfInterestAttributes {
+	class AreaOfInterestAttributes extends AbstractOperation {
 
-		public function __construct() {
-
+		public function getInputParameters() {
+			return [
+					'areaOfInterestAttributes' => []
+				];
 		}
 
-		public static function run($task) {
+		public function run( \Tasks\Task $task ) {
 			$token = $task->getApiToken();
 
 			$areaIds = [];
@@ -33,7 +35,7 @@
 		}
 
 
-		public static function checkReadyForOperation($task) {
+		public function checkReady( \Tasks\Task $task ) {
 			try {
 				$token = $task->getApiToken();
 
@@ -55,35 +57,28 @@
 			}
 		}
 
-		public static function checkOperationComplete($task, bool $thrown = true) {
+		public function checkComplete( \Tasks\Task $task ) {
 
-			try {
-				$token = $task->getApiToken();
+			$token = $task->getApiToken();
 
-				//TODO: Check whether project still running
+			//TODO: Check whether project still running
 
-				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/areas-interest_area')->run();
-				if ( count($curlTask->getContent())==0 ) {
-					return true;
-				}
-				else {
-					$attributesToFind = $task->getData()['areaOfInterestAttributes'];
-					foreach ( $curlTask->getContent() as $key => $area ) {
-						foreach ( $attributesToFind as $key=> $value ) {
-							if ( !array_key_exists($key, $area['attributes']) ) {
-								if ( !is_null($value) && is_numeric($value) ) {
-									return false;
-								}
+			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/areas-interest_area')->run();
+			if ( count($curlTask->getContent())==0 ) {
+				return true;
+			}
+			else {
+				$attributesToFind = $task->getData()['areaOfInterestAttributes'];
+				foreach ( $curlTask->getContent() as $key => $area ) {
+					foreach ( $attributesToFind as $key=> $value ) {
+						if ( !array_key_exists($key, $area['attributes']) ) {
+							if ( !is_null($value) && is_numeric($value) ) {
+								return false;
 							}
 						}
 					}
-					return true;
 				}
-			} catch (\Throwable $e) {
-				if ($thrown) {
-					throw $e;
-				}
-				return false;
+				return true;
 			}
 		}
 	}

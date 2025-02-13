@@ -1,5 +1,5 @@
 <?php
-	namespace Runners;
+	namespace Tasks\Runners;
 
 	include_once "src/includes.php";
 

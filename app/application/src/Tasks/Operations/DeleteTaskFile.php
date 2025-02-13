@@ -1,14 +1,10 @@
 <?php
 
-	namespace Operations;
+	namespace Tasks\Operations;
 
-	class DeleteTaskFile {
+	class DeleteTaskFile extends AbstractOperation {
 
-		public function __construct() {
-
-		}
-
-		public static function run($task) {
+		public function run( \Tasks\Task $task ) {
 			global $KEEP_TASKS_WITH_ERROR;
 
 			if ( !empty($task->getError()) ) {
@@ -22,11 +18,11 @@
 		}
 
 
-		public static function checkReadyForOperation($task) {
+		public function checkReady( \Tasks\Task $task ) {
 			return true;
 		}
 
-		public static function checkOperationComplete($task, bool $thrown = true) {
+		public function checkComplete( \Tasks\Task $task ) {
 			return $task->getOperationResult();
 		}
 	}

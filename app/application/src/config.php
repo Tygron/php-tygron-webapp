@@ -2,6 +2,7 @@
 
 
 	$APP_DIR		=	implode(DIRECTORY_SEPARATOR,	[__DIR__,	'..']);
+	$SRC_DIR		=	implode(DIRECTORY_SEPARATOR,	[$APP_DIR,	'src']);
 	$CUSTOM_DIR		=	implode(DIRECTORY_SEPARATOR,    [$APP_DIR,	'..','custom']);
 
 	$CONFIG_OVERRIDE_FILE	=	implode(DIRECTORY_SEPARATOR,	[$CUSTOM_DIR,'config','config.php']);

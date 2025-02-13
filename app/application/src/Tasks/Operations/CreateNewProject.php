@@ -1,14 +1,10 @@
 <?php
 
-	namespace Operations;
+	namespace Tasks\Operations;
 
-	class CreateNewProject {
+	class CreateNewProject extends AbstractOperation {
 
-		public function __construct() {
-
-		}
-
-		public static function run($task) {
+		public function run( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
 			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
@@ -34,26 +30,18 @@
 			$task->save();
 		}
 
-		public static function checkReadyForOperation($task) {
+		public function checkReady( \Tasks\Task $task ) {
 			return empty($task->getApiToken());
 		}
 
-		public static function checkOperationComplete($task, bool $thrown = true) {
+		public function checkComplete( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
-			try {
-				$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
-				$token = $task->getApiToken();
+			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
+			$token = $task->getApiToken();
 
-		        	$curlTask = \Curl\TygronCurlTask::get($credentials, $credentials['platform'], 'api/session/location/?token='.$token)->run();
-				return ($curlTask->getStatus() == 400) && (str_contains( strtolower($curlTask->getContent()), 'not set' ));
-			} catch (\Throwable $e) {
-				if ($thrown) {
-					$task->log(get_text('An exception occurred',[$e->getMessage()]));
-					throw $e;
-				}
-				return false;
-			}
+	        	$curlTask = \Curl\TygronCurlTask::get($credentials, $credentials['platform'], 'api/session/location/?token='.$token)->run();
+			return ($curlTask->getStatus() == 400) && (str_contains( strtolower($curlTask->getContent()), 'not set' ));
 		}
 	}
 

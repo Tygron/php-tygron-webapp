@@ -1,14 +1,16 @@
 <?php
 
-	namespace Operations;
+	namespace Tasks\Operations;
 
-	class GenerateProject {
+	class GenerateProject extends AbstractOperation {
 
-		public function __construct() {
-
+		public function getInputParameters() {
+			return [
+					'areaOfInterest' => null
+				];
 		}
 
-		public static function run($task) {
+		public function run( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
 			$token = $task->getApiToken();
@@ -21,7 +23,7 @@
 		}
 
 
-		public static function checkReadyForOperation($task) {
+		public function checkReady( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
 			try {
@@ -35,30 +37,23 @@
 			}
 		}
 
-		public static function checkOperationComplete($task, bool $thrown = true) {
+		public function checkComplete( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
-			try {
-				$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
-				$token = $task->getApiToken();
+			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
+			$token = $task->getApiToken();
 
-				//TODO: Check whether project still running
+			//TODO: Check whether project still running
 
-				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/progress')->run();
-				if ( count($curlTask->getContent())==0 ) {
-					throw new Exception('No progress items');
-				}
-				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/info')->run();
-				if ($curlTask->getContent()['state']=='NORMAL') {
-					return true;
-				}
-				return false;
-			} catch (\Throwable $e) {
-				if ($thrown) {
-					throw $e;
-				}
-				return false;
+			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/progress')->run();
+			if ( count($curlTask->getContent())==0 ) {
+				throw new Exception('No progress items');
 			}
+			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/info')->run();
+			if ($curlTask->getContent()['state']=='NORMAL') {
+				return true;
+			}
+			return false;
 		}
 	}
 

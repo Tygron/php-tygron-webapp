@@ -14,6 +14,9 @@
 				'credentialsFile'	=>	'',
 				'templateName'		=>	'',
 				'platform'		=>	'engine',
+
+				'apiToken'		=>	'',
+
 				'location'		=>	null,
 				'size'			=>	[500,500],
 
@@ -21,7 +24,6 @@
 				'lastOperationTime'	=>	null,
 				'completionTime'	=>	null,
 
-				'apiToken'		=>	'',
 				'taskOperations'	=>	[],
 				'cleanupOperations'	=>	[],
 				'currentOperation'	=>	'',
@@ -36,6 +38,8 @@
 				'error'			=>	null,
 				'log'			=>	[],
 			];
+
+		public static ?array $ALLOWED_PARAMETERS = null;
 
 
 		public function __construct( $parameters ) {
@@ -235,7 +239,7 @@
 			if ($this->data['initialized']) {
 				return;
 			}
-			if ( empty($this->getCurrentOperation()) ) {
+			if ( empty($this->getCurrentOperation()) && count($this->getOperations())>0 ) {
 				$this->setCurrentOperation($this->getFirstOperation());
 			}
 			$this->data['initialized'] = true;
@@ -358,6 +362,22 @@
 			if ( empty($this->getLocation()) ) {
 				throw new \Exception('No location provided');
 			}
+		}
+
+
+		public static function getAllowedParameters() {
+			if ( is_null(self::$ALLOWED_PARAMETERS) ) {
+				$operationClasses = \Utils\Classes::getClassesInFolder([__DIR__,'Operations']);
+				$allowedParameters = [];
+				foreach ( $operationClasses as $key=>$className) {
+					try {
+						$allowedParameters = array_merge($allowedParameters, (new $className())->getInputParameters());
+					} catch( \Throwable $e ) {
+					}
+				}
+				self::$ALLOWED_PARAMETERS = $allowedParameters;
+			}
+			return self::$ALLOWED_PARAMETERS;
 		}
 
 

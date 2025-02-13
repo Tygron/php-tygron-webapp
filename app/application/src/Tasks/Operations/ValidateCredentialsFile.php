@@ -1,14 +1,10 @@
 <?php
 
-	namespace Operations;
+	namespace Tasks\Operations;
 
-	class ValidateCredentialsFile {
+	class ValidateCredentialsFile extends AbstractOperation {
 
-		public function __construct() {
-
-		}
-
-		public static function run($task) {
+		public function run( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
 			$credentialsFileName = $task->getCredentialsFileName();
@@ -33,11 +29,11 @@
 		}
 
 
-		public static function checkReadyForOperation($task) {
+		public function checkReady( \Tasks\Task $task ) {
 			return true;
 		}
 
-		public static function checkOperationComplete($task, bool $thrown = true) {
+		public function checkComplete( \Tasks\Task $task ) {
 			return $task->getOperationResult() === true;
 		}
 	}

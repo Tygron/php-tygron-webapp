@@ -60,6 +60,22 @@
 			return $decodedContents;
 		}
 
+		public static function getContentsOfDirectory( string|array $path, bool $hidden = false ) {
+			$path = self::makePath($path);
+			if (!is_dir($path)) {
+				throw new \Exception('Path is not a directory: '.strval($path));
+			}
+			$files = array_diff(scandir($path),['.','..']);
+
+			if (!$hidden) {
+				$hideFilter = function($value) {
+					return !( substr($value,0,1)==='.' );
+				};
+				$files = array_filter($files, $hideFilter);
+			}
+			return $files;
+		}
+
 		public static function makePath( string|array $path ) {
 			$madePath = '';
 			if ( is_string($path) ) {
@@ -90,7 +106,7 @@
 			foreach ($pathParts as $part) {
 				$dir = $dir . DIRECTORY_SEPARATOR . $part;
 				if ( is_file($dir) ) {
-					throw new Exception('Could not ensure directory for \''.$path.'\', because \''.$dir.'\' is a file');
+					throw new \Exception('Could not ensure directory because it is a file: '.$path);
 				}
 				if ( !is_dir($dir) ) {
 					mkdir($dir);

@@ -41,11 +41,7 @@
 		}
 
 		protected function getAllowedExtraParameters() {
-			//TODO: Obtain dynamically from (potential) operations
-			return [
-					'areaOfInterest'		=>	null,
-					'areaOfInterestAttributes'	=>	[],
-				];
+			return \Tasks\Task::getAllowedParameters();
 		}
 
 		protected function mergeParametersForTask( array $parameters ) {
