@@ -1,5 +1,9 @@
 <?php
 
+	// Webbase. Use "/" when running directly as example.tygron.com/
+	// Use "/subdir/" when running from example.tygron.com/subdir/
+	$APPLICATION_WEBBASE = '/';
+
 	//Location of the workspace folder
 	$WORKSPACE_DIR = '/var/workspace/';
 

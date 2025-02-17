@@ -1,6 +1,5 @@
 <?php
 
-
 	$APP_DIR		=	implode(DIRECTORY_SEPARATOR,	[__DIR__,	'..']);
 	$SRC_DIR		=	implode(DIRECTORY_SEPARATOR,	[$APP_DIR,	'src']);
 	$CUSTOM_DIR		=	implode(DIRECTORY_SEPARATOR,    [$APP_DIR,	'..','custom']);
@@ -11,13 +10,16 @@
 		include_once($CONFIG_OVERRIDE_FILE);
 		include_once($CONFIG_OVERRIDE_FILE); // In case location changed
 	}
-	$APP_HTML_DIR 		=	implode(DIRECTORY_SEPARATOR,	[$APP_DIR, 	'resources', 'html'] );
 
+	$APP_RESOURCES_DIR 		  =	implode(DIRECTORY_SEPARATOR, [$APP_DIR, 'resources'] );
 
-	//Some of the variables below can be overwritten, others should not.
+	//Variables can be overwritten.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
+	$APPLICATION_WEBBASE		??=	'/';
 
-	$CUSTOM_HTML_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'html'] );
+	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR] );
+	$APP_HTML_DIR = $APP_RESOURCES_DIR.'/html/ ';
+	$CUSTOM_HTML_DIR = $CUSTOM_RESOURCES_DIR.'/html/ ';
 
 	$WORKSPACE_DIR 			??=	implode(DIRECTORY_SEPARATOR, ['','var','workspace']);
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);

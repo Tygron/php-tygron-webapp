@@ -9,6 +9,6 @@
 	include_once 'html.php';
 	include_once 'logging.php';
 
-	\Rendering\Renderer::addAssetSource( $CUSTOM_HTML_DIR );
-	\Rendering\Renderer::addAssetSource( $APP_HTML_DIR );
+	\Assets\AssetReader::addSource($CUSTOM_RESOURCES_DIR);
+	\Assets\AssetReader::addSource($APP_RESOURCES_DIR);
 ?>

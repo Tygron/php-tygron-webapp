@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_URI} !(.*)/css/index.php
+RewriteRule (.*) css/index.php?file=$1 [NC]
