@@ -4,9 +4,13 @@
 
 	class Renderer {
 
-		public static function getRendered( string $asset = null, array $data = null ) {
-			$asset = \Assets\AssetReader::getAsset( $asset, 'html' );
-			$asset = self::populate( $asset, $data );
+		public static function renderFromFile( string $file, array $data = null ) {
+			$asset = \Assets\AssetReader::getAsset( $file, null );
+			return self::renderFromTemplate($asset, $data);
+		}
+
+		public static function renderFromTemplate( string $template, array $data = null) {
+			$asset = self::populate( $template, $data );
 			$asset = self::clean( $asset );
 			return $asset;
 		}
@@ -15,7 +19,7 @@
 			if ( is_null($data) ) {
 				return $asset;
 			}
-			foreach ( $data as $key=>$value ) {
+			foreach ( $data as $key => $value ) {
 				if (is_array($value)) {
 					$can_be_imploded = true;
 					foreach ($value as $subKey => $subValue) {

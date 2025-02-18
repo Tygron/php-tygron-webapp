@@ -7,11 +7,11 @@
 		public function run( array $parameters = null ) {
 			global $_INPUTS;
 
-			$taskName = get_clean_user_input('task');
+			$taskName = get_clean_user_input('taskName');
 			try {
 				$task = \Tasks\Task::load($taskName);
 			} catch (\Throwable $e) {
-				$renderable = $this->getRenderable( 'TaskNotFound', ['taskName' => $taskName] );
+				$renderable = $this->getRenderable( 'TaskNotFound', ['taskName' => $taskName, 'message' => $e->getMessage()] );
 				return $renderable->getRendered();
 
 			}

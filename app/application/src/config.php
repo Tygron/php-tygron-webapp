@@ -12,14 +12,15 @@
 	}
 
 	$APP_RESOURCES_DIR 		  =	implode(DIRECTORY_SEPARATOR, [$APP_DIR, 'resources'] );
+	$APP_ASSETS_DIR			  =	implode(DIRECTORY_SEPARATOR, [$APP_RESOURCES_DIR, 'assets']);
 
 	//Variables can be overwritten.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
 	$APPLICATION_WEBBASE		??=	'/';
 
-	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR] );
-	$APP_HTML_DIR = $APP_RESOURCES_DIR.'/html/ ';
-	$CUSTOM_HTML_DIR = $CUSTOM_RESOURCES_DIR.'/html/ ';
+	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'resources'] );
+	$CUSTOM_ASSETS_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_RESOURCES_DIR, 'assets'] );
+
 
 	$WORKSPACE_DIR 			??=	implode(DIRECTORY_SEPARATOR, ['','var','workspace']);
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
@@ -64,6 +65,19 @@
 			],
 		],
 	];
+
+
+	//Debug flags
+
+	//When rendering assets such as html, css, js files, include originating file and dir as comment or other meta information.
+	$DEBUG_ASSETS_METADATA ??= false;
+
+
+	//
+	$CONTENT_HEADERS ??= [];
+	$CONTENT_HEADERS['js'] ??= [
+			'Content-Type' => 'application/javascript'
+		];
 
 	\Utils\Time::$DEFAULT_TIMEZONE = $TIMEZONE_DEFAULT;
 ?>

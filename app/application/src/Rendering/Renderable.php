@@ -58,4 +58,8 @@
 			return $this->rendered;
 		}
 
+		public function output() {
+			echo $this->render();
+		}
+
 	}

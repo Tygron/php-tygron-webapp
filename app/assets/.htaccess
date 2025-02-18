@@ -1,0 +1,5 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{REQUEST_URI} !(.*)/assets/index.php
+RewriteRule (.*) assets/index.php?file=$1 [NC]

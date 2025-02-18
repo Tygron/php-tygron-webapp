@@ -9,7 +9,6 @@
 				$task = \Tasks\TaskGenerator::generate($parameters);
 				$task->validate();
 			} catch ( \Throwable $e ) {
-
 				return $this->getRenderable( 'CreateTaskError', ['message'=>$e->getMessage()] );
 			}
 

@@ -14,7 +14,13 @@
 			}
 
 			if ( !empty($AUTHENTICATION_TOKEN && $authenticationToken != $AUTHENTICATION_TOKEN)) {
-				echo \Rendering\Renderer::getRendered('login.html');
+				$asset = \Assets\AssetReader::getAsset(
+					'login.html',
+					'html'
+				);
+				$renderableAsset = new \Rendering\RenderableAsset();
+				$renderableAsset->setAsset($asset);
+				$renderableAsset->output();
 				exit();
 			}
 		}

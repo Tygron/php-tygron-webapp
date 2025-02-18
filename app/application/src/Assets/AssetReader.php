@@ -14,18 +14,23 @@
 			$sources = self::getAssetSources($assetType);
 			foreach ( $sources as $index => $source ) {
 				$fileContent = null;
+				$fileFound = null;
 				try {
 					$fileContent = \Utils\Files::readFile([$source, $assetName]);
+					$fileMimeType = \Utils\Files::readFileMimeType([$source, $assetName]);
+
 				} catch ( \Throwable $e ) {
 					continue;
 				}
 
 				$asset = new \Assets\Asset(
 						$fileContent,
-						$assetType,
+						$fileMimeType,
 
 						$assetName,
-						$source
+						$source,
+
+						$assetType,
 					);
 				return $asset;
 			}

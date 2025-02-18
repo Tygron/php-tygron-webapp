@@ -43,6 +43,15 @@
 			return $contents;
 		}
 
+		public static function readFileMimeType( string|array $path ) {
+			$path = self::makePath($path);
+			$mime = mime_content_type($path);
+			if (!$mime) {
+				throw new \Exception('Could not read file at \''.$path.'\'');
+			}
+			return $mime;
+		}
+
 		public static function writeJsonFile( string|array $path, $content ) {
 			$path = self::makePath($path);
 

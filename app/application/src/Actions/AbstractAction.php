@@ -59,16 +59,21 @@
 			return $injections;
 		}
 
-		protected function getRenderable( string $asset = null, array|null $data = null ) {
-			if ( is_null($asset) ) {
-				$asset = $this->name();
+		protected function getRenderable( string $assetName = null, array|null $data = null ) {
+			if ( is_null($assetName) ) {
+				$assetName = $this->name();
 			}
-			if ( strlen(\Utils\Files::getFileExtension($asset)) == 0 ) {
-				$asset = $asset . '.html';
+			if ( strlen(\Utils\Files::getFileExtension($assetName)) == 0 ) {
+				$assetName = $assetName . '.html';
 			}
-			$renderable = new \Rendering\Renderable();
-			$renderable->setTemplate($asset);
-			$renderable->setData($data);
-			return $renderable;
+
+			$asset = \Assets\AssetReader::getAsset(
+					$assetName,
+					'html'
+				);
+			$renderableAsset = new \Rendering\RenderableAsset();
+			$renderableAsset->setAsset($asset);
+			$renderableAsset->setData($data);
+			return $renderableAsset;
 		}
 	}

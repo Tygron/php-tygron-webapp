@@ -5,7 +5,7 @@
 	class CreateTaskForm extends AbstractAction {
 
 		public function run( array $parameters = null ) {
-			return \Rendering\Renderer::getRendered('form.html');
+			return $this->getRenderable( null, $this->mergeParametersForTask($parameters) );
 		}
 	}
 

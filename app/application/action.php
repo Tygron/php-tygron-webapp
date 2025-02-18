@@ -1,4 +1,3 @@
-
 <?php
 
 	$action = get_clean_user_input('action');
@@ -23,7 +22,11 @@
 		throw new Exception( get_text('Could not load action %s',[$action]), previous:$e);
 	}
 
-	echo $actionObject->startAction($_INPUTS_CLEANED);
-
+	$output = $actionObject->startAction($_INPUTS_CLEANED);
+	if ( $output instanceof \Rendering\Renderable ) {
+		$output->output();
+	} else {
+		echo $output;
+	}
 
 ?>
