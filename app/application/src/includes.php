@@ -11,4 +11,7 @@
 
 	\Assets\AssetReader::addSource($CUSTOM_ASSETS_DIR);
 	\Assets\AssetReader::addSource($APP_ASSETS_DIR);
+
+	\Assets\AssetReader::addSource($CUSTOM_RESOURCES_DIR, false);
+	\Assets\AssetReader::addSource($APP_RESOURCES_DIR, false);
 ?>

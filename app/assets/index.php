@@ -11,10 +11,15 @@
 		$assetName = implode(DIRECTORY_SEPARATOR, $assetName);
 	}
 
-	$asset = \Assets\AssetReader::getAsset(
-			$assetName,
-			$assetType
-		);
+	$asset = null;
+	try {
+		$asset = \Assets\AssetReader::getPublicAsset(
+				$assetName,
+				$assetType
+			);
+	} catch (\Exception $e) {
+		exit('Asset not found');
+	}
 	$renderableAsset = new \Rendering\RenderableAsset();
 	$renderableAsset->setAsset($asset);
 	$renderableAsset->output();

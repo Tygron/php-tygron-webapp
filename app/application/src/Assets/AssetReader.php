@@ -4,15 +4,43 @@
 
 	class AssetReader {
 
-		private static string|array $DEFAULT_ASSET_DIR = [];
+		private static string|array $DEFAULT_PUBLIC_ASSET_DIR = [];
+		private static string|array $DEFAULT_PRIVATE_ASSET_DIR = [];
 
-		public static function addSource( array|string $sources) {
-			self::_addAssetSourceDir($sources);
+		public static function addSource( array|string $sources, bool $publicSource = true ) {
+			self::_addAssetSourceDir($sources, $publicSource);
 		}
 
-		public static function getAsset( string $assetName, string $assetType = null) {
-			$sources = self::getAssetSources($assetType);
-			foreach ( $sources as $index => $source ) {
+		public static function getAsset( string $assetName, string $assetType = null ) {
+			return self::getPrivateAsset( $assetName, $assetType );
+		}
+
+		public static function getPublicAsset( string $assetName, string $assetType = null ) {
+			$sources = self::getAssetSources(
+					$assetType,
+					self::$DEFAULT_PUBLIC_ASSET_DIR
+				);
+			return self::_getAsset( $assetName, $assetType, $sources );
+		}
+
+		public static function getPrivateAsset( string $assetName, string $assetType = null) {
+			$sources = self::getAssetSources(
+					$assetType,
+					array_merge( self::$DEFAULT_PUBLIC_ASSET_DIR, self::$DEFAULT_PRIVATE_ASSET_DIR )
+				);
+			return self::_getAsset( $assetName, $assetType, $sources );
+		}
+
+		public static function getAssetSources( string $assetType = null, string|array $assetDir = null) {
+			if ( is_null($assetDir) ) {
+				$assetDir = self::$DEFAULT_PUBLIC_ASSET_DIR;
+			}
+
+			return self::_getAssetSources( $assetType, $assetDir);
+		}
+
+		protected static function _getAsset( string $assetName, string $assetType, array $assetSources ) {
+			foreach ( $assetSources as $index => $source ) {
 				$fileContent = null;
 				$fileFound = null;
 				try {
@@ -34,14 +62,12 @@
 					);
 				return $asset;
 			}
-			throw new \Exception(get_text('Asset not found in %s location(s): %s', [count($sources), $assetName]));
+			throw new \Exception(get_text('Asset not found in %s location(s): %s', [count($assetSources), $assetName]));
+
 		}
 
-		public static function getAssetSources( string $assetType = null, string|array $assetDir = null) {
+		protected static function _getAssetSources( string $assetType = null, string|array $assetDir ) {
 			$results = [];
-			if ( is_null($assetDir) ) {
-				$assetDir = self::$DEFAULT_ASSET_DIR;
-			}
 			if ( is_string($assetDir) ) {
 				$assetDir = [$assetDir];
 			}
@@ -57,13 +83,17 @@
 			return $results;
 		}
 
-		protected static function _addAssetSourceDir( array| string $sources ) {
+		protected static function _addAssetSourceDir( array| string $sources, bool $publicSource = true ) {
 			if ( !is_array($sources) ) {
 				$sources = [$sources];
 			}
 			foreach ( $sources as $index => $source ) {
 				if ( is_dir($source) ) {
-					array_push( self::$DEFAULT_ASSET_DIR, $source );
+					if ( $publicSource ) {
+						array_push( self::$DEFAULT_PUBLIC_ASSET_DIR, $source );
+					} else {
+						array_push( self::$DEFAULT_PRIVATE_ASSET_DIR, $source );
+					}
 				}
 			}
 		}
