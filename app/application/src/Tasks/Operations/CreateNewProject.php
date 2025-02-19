@@ -11,6 +11,10 @@
 
 			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/start', ['EDITOR', $task->getTemplateName()])->run();
 		        $sessionId = $curlTask->getContent();
+			if ( !$curlTask->getResponseIsSuccess() ) {
+				$task->log(get_text('Could not start project for reason: %s',[$curlTask->getContent()]));
+				throw new \Exception( $curlTask->getContent() );
+			}
 			$task->log(get_text('Started template: %s',[$task->getTemplateName()]));
 
 		        $curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/join', [$sessionId, 'EDITOR'])->run();
