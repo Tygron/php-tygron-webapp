@@ -32,6 +32,10 @@
 			if ( array_key_exists('locationY', $_INPUTS) ) {
 				$inputs['locationY'] = get_clean_user_input('locationY', '[\.\-0-9]');
 			}
+			if ( array_key_exists('location', $_INPUTS) ) {
+				$inputs['location'] = get_clean_user_input('location', '[\[\]\,\.0-9]');
+				$inputs['location'] = json_decode($inputs['location'], true);
+			}
 			if ( array_key_exists('areaOfInterest', $_INPUTS) ) {
 				$inputs['areaOfInterest'] = get_clean_user_input('areaOfInterest', '[\{\}\[\]\s\-\_\,\.\'\"\:a-zA-Z0-9]');
 				$inputs['areaOfInterest'] = json_decode($inputs['areaOfInterest'], true);

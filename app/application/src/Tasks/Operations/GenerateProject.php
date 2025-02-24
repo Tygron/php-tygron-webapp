@@ -6,6 +6,7 @@
 
 		public function getInputParameters() {
 			return [
+					'location'	=> null,
 					'areaOfInterest' => null
 				];
 		}

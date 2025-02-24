@@ -39,6 +39,8 @@
                         $startTime = $task->getLastOperationTime();
                         $currentTime = \Utils\Time::getCurrentTimestamp();
 
+			$waitTime = $task->getData()['recalculateWaitTime'] ?? self::$WAIT_TIME;
+
 			$period = \Utils\Time::getTimePeriod($startTime, $currentTime);
 			if ( $period<$waitTime ) {
 				return false;
