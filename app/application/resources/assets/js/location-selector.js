@@ -1,20 +1,27 @@
 class LocationSelector {
 
 	inputs = {
+		// output: center coordinate for location
 		'location'			: 'input[name=\'location\']',
 		'locationX'			: 'input[name=\'locationX\']',
 		'locationY'			: 'input[name=\'locationY\']',
 
+		// output: size for location
 		'size'				: 'input[name=\'size\']',
 		'sizeX'				: 'input[name=\'sizeX\']',
 		'sizeY'				: 'input[name=\'sizeY\']',
 
-		'polygon'			: 'input[name=\'polygon\']',
-
+		// output: additional area to to send over (derived from coordinate and size, or polygon)
 		'areaOfInterest'		: 'input[name=\'areaOfInterest\']',
 		'areaOfInterestAttributes'	: 'input[name=\'areaOfInterestAttributes\']',
 
+		// crs for output of selected data
 		'crs'				: 'input[name=\'crs\']',
+
+		// input only: the polygon of interest
+		'polygon'			: 'input[name=\'polygon\']',
+
+		// inpout only: the zoom level
 		'zoomLevel'			: 'input[name=\'zoomLevel\']',
 	}
 
@@ -28,15 +35,25 @@ class LocationSelector {
 			'layer' 				: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			'config'				: { 'attribution' : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
 		} ],
+		'selectableLayer'		: null,
 		'styles'			: {
 			'polygon'				: { 'color' : 'orange', 'fillColor' : 'orange' },
+			'selectables'				: { 'color' : 'black', 'fillColor' : 'darkgrey' },
 		},
 
 		'cameraPadding'			: [ 100, 100 ],
-		'squareSize'			: false,
+
 		'generateAOI'			: true,
-		'shrinkForAOI'			: true,
-		'growForAOI'			: true,
+
+		'squareSize'			: false, //TODO
+		'minSize'			: 500, //TODO
+		'maxSize'			: 5000, //TODO
+		'shrinkForAOI'			: true, //TODO
+		'growForAOI'			: true, //TODO
+	}
+
+	selectables = {
+
 	}
 
 	defaults = {
@@ -78,7 +95,7 @@ class LocationSelector {
 
 	setupSettings( settings ) {
 		for ( let type of Object.keys(settings) ) {
-			if ( !['inputs','dom','defaults'].includes(type) ) {
+			if ( !['inputs','dom','defaults','selectables','config'].includes(type) ) {
 				continue;
 			}
 			let provided = settings[type];
@@ -100,6 +117,14 @@ class LocationSelector {
 	}
 	setCameraToSelection() {
 		this.setCameraToBounds( this.computeSelectionBounds() );
+	}
+	setSelectable( key ) {
+		if ( this.selectables[key] == null ) {
+			this.config['selectableLayer'] = null;
+		} else {
+			this.config['selectableLayer'] = key;
+		}
+		this.reloadSelectablesLayer();
 	}
 
 	//* SELECTION *//
@@ -226,15 +251,17 @@ class LocationSelector {
 			}
 		}
 		if ( Array.isArray(data) ) {
+			if ( data.length === 0 ) {
+				return 'coordinates';
+			}
 			if ( data.length === 2 ) {
 				if ( (this.checkDataType(data[0]) === 'numeric') && (this.checkDataType(data[0]) === 'numeric') ) {
 					return 'coordinate';
 				}
 			}
-			if ( data.length===0 || this.checkDataType(data[0]) === 'coordinate' ) {
+			if ( this.checkDataType(data[0]) === 'coordinate' ) {
 				return 'coordinates';
 			}
-			return 'unknown';
 		}
 		if ( data['x'] && data['y'] ) {
 			return 'coordinate';
@@ -247,6 +274,25 @@ class LocationSelector {
 		}
 		if ( data['type'] == 'MultiPolygon' ) {
 			return 'multipolygon';
+		}
+		if ( data['type'] == 'Feature' ) {
+			return 'feature';
+		}
+		return 'unknown';
+	}
+
+	swapCoordinatesXY(coordinate) {
+		if ( Array.isArray(coordinate) ) {
+			if ( this.checkDataType(coordinate) == 'coordinate' ) {
+				return [coordinate[1], coordinate[0]];
+			} else {
+				let arr = [];
+				for(let i=0;i<coordinate.length;i++) {
+					let c = this.swapCoordinatesXY(coordinate[i]);
+					arr.push(c);
+				}
+				return arr;
+			}
 		}
 	}
 
@@ -488,32 +534,84 @@ class LocationSelector {
 		}
 	}
 	visualizeElement( id, element ) {
-		this.visualizeReset( id );
-		switch( this.checkDataType(element) ) {
-			case 'coordinates':
-				element = L.polygon(element)
-				break;
-			case 'polygon':
-				element = L.polygon(element.coordinates)
-				break;
-			case 'coordinate':
-				element = L.marker(element)
-				break;
-			default:
-				element = null;
-				break;
-		}
-		if ( element == null ) {
-			return;
-		}
+		this.visualizeElements( id, [element] );
+	}
 
+	visualizeElements( id, elements ) {
+		this.visualizeReset( id );
+		let style = {};
 		try {
-			element.setStyle( this.config.styles[id] ?? {});
+			style = this.config.styles[id] ?? {};
 		} catch (err)
 		{
 		}
-		this.visualization[id] = element;
-		element.addTo(this.leaflet);
+		let group = new L.LayerGroup();
+		for ( let i = 0; i < elements.length ; i++ ) {
+			let element = elements[i];
+			switch( this.checkDataType(element) ) {
+				case 'feature':
+					element = L.polygon(element.geometry.coordinates);
+					break;
+				case 'coordinates':
+					element = L.polygon(element)
+					break;
+				case 'polygon':
+					element = L.polygon(element.coordinates)
+					break;
+				case 'coordinate':
+					element = L.marker(element)
+					break;
+				default:
+					element = null;
+					break;
+			}
+			if ( element == null ) {
+				continue;
+			}
+			if ( typeof element.setStyle === 'function' ) {
+				element.setStyle(style);
+			}
+			group.addLayer(element);
+			//element.addTo(group);
+		}
+		this.visualization[id] = group;
+		group.addTo(this.leaflet);
+	}
+
+
+	reloadSelectablesLayer() {
+		//TODO:
+		let layer = this.selectables[this.config['selectableLayer']];
+		if (layer === null) {
+			return;
+		}
+		let bbox = this.leaflet.getBounds().toBBoxString();
+		let bboxCrs = 'urn:ogc:def:crs::EPSG::4326';
+		let bboxString = bbox+','+bboxCrs;
+		let parameters = {
+			service : 'wfs',
+			request: 'GetFeature',
+			outputFormat: 'application/json',
+			srsName: 'EPSG:4326',
+			bbox: bboxString,
+			//maxFeatures: 250
+		}
+		parameters = L.Util.extend(parameters, layer['parameters']);
+		let url = layer['url'] + L.Util.getParamString(parameters);
+		let request = $.ajax( {
+			url : url,
+			dataType : 'json',
+		} );
+		let self = this;
+		request.then(function(e){
+			let features = e.features;
+			for ( let i = 0; i < features.length ; i++ ) {
+				let feature = features[i];
+				feature.geometry.coordinates = self.swapCoordinatesXY(feature.geometry.coordinates);
+			}
+ 			console.log(features);
+			self.visualizeElements( 'selectables', features );
+		});
 	}
 
 	//* INTERFACE *//
@@ -674,5 +772,12 @@ class LocationSelector {
 			self.updateSelectionToInterface();
 		});
 	}
+
+	addMapChangeHandler() {
+		let self = this;
+		let mapChangeHandler = function() {
+				self.reloadSelectableLayers();
+			}
+		}
 
 }
