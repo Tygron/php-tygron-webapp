@@ -580,9 +580,12 @@ class LocationSelector {
 
 
 	reloadSelectablesLayer() {
-		//TODO:
 		let layer = this.selectables[this.config['selectableLayer']];
-		if (layer === null) {
+		if ( !layer ) {
+			return;
+		}
+		if ( layer.zoomLevel && (layer.zoomLevel > this.leaflet.getZoom()) ) {
+			this.visualizeReset('selectables');
 			return;
 		}
 		let bbox = this.leaflet.getBounds().toBBoxString();
@@ -609,7 +612,6 @@ class LocationSelector {
 				let feature = features[i];
 				feature.geometry.coordinates = self.swapCoordinatesXY(feature.geometry.coordinates);
 			}
- 			console.log(features);
 			self.visualizeElements( 'selectables', features );
 		});
 	}
@@ -681,6 +683,7 @@ class LocationSelector {
 		this.leaflet = L.map(id, {crs:L.CRS.EPSG3857});
 		this.addClickHandler();
 		this.addInterfaceHandler();
+		this.addMapChangeHandler();
 	}
 
 	setupLeafletBackground() {
@@ -775,9 +778,11 @@ class LocationSelector {
 
 	addMapChangeHandler() {
 		let self = this;
-		let mapChangeHandler = function() {
-				self.reloadSelectableLayers();
-			}
-		}
-
+		let handlerFunction = function(e) {
+			console.log('Zoom to : '+self.leaflet.getZoom());
+			self.reloadSelectablesLayer();
+		};
+		this.leaflet.on('zoomend', handlerFunction);
+		this.leaflet.on('moveend', handlerFunction);
+	}
 }
