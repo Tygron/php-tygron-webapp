@@ -88,6 +88,7 @@ class LocationSelector {
 		this.setupCreateLeaflet();
 		this.setupData();
 		this.setupLeafletBackground();
+		this.setupAddHandlers();
 		this.setupStartLeaflet();
 		console.log(this);
 		console.log(this.selection);
@@ -222,8 +223,8 @@ class LocationSelector {
 		switch (this.checkDataType(data)) {
 			case 'coordinate'	:	return this.convertCoordinateToLeaflet(data);
 			case 'coordinates'	:	return this.convertCoordinatesToLeaflet(data);
-			case 'polygon'		:
-			case 'multipolygon'	:	return this.convertPolygonToLeaflet(data);
+			case 'polygon'		:	return this.convertPolygonToLeaflet(data);
+			case 'multipolygon'	:	return this.convertMultiPolygonToLeaflet(data);
 		}
 		return data;
 	}
@@ -235,8 +236,8 @@ class LocationSelector {
 		switch (this.checkDataType(data)) {
 			case 'coordinate'	:	return this.convertCoordinateFromLeaflet(data);
 			case 'coordinates'	:	return this.convertCoordinatesFromLeaflet(data);
-			case 'polygon'		:
-			case 'multipolygon'	:	return this.convertPolygonFromLeaflet(data);
+			case 'polygon'		:	return this.convertPolygonFromLeaflet(data);
+			case 'multipolygon'	:	return this.convertMultiPolygonFromLeaflet(data);
 		}
 		return data;
 	}
@@ -262,6 +263,9 @@ class LocationSelector {
 			if ( this.checkDataType(data[0]) === 'coordinate' ) {
 				return 'coordinates';
 			}
+			if ( this.checkDataType(data[0]) === 'feature' ) {
+				return 'features';
+			}
 		}
 		if ( data['x'] && data['y'] ) {
 			return 'coordinate';
@@ -282,6 +286,18 @@ class LocationSelector {
 	}
 
 	swapCoordinatesXY(coordinate) {
+		if ( coordinate.type != null ) {
+			return {
+				'type' : coordinate.type,
+				'coordinates' : this.swapCoordinatesXY(coordinate.coordinates),
+			};
+		}
+
+		if ( (coordinate.lat != null) || (coordinate.x != null) ) {
+			//If the coordinate is clear on direction, don't change it
+			return coordinate;
+		}
+
 		if ( Array.isArray(coordinate) ) {
 			if ( this.checkDataType(coordinate) == 'coordinate' ) {
 				return [coordinate[1], coordinate[0]];
@@ -294,9 +310,10 @@ class LocationSelector {
 				return arr;
 			}
 		}
+		throw new Error('Could not parse structure of coordinate object.')
 	}
 
-	convertCoordinateToLeaflet(coordinate, arrayType = 'xy') {
+	convertCoordinateToLeaflet(coordinate, arrayType = 'xy', arrayOutput = null) {
 		let crs = this.selection['crs'];
 		if ( coordinate['crs'] ) {
 			crs = coordinate['crs'];
@@ -311,33 +328,48 @@ class LocationSelector {
 		}
 		let leafletCoordinate = crsObj.unproject(coordinate);
 
+		if ( arrayOutput == 'xy') {
+			leafletCoordinate = [leafletCoordinate.lng, leafletCoordinate.lat];
+		} else if ( arrayOutput == 'yx' ) {
+			leafletCoordinate = [leafletCoordinate.lat, leafletCoordinate.lng];
+		}
+
 		return leafletCoordinate;
 	}
-	convertCoordinateFromLeaflet(leafletCoordinate, arrayType = 'xy') {
+	convertCoordinateFromLeaflet(leafletCoordinate, arrayType = 'yx', arrayOutput = 'xy') {
 		let crs = this.selection['crs'];
 		let crsObj = L.CRS['EPSG'+crs];
+
+		if ( Array.isArray(leafletCoordinate) ) {
+			if ( arrayType == 'xy' ) {
+				leafletCoordinate = [leafletCoordinate[1], leafletCoordinate[0]];
+			} else if ( arrayType == 'yx') {
+				leafletCoordinate = [leafletCoordinate[0], leafletCoordinate[1]];
+			}
+		}
+
 		leafletCoordinate = L.latLng(leafletCoordinate);
 		let coordinate = crsObj.project(leafletCoordinate);
 
-		if ( arrayType == 'yx' ) {
+		if ( arrayOutput == 'yx' ) {
 			return [coordinate.y, coordinate.x];
-		} else if ( arrayType == 'xy') {
+		} else if ( arrayOutput == 'xy') {
 			return [coordinate.x, coordinate.y];
-			}
+		}
 		return coordinate;
 	}
 
-	convertCoordinatesToLeaflet(coordinates, arrayType = 'xy' ) {
+	convertCoordinatesToLeaflet(coordinates, arrayType = 'xy', arrayOutput = null ) {
 		let output = [];
 		for ( let i=0 ; i<coordinates.length ; i++ ) {
-			output[i] = this.convertCoordinateToLeaflet( coordinates[i], arrayType );
+			output[i] = this.convertCoordinateToLeaflet( coordinates[i], arrayType, arrayOutput );
 		}
 		return output;
 	}
-	convertCoordinatesFromLeaflet(leafletCoordinates, arrayType = 'xy' ) {
+	convertCoordinatesFromLeaflet(leafletCoordinates, arrayType = 'yx', arrayOutput = 'xy' ) {
 		let output = [];
 		for ( let i=0 ; i<leafletCoordinates.length ; i++ ) {
-			output[i] = this.convertCoordinateFromLeaflet( leafletCoordinates[i], arrayType );
+			output[i] = this.convertCoordinateFromLeaflet( leafletCoordinates[i], arrayType, arrayOutput );
 		}
 		return output;
 	}
@@ -348,7 +380,7 @@ class LocationSelector {
 		}
 		let convertedCoordinateSets = [];
 		for ( let i of Object.keys(coordinatesSets) ) {
-			convertedCoordinateSets[i] = this.convertCoordinatesToLeaflet( coordinatesSets[i], 'xy' );
+			convertedCoordinateSets[i] = this.convertCoordinatesToLeaflet( coordinatesSets[i], 'xy', 'yx' );
 		}
 		return {
 			'type' : 'Polygon',
@@ -359,11 +391,46 @@ class LocationSelector {
 		let coordinatesSets = polygon.coordinates;
 		let convertedCoordinateSets = [];
 		for ( let i of Object.keys(coordinatesSets) ) {
-			convertedCoordinateSets[i] = this.convertCoordinatesFromLeaflet( coordinatesSets[i], 'xy' );
+			convertedCoordinateSets[i] = this.convertCoordinatesFromLeaflet( coordinatesSets[i], 'yx', 'xy' );
+		}
+		return {
+			'type' : 'Polygon',
+			'coordinates' : convertedCoordinateSets,
+		}
+
+	}
+	convertMultiPolygonToLeaflet(multipolygon) {
+		let coordinatesSets = multipolygon.coordinates;
+		let convertedCoordinatesSets = [];
+		for ( let j of Object.keys(coordinatesSets) ) {
+			let coordinatesSet = coordinatesSets[j];
+
+			let convertedCoordinatesSet = [];
+			for ( let i of Object.keys(coordinatesSet) ) {
+				convertedCoordinatesSet[i] = this.convertCoordinatesToLeaflet( coordinatesSet[i], 'xy', 'yx' );
+			}
+			convertedCoordinatesSets[j] = convertedCoordinatesSet;
 		}
 		return {
 			'type' : 'MultiPolygon',
-			'coordinates' : [convertedCoordinateSets],
+			'coordinates' : convertedCoordinatesSets,
+		}
+	}
+	convertMultiPolygonFromLeaflet(multipolygon) {
+		let coordinatesSets = multipolygon.coordinates;
+		let convertedCoordinatesSets = [];
+		for ( let j of Object.keys(coordinatesSets) ) {
+			let coordinatesSet = coordinatesSets[j];
+
+			let convertedCoordinatesSet = [];
+			for ( let i of Object.keys(coordinatesSet) ) {
+				convertedCoordinatesSet[i] = this.convertCoordinatesFromLeaflet( coordinatesSet[i], 'yx', 'xy' );
+			}
+			convertedCoordinatesSets[j] = convertedCoordinatesSet;
+		}
+		return {
+			'type' : 'MultiPolygon',
+			'coordinates' : convertedCoordinatesSets,
 		}
 
 	}
@@ -418,13 +485,15 @@ class LocationSelector {
 	}
 
 	computeCenterFromGeometry( geometry ) {
-		let coordinates = geometry.coordinates;
-		return L.polygon(coordinates).getBounds().getCenter();
+		geometry = {
+			'type': geometry.type,
+			'coordinates' : this.swapCoordinatesXY(geometry.coordinates),
+		};
+		return L.geoJson(geometry).getBounds().getCenter();
 	}
 
 	computeBoundsFromGeometry( geometry ) {
-		let coordinates = geometry.coordinates;
-		let bounds = L.polygon(coordinates).getBounds();
+		let bounds = L.geoJson(geometry).getBounds();
 		return [
 				[bounds.getNorth(), bounds.getWest()],
 				[bounds.getNorth(), bounds.getEast()],
@@ -435,7 +504,7 @@ class LocationSelector {
 
 	computeSizeFromGeometry( geometry ) {
 		let coordinates = geometry.coordinates;
-		let bounds = L.polygon(coordinates).getBounds();
+		let bounds = L.geoJson(geometry).getBounds();
 
 		let size = {
 			'width': Math.max(
@@ -489,6 +558,9 @@ class LocationSelector {
 			if ( ['coordinate','polygon','areaOfInterest'].includes(key) ) {
 				value = this.convertToLeaflet(value);
 			}
+			//if ( ['polygon','multipolygon'].includes(this.checkDataType(value)) ) {
+			//	value.coordinates = this.swapCoordinatesXY(value.coordinates);
+			//}
 			this.selection[key] = value;
 		}
 	}
@@ -499,6 +571,9 @@ class LocationSelector {
 		}
 		for ( let key of Object.keys(this.selection) ) {
 			let value = this.convertFromLeaflet(this.selection[key]);
+			//if ( ['polygon','multipolygon'].includes(this.checkDataType(value)) ) {
+			//	value.coordinates = this.swapCoordinatesXY(value.coordinates);
+			//}
 			switch(key) {
 				case 'coordinate' :
 					this.writeDataToInterfaceElement('location', 'locationX', 'locationY', 'x', 'y', value);
@@ -533,11 +608,11 @@ class LocationSelector {
 			delete this.visualization[i];
 		}
 	}
-	visualizeElement( id, element ) {
-		this.visualizeElements( id, [element] );
+	visualizeElement( id, element, handler = null ) {
+		this.visualizeElements( id, [element], handler );
 	}
 
-	visualizeElements( id, elements ) {
+	visualizeElements( id, elements, handler = null ) {
 		this.visualizeReset( id );
 		let style = {};
 		try {
@@ -548,18 +623,26 @@ class LocationSelector {
 		let group = new L.LayerGroup();
 		for ( let i = 0; i < elements.length ; i++ ) {
 			let element = elements[i];
+			let multipleElements = false;
 			switch( this.checkDataType(element) ) {
+				case 'features':
+					element = L.geoJSON(element);
+					multipleElements = true;
+					break;
 				case 'feature':
 					element = L.polygon(element.geometry.coordinates);
 					break;
 				case 'coordinates':
-					element = L.polygon(element)
+					element = L.polygon(element);
 					break;
 				case 'polygon':
-					element = L.polygon(element.coordinates)
+					element = L.polygon(element.coordinates);
+					break;
+				case 'multipolygon':
+					element = L.geoJSON(this.swapCoordinatesXY(element));
 					break;
 				case 'coordinate':
-					element = L.marker(element)
+					element = L.marker(element);
 					break;
 				default:
 					element = null;
@@ -570,6 +653,17 @@ class LocationSelector {
 			}
 			if ( typeof element.setStyle === 'function' ) {
 				element.setStyle(style);
+			}
+			if ( typeof handler === 'function' ) {
+				if ( multipleElements ) {
+					element.eachLayer(function(layer){
+						layer.on('click', handler);
+					});
+				} else {
+					element.on('click', handler);
+				}
+			} else {
+				element.options.interactive = false;
 			}
 			group.addLayer(element);
 			//element.addTo(group);
@@ -607,12 +701,9 @@ class LocationSelector {
 		} );
 		let self = this;
 		request.then(function(e){
+			console.log(e.features.length);
 			let features = e.features;
-			for ( let i = 0; i < features.length ; i++ ) {
-				let feature = features[i];
-				feature.geometry.coordinates = self.swapCoordinatesXY(feature.geometry.coordinates);
-			}
-			self.visualizeElements( 'selectables', features );
+			self.visualizeElement( 'selectables', features, function(e){self.selectHandler(e);} );
 		});
 	}
 
@@ -681,9 +772,6 @@ class LocationSelector {
 			$(this.dom['mapContainer']).attr('id', id);
 		}
 		this.leaflet = L.map(id, {crs:L.CRS.EPSG3857});
-		this.addClickHandler();
-		this.addInterfaceHandler();
-		this.addMapChangeHandler();
 	}
 
 	setupLeafletBackground() {
@@ -699,6 +787,16 @@ class LocationSelector {
 		this.loadSelectionFromInterface(false);
 		this.processSelectionData();
 		this.updateSelectionToInterface();
+	}
+
+	setupAddHandlers() {
+		let self = this;
+		this.leaflet.on('click', function(e){self.clickHandler(e)});
+
+		this.leaflet.on('zoomend', function(e){self.zoomHandler(e)});
+		this.leaflet.on('moveend', function(e){self.moveHandler(e)});
+
+		$(this.dom['inputsParent']).on('change','input', function(e){self.interfaceHandler(e)});
 	}
 
 	setupStartLeaflet() {
@@ -753,36 +851,38 @@ class LocationSelector {
 
 	//* HANDLERS *//
 
-	addClickHandler() {
-		let self = this;
-		this.leaflet.on('click', function(e){
-			let coordinate = e.latlng;
-			self.setCoordinate(coordinate);
-			self.updateSelectionToInterface();
-		});
+	clickHandler(e) {
+		let coordinate = e.latlng;
+		this.setCoordinate(coordinate);
+		this.updateSelectionToInterface();
 	}
 
-	addInterfaceHandler() {
-		let self = this;
-		$(this.dom['inputsParent']).on('change','input',function(e) {
-			self.loadSelectionFromInterface(true);
-			if (e.target.name == 'polygon') {
-				self.createAndSetSelectionFromPolygon();
-			} else {
-				self.createAndSetSelectionData();
-			}
-			self.redrawVisualization();
-			self.updateSelectionToInterface();
-		});
+	interfaceHandler(e) {
+		this.loadSelectionFromInterface(true);
+		if (e.target.name == 'polygon') {
+			this.createAndSetSelectionFromPolygon();
+		} else {
+			this.createAndSetSelectionData();
+		}
+		this.redrawVisualization();
+		this.updateSelectionToInterface();
 	}
 
-	addMapChangeHandler() {
-		let self = this;
-		let handlerFunction = function(e) {
-			console.log('Zoom to : '+self.leaflet.getZoom());
-			self.reloadSelectablesLayer();
-		};
-		this.leaflet.on('zoomend', handlerFunction);
-		this.leaflet.on('moveend', handlerFunction);
+	zoomHandler(e) {
+		this.reloadSelectablesLayer();
+	}
+	moveHandler(e) {
+		this.reloadSelectablesLayer();
+	}
+
+	selectHandler(e) {
+		console.log(e.target);
+		console.log(e.target.feature.id);
+		let geometry = e.target.feature.geometry;
+		geometry = this.swapCoordinatesXY(geometry);
+		this.setPolygon(geometry);
+		this.createAndSetSelectionFromPolygon();
+		this.redrawVisualization();
+		this.updateSelectionToInterface();
 	}
 }
