@@ -674,6 +674,11 @@ class LocationSelector {
 
 
 	reloadSelectablesLayer() {
+		let selectedLayerKey = this.config['selectableLayer'];
+		if (selectedLayerKey == null || selectedLayerKey == '') {
+			this.visualizeElement( 'selectables', null );
+			return;
+		}
 		let layer = this.selectables[this.config['selectableLayer']];
 		if ( !layer ) {
 			return;
@@ -869,6 +874,8 @@ class LocationSelector {
 	}
 
 	zoomHandler(e) {
+		this.selection['zoomLevel'] = this.leaflet.getZoom();
+		this.updateSelectionToInterface();
 		this.reloadSelectablesLayer();
 	}
 	moveHandler(e) {
