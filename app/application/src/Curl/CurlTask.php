@@ -80,6 +80,14 @@
 			return $this;
 		}
 
+		public function setTimeout( int $timeoutInSeconds ) {
+			if ( $timeoutInSeconds < 0 ) {
+				throw new \Exception('Attempting to set invalid timeout: '.strval($timeoutInSeconds ?? 'null'));
+			}
+			$this->timeoutInSeconds = $timeoutInSeconds;
+			return $this;
+		}
+
 
 
 		public function getRequest() {
@@ -109,6 +117,9 @@
 
 		public function getResponseIsSuccess() {
 			return $this->statusCode>=200 && $this->statusCode<300;
+		}
+		public function isTimedOut() {
+			return $this->statusCode == 0 && $this->curlErrorCode == 28;
 		}
 
 
