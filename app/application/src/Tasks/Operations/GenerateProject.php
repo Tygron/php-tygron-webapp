@@ -46,14 +46,29 @@
 
 			//TODO: Check whether project still running
 
+			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/progress')->setTimeout(5)->run();
+			if ( $curlTask->isTimedOut() ) {
+				//Acceptable that the session is non-responsive for a while
+				return false;
+			}
 			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/progress')->run();
+			if ( !is_countable($curlTask->getContent()) ) {
+				throw new Exception('No progress items');
+			}
 			if ( count($curlTask->getContent())==0 ) {
 				throw new Exception('No progress items');
 			}
+
+			$lastItem = $curlTask->getContent()[array_key_last($curlTask->getContent())];
+
 			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/info')->run();
 			if ($curlTask->getContent()['state']=='NORMAL') {
 				return true;
 			}
+
+			$task->setOperationFeedback( round($curlTask->getContent()['loaded'] * 100).' %' );
+			$task->save();
+
 			return false;
 		}
 	}
