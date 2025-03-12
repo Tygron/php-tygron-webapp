@@ -28,6 +28,7 @@
 				'cleanupOperations'	=>	[],
 				'currentOperation'	=>	'',
 				'startedOperation'	=>	'',
+				'operationFeedback'	=>	null,
 				'operationResult'	=>	null,
 
 				'taskCompleted'		=>	false,
@@ -86,6 +87,9 @@
 						break;
 					case 'startedOperation':
 						$this->setStartedOperation($value);
+						break;
+					case 'operationFeedback':
+						$this->setOperationFeedback($value);
 						break;
 					case 'operationResult':
 						$this->setOperationResult($value);
@@ -178,10 +182,14 @@
 		}
 		public function setCurrentOperation( string $operation ) {
 			$this->data['currentOperation'] = $operation;
+			$this->setOperationFeedback(null);
 			$this->setOperationResult(null);
 		}
 		public function setStartedOperation( string $operation ) {
 			$this->data['startedOperation'] = $operation;
+		}
+		public function setOperationFeedback( $feedback ) {
+			$this->data['operationFeedback'] = $feedback;
 		}
 		public function setOperationResult( $result ) {
 			$this->data['operationResult'] = $result;
@@ -325,6 +333,9 @@
 		}
 		public function getStartedOperation() {
 			return $this->data['startedOperation'];
+		}
+		public function getOperationFeedback() {
+			return $this->data['operationFeedback'];
 		}
 		public function getOperationResult() {
 			return $this->data['operationResult'];
