@@ -266,8 +266,14 @@
 
 
 
-		public function getData() {
-			return $this->data;
+		public function getData(string $key = null, $defaultReturn = null) {
+			if ( is_null($key) ) {
+				return $this->data;
+			}
+			if ( array_key_exists($key,$this->data) ) {
+				return $this->data[$key];
+			}
+			return $defaultReturn;
 		}
 
 		public function getTaskName() {

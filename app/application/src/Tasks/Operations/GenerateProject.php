@@ -18,8 +18,8 @@
 
 			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/set_initial_map_size', $task->getSize())->run();
 
-			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', [$task->getLocation()[0], $task->getLocation()[1], null, $task->getData()['areaOfInterest']])->run();
-
+			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', [$task->getLocation()[0], $task->getLocation()[1], null, $task->getData('areaOfInterest')])->run();
+			$task->log($curlTask->getContent());
 			$task->save();
 		}
 
@@ -53,10 +53,10 @@
 			}
 			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/progress')->run();
 			if ( !is_countable($curlTask->getContent()) ) {
-				throw new Exception('No progress items');
+				throw new \Exception('No progress items (not countable)');
 			}
 			if ( count($curlTask->getContent())==0 ) {
-				throw new Exception('No progress items');
+				throw new \Exception('No progress items (count is 0)');
 			}
 
 			$lastItem = $curlTask->getContent()[array_key_last($curlTask->getContent())];

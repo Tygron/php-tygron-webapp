@@ -17,9 +17,13 @@
 			$attributeNames = [];
 			$attributeValues = [];
 
+			if ( empty($task->getData('areaOfInterestAttributes')) ) {
+				return;
+			}
+
 			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/areas-interest_area')->run();
 			foreach ( $curlTask->getContent() as $key => $area ) {
-				foreach ( $task->getData()['areaOfInterestAttributes'] as $attName => $attValue ) {
+				foreach ( $task->getData('areaOfInterestAttributes') as $attName => $attValue ) {
 					array_push($areaIds, $area['id']);
 					array_push($attributeNames, $attName);
 					array_push($attributeValues, $attValue);
@@ -68,7 +72,10 @@
 				return true;
 			}
 			else {
-				$attributesToFind = $task->getData()['areaOfInterestAttributes'];
+				$attributesToFind = $task->getData('areaOfInterestAttributes');
+				if ( empty($attributesToFind) ) {
+					return true;
+				}
 				foreach ( $curlTask->getContent() as $key => $area ) {
 					foreach ( $attributesToFind as $key=> $value ) {
 						if ( !array_key_exists($key, $area['attributes']) ) {
