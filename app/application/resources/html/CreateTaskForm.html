@@ -14,8 +14,6 @@
 
 				locSelector = new LocationSelector();
 				locSelector.createLocationSelector();
-				//locSelector.createLocationSelector( 'body', $('#locationSelection') );
-				locSelector.createLocationSelectorEmbedded( $('#locationSelection') );
 			});
 	</script>
 
@@ -137,7 +135,17 @@
 						<option value='green'>Green</option>
 					</select>
 				</label></div>
+
 			</div>
+
+			<div class='settingBlock'>
+				<h4>Extent:</h4>
+				<div class='locationSelectorInputs'><label>
+					<span>Size:</span>
+					<input type='number' name='size' min='500' max='5000' step='500' value='1000'></input>
+				</label></div>
+			</div>
+
 
 			<div class='settingBlock'>
 				<h4>Credentials:</h4>
