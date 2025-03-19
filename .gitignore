@@ -9,8 +9,6 @@ docker-compose-override.yaml
 !sample-*
 !.gitkeep
 
-!/app/custom/sample/
-
 !/app/custom/*/.gitkeep
 !/app/custom/*/sample-*
 
