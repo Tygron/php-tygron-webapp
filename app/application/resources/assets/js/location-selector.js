@@ -1,3 +1,12 @@
+/*L.CRS['EPSG28992'] = new L.Proj.CRS(
+	'EPSG:28992',
+	'+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +no_defs', {
+		origin: [-285401.92, 22598.08],
+		resolutions: [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420, 0.210, 0.105],
+		bounds: L.bounds([-285401.92, 22598.08], [595401.920, 903401.920])
+	}
+);*/
+
 class LocationSelector {
 
 	inputs = {
@@ -18,10 +27,13 @@ class LocationSelector {
 		// crs for output of selected data
 		'crs'				: 'input[name=\'crs\']',
 
+		// input only: buffer between area of interest size and project area size
+		'bufferSize'			: 'input[name=\'bufferSize\']',
+
 		// input only: the polygon of interest
 		'polygon'			: 'input[name=\'polygon\']',
 
-		// inpput only: the zoom level
+		// input only: the zoom level
 		'zoomLevel'			: 'input[name=\'zoomLevel\']',
 	}
 
@@ -37,21 +49,26 @@ class LocationSelector {
 		} ],
 		'selectableLayer'		: null,
 		'styles'			: {
-			'polygon'				: { 'color' : 'orange', 'fillColor' : 'orange' },
-			'selectables'				: { 'color' : 'black', 'fillColor' : 'darkgrey' },
+			'polygon'			: { 'color' : 'orange', 'fillColor' : 'orange' },
+			'areaOfInterest'		: { 'color' : 'orange', 'fillColor' : 'orange' },
+			'selectables'			: { 'color' : 'black', 'fillColor' : 'darkgrey' },
 		},
 
 		'cameraPadding'			: [ 100, 100 ],
 
-		'generateAOI'			: true,
+		'minSize'			: 500,
+		'maxSize'			: 5000,
+		'forceSquareSize'		: false,
 
-		'minSize'			: 500, //TODO
-		'maxSize'			: 5000, //TODO
-		'shrinkForAOI'			: true, //TODO
-		'growForAOI'			: true, //TODO
+		'generateAOI'			: false,
+		'shrinkForAOI'			: true,
+		'growForAOI'			: true,
 	}
 
 	selectables = {
+
+	}
+	visualizables = {
 
 	}
 
@@ -59,6 +76,8 @@ class LocationSelector {
 		crs : '3857',
 		coordinate : { crs : '3857', x: 479967, y: 6814662 },
 		size : 500,
+		bufferSize: 500,
+
 		zoomLevel :  13,
 	}
 
@@ -129,91 +148,89 @@ class LocationSelector {
 		}
 		this.reloadSelectablesLayer();
 	}
-
 	clearAreaOfInterest() {
-		this.createAndSetSelectionClearPolygon();
-                this.redrawVisualization();
-                this.updateSelectionToInterface();
+		this.setPolygon(null);
 	}
+
+
 
 	//* SELECTION *//
 	setCoordinate(coordinate) {
 		this.selection['coordinate'] = coordinate;
-		this.createAndSetSelectionFromCoordinate();
-		this.redrawVisualization();
-	}
-	setPolygon(polygon) {
-		this.selection['polygon'] = polygon;
-		this.createAndSetSelectionFromPolygon();
-		this.redrawVisualization();
-	}
 
-
-	createAndSetSelectionData() {
+		this.processSelectionData();
+	}
+	setPolygon(polygon, recalculate = false) {
+		if ( !recalculate || polygon ) {
+			this.selection['polygon'] = polygon;
+		}
 		if ( this.selection['polygon'] != null ) {
-			this.createAndSetSelectionFromPolygon();
-		} else {
-			this.createAndSetSelectionFromCoordinate();
-		}
-	}
-
-	createAndSetSelectionFromCoordinate() {
-		let bounds = this.computeBoundsFromCoordinate(this.selection['coordinate'],this.selection['size']);
-		this.selection['selectionBounds'] = bounds;
-
-		if ( (this.selection['polygon'] == null) && (this.config['generateAOI'] == true) ) {
-			let areaOfInterest = this.computeGeometryFromBounds(bounds);
-			areaOfInterest = this.computeMultiPolygonsFromGeometries(areaOfInterest);
-			this.selection['areaOfInterest'] = areaOfInterest;
-		}
-	}
-
-	createAndSetSelectionFromPolygon() {
-		if (this.selection['polygon'] != null) {
 			this.selection['coordinate'] = this.computeCenterFromGeometry(this.selection['polygon']);
 			this.createAndSetSizeFromPolygon();
-			let areaOfInterest = this.computeGeometriesFromFeatures(this.selection['polygon']);
-			areaOfInterest = this.computeMultiPolygonsFromGeometries(areaOfInterest);
-			this.selection['areaOfInterest'] = areaOfInterest;
+		} else {
+			this.processSelectionData();
 		}
-		this.createAndSetSelectionFromCoordinate();
 	}
-	createAndSetSelectionClearPolygon() {
-		this.selection['polygon'] = null;
-		this.selection['areaOfInterest'] = null;
-		this.selection['areaOfInterestAttributes'] = null;
-		this.createAndSetSelectionFromCoordinate();
+	setSize(size) {
+		let cappedSize = {
+				'width':	Math.min( this.config['maxSize'], Math.max(this.config['minSize'], Math.ceil(size.width ?? size)) ),
+				'height':	Math.min( this.config['maxSize'], Math.max(this.config['minSize'], Math.ceil(size.height ?? size)) ),
+			};
+		if ( this.config['forceSquareSize'] ) {
+			cappedSize = Math.max(cappedSize.width, cappedSize.height);
+		}
+		this.selection['size'] = cappedSize;
+		this.processSelectionData();
+	}
+
+	processSelectionData() {
+		this.visualizables['selectionBounds'] = this.computeBoundsFromCoordinate( this.selection['coordinate'],this.selection['size']);
+
+		this.createAndSetAreaOfInterest();
+
+		this.redrawVisualization();
+		this.updateSelectionToInterface();
 	}
 
 	createAndSetSizeFromPolygon() {
-		console.log('TODO');
-		this.computeSizeFromGeometry(this.selection['polygon']);
-		// Compute bounds
-		// Compute height
-		// Compute width
-		// if config, clamp up
-		// if config, clamp down
-		// Store result
+		let size = this.computeSizeFromGeometry(this.selection['polygon']);
+		let selectionSize = this.selection['size'];
+		let bufferSize = this.selection['bufferSize'];
+		selectionSize = {
+				'width': 	( selectionSize.width	?? selectionSize ),
+				'height': 	( selectionSize.height	?? selectionSize ),
+			};
+		if ( this.config['shrinkForAOI'] ) {
+			selectionSize.width	=	Math.min(selectionSize.width, size.width);
+			selectionSize.height	=	Math.min(selectionSize.height, size.height);
+		}
+		if ( this.config['growForAOI'] ) {
+			selectionSize.width	=	Math.max(selectionSize.width, size.width);
+			selectionSize.height	=	Math.max(selectionSize.height, size.height);
+		}
+		selectionSize.width		+=	+(bufferSize.width ?? bufferSize);
+		selectionSize.height		+=	+(bufferSize.height ?? bufferSize);
+		this.setSize(selectionSize);
 	}
 
-	createAndSetSelectionBoundsFromCoordinate() {
-		if ( this.selection['areaOfInterest'] != null ) {
-			this.selection['selectionBounds'] = this.computeBoundsFromGeometry(
-				this.selection['areaOfInterest']
-			)
-		}
-
-		if ( this.selection['areaOfInterest'] == null ) {
-			this.selection['selectionBounds'] = this.computeBoundsFromCoordinate(
-				this.selection['coordinate'],
-				this.selection['size'],
-			)
+	createAndSetAreaOfInterest() {
+		if ( this.selection['polygon'] != null ) {
+			let areaOfInterest = this.computeGeometriesFromFeatures(this.selection['polygon']);
+			areaOfInterest = this.computeMultiPolygonsFromGeometries(areaOfInterest);
+			this.selection['areaOfInterest'] = areaOfInterest;
+		} else if ( this.config['generateAOI'] == true ) {
+			let aoiBounds = this.computeBoundsFromCoordinate(this.selection['coordinate'], this.computeSize(this.selection['size'],-this.selection['bufferSize']) );
+			let areaOfInterest = this.computeGeometryFromBounds(aoiBounds);
+			areaOfInterest = this.computeMultiPolygonsFromGeometries(areaOfInterest);
+			this.selection['areaOfInterest'] = areaOfInterest;
+		} else {
+			this.selection['areaOfInterest'] = null;
 		}
 	}
 
 	computeSelectionBounds() {
-		if (this.selection['selectionBounds'] !== null ) {
-			return this.selection['selectionBounds'];
+		if (this.visualizables['selectionBounds'] !== null ) {
+			return this.visualizables['selectionBounds'];
 		} else if ( this.selection['polygon'] !== null ) {
 			return this.computeBoundsFromGeometry(
 				this.selection['polygon']
@@ -225,6 +242,15 @@ class LocationSelector {
 			);
 		}
 	}
+
+	computeSize( size, bufferSize = 0 ) {
+		size = {
+				'width':	Math.max( 0, +(size.width ?? size) 	+ (+(bufferSize.width ?? bufferSize)*2) ),
+				'height':	Math.max( 0, +(size.height ?? size) 	+ (+(bufferSize.height ?? bufferSize)*2) ),
+			};
+		return size;
+	}
+
 
 	//* DATA CONVERSION *//
 
@@ -264,7 +290,7 @@ class LocationSelector {
 	}
 
 	checkDataType(data) {
-		if ( data === null ) {
+		if ( data === null || typeof data === 'undefined' ) {
 			return null;
 		}
 		if ( !(data instanceof Object) ) {
@@ -610,20 +636,12 @@ class LocationSelector {
 	}
 
 	computeCenterFromGeometry( geometry ) {
-		//if ( Array.isArray(geometry) ) {
-			geometry = this.swapCoordinatesXY(geometry);
-		//}
-		return L.geoJson(geometry).getBounds().getCenter();
-
-		geometry = {
-			'type': geometry.type,
-			'coordinates' : this.swapCoordinatesXY(geometry.coordinates),
-		};
+		geometry = this.swapCoordinatesXY(geometry);
 		return L.geoJson(geometry).getBounds().getCenter();
 	}
 
 	computeBoundsFromGeometry( geometry ) {
-		let bounds = L.geoJson(geometry).getBounds();
+		let bounds = L.geoJson(this.swapCoordinatesXY(geometry)).getBounds();
 		return [
 				[bounds.getNorth(), bounds.getWest()],
 				[bounds.getNorth(), bounds.getEast()],
@@ -636,9 +654,8 @@ class LocationSelector {
 		if ( !Array.isArray(geometry) ) {
 			geometry = [geometry];
 		} else {
-			geometry = this.swapCoordinatesXY(geometry);
 		}
-		let coordinates = geometry.coordinates;
+		geometry = this.swapCoordinatesXY(geometry);
 		let bounds = L.geoJson(geometry).getBounds();
 
 		let size = {
@@ -723,26 +740,34 @@ class LocationSelector {
 		}
 	}
 
-	processSelectionData() {
-		//TODO:
-		//Calculate central coordinate from Area of Interest
-		//Calculate selectionBounds from coordinate and size
-	}
-
 	//* VISUALIZATION *//
 
 	redrawVisualization() {
-		this.visualizeElement(	'coordinate',		this.selection['coordinate']);
-		this.visualizeElement(	'polygon',		this.selection['polygon']);
-		this.visualizeElement(	'selectionBounds',	this.selection['selectionBounds']);
+		let self = this;
+
+		this.visualizeElement(		'coordinate',
+			this.selection[		'coordinate'		],
+			);
+		this.visualizeElement(		'selectables',
+			this.visualizables[	'selectables'		],function(e){ self.selectHandler(e); }
+			);
+		this.visualizeElement(		'areaOfInterest',
+			this.selection[		'areaOfInterest'	],
+			);
+//		this.visualizeElement(		'polygon',
+//			this.selection[		'polygon'		],
+//			);
+		this.visualizeElement(		'selectionBounds',
+			this.visualizables[	'selectionBounds'	],
+			);
 	}
 	visualizeReset( id = null, all = false ) {
+		let self = this;
 		for (let i of Object.keys(this.visualization) ) {
 			if ( (!all) && (i != id) ) {
 				continue;
 			}
-			this.visualization[i].removeFrom(this.leaflet);
-			delete this.visualization[i];
+			this.visualization[i].eachLayer( function(layer){ self.visualization[i].removeLayer(layer); } );
 		}
 	}
 	visualizeElement( id, element, handler = null ) {
@@ -757,7 +782,7 @@ class LocationSelector {
 		} catch (err)
 		{
 		}
-		let group = new L.LayerGroup();
+		let group = this.visualization[id] ?? new L.LayerGroup();
 		for ( let i = 0; i < elements.length ; i++ ) {
 			let element = elements[i];
 			let multipleElements = false;
@@ -805,27 +830,24 @@ class LocationSelector {
 				element.options.interactive = false;
 			}
 			group.addLayer(element);
-			//element.addTo(group);
 		}
-		this.visualization[id] = group;
-		group.addTo(this.leaflet);
+		if ( !this.leaflet.hasLayer(group) ) {
+			this.visualization[id] = group;
+			group.addTo(this.leaflet);
+		}
 	}
 
 
 	reloadSelectablesLayer() {
-		let selectedLayerKey = this.config['selectableLayer'];
-		if (selectedLayerKey == null || selectedLayerKey == '') {
-			this.visualizeElement( 'selectables', null );
-			return;
-		}
-		let layer = this.selectables[this.config['selectableLayer']];
-		if ( !layer ) {
-			return;
-		}
-		if ( layer.zoomLevel && (layer.zoomLevel > this.leaflet.getZoom()) ) {
+		let selectableLayerKey = this.config['selectableLayer'];
+		let selectableLayerData = this.selectables[selectableLayerKey];
+
+		if ( selectableLayerData == null || (selectableLayerData.zoomLevel && (selectableLayerData.zoomLevel > this.leaflet.getZoom())) ) {
+			this.visualizables['selectables'] = [];
 			this.visualizeReset('selectables');
 			return;
 		}
+
 		let bbox = this.leaflet.getBounds().toBBoxString();
 		let bboxCrs = 'urn:ogc:def:crs::EPSG::4326';
 		let bboxString = bbox+','+bboxCrs;
@@ -837,20 +859,20 @@ class LocationSelector {
 			bbox: bboxString,
 			//maxFeatures: 250
 		}
-		parameters = L.Util.extend(parameters, layer['parameters']);
-		let url = layer['url'] + L.Util.getParamString(parameters);
+		parameters = L.Util.extend(parameters, selectableLayerData['parameters']);
+		let url = selectableLayerData['url'] + L.Util.getParamString(parameters);
 		let request = $.ajax( {
 			url : url,
 			dataType : 'json',
 		} );
 		let self = this;
 		request.then(function(e){
-			console.log(e.features.length);
 			let features = e.features;
-			if ( layer['swapxy'] ) {
+			if ( selectableLayerData['swapxy'] ) {
 				features = self.swapCoordinatesXY(features);
 			}
-			self.visualizeElement( 'selectables', features, function(e){self.selectHandler(e);} );
+			self.visualizables['selectables'] = features;
+			self.redrawVisualization();
 		});
 	}
 
@@ -939,6 +961,7 @@ class LocationSelector {
 		this.loadSelectionFromInterface(false);
 		this.processSelectionData();
 		this.updateSelectionToInterface();
+		this.redrawVisualization();
 	}
 
 	setupAddHandlers() {
@@ -1004,20 +1027,21 @@ class LocationSelector {
 	//* HANDLERS *//
 
 	clickHandler(e) {
+		if ( this.config['skipNextClickHandle'] ) {
+			delete this.config['skipNextClickHandle'];
+			return;
+		}
 		let coordinate = e.latlng;
 		this.setCoordinate(coordinate);
-		this.updateSelectionToInterface();
 	}
 
 	interfaceHandler(e) {
 		this.loadSelectionFromInterface(true);
 		if (e != null && e.target.name == 'polygon') {
-			this.createAndSetSelectionFromPolygon();
+			this.setPolygon(null, true);
 		} else {
-			this.createAndSetSelectionData();
+			this.processSelectionData();
 		}
-		this.redrawVisualization();
-		this.updateSelectionToInterface();
 	}
 
 	uploadHandler(e) {
@@ -1034,9 +1058,7 @@ class LocationSelector {
 			if ( !geometries || geometries.length == 0 ) {
 				return;
 			}
-			self.setPolygon(self.convertToLeaflet(geometries));
-			self.createAndSetSelectionFromPolygon();
-			self.updateSelectionToInterface();
+			self.setPolygon(self.convertToLeaflet(geometries, crs));
 		});
 	}
 
@@ -1050,13 +1072,9 @@ class LocationSelector {
 	}
 
 	selectHandler(e) {
-		console.log(e.target);
-		console.log(e.target.feature.id);
 		let geometry = e.target.feature.geometry;
 		geometry = this.swapCoordinatesXY(geometry);
 		this.setPolygon(geometry);
-		this.createAndSetSelectionFromPolygon();
-		this.redrawVisualization();
-		this.updateSelectionToInterface();
+		this.config['skipNextClickHandle'] = true;
 	}
 }
