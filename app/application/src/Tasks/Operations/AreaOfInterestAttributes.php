@@ -35,6 +35,7 @@
 					[$areaIds, $attributeNames, $attributeValues]
 				)->run();
 
+			$task->log(get_text('There were %s Attributes added to %s Areas of Interest',[count($attributeNames),count($areaIds)]));
 			$task->save();
 		}
 
@@ -48,6 +49,7 @@
 				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/areas-interest_area')->run();
 				if ( count($curlTask->getContent())==0 ) {
 					$task->log(get_text('There is no area of interest to add attributes to'));
+					$task->save();
 					return true;
 				}
 

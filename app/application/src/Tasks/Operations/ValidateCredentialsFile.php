@@ -21,6 +21,7 @@
 				throw new \Exception('Credentials were invalid');
 			}
 			$task->log(get_text('Validated credentials for user'));
+			$task->save();
 
 			$credentials['password'] = $curlTask->getContent();
 

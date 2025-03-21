@@ -14,8 +14,10 @@
 			$curlTask = \Curl\TygronCurlTask::get($token, $credentials['platform'], 'api/session/info')->run();
 			$sessionId = $curlTask->getContent()['id'];
 
-			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/set_session_keep_alive', [$sessionId, self::$enum])->run();
+			$keepAliveType = self::$enum;
+			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/set_session_keep_alive', [$sessionId, $keepAliveType])->run();
 
+			$task->log(get_text('Set project to Keep Alive (%s). Result: %s', [$keepAliveType, $curlTask->getContent()]));
 			$task->save();
 		}
 

@@ -17,9 +17,19 @@
 			$token = $task->getApiToken();
 
 			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/set_initial_map_size', $task->getSize())->run();
+			if ( !$curlTask->getResponseIsSuccess() ) {
+				throw new \Exception($curlTask->getContent());
+			}
+			$task->log(get_text( 'Project size set to: %s', [ implode(', ',$task->getSize()) ] ));
+			$task->save();
 
 			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', [$task->getLocation()[0], $task->getLocation()[1], null, $task->getData('areaOfInterest')])->run();
-			$task->log($curlTask->getContent());
+			if ( !$curlTask->getResponseIsSuccess() ) {
+				throw new \Exception($curlTask->getContent());
+			}
+			$task->log(get_text( 'Started project generation' ));
+
+			$task->setOperationFeedback( '0 %' );
 			$task->save();
 		}
 

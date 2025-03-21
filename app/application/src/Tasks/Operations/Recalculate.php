@@ -25,8 +25,13 @@
 				//TODO: Check whether project still running
 
 				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/info')->run();
-				if ($curlTask->getContent()['state']=='NORMAL') {
+				$state = $curlTask->getContent()['state'];
+				if ( $state=='NORMAL' ) {
 					return true;
+				} else {
+					$task->log(get_text('Session in unexpected state: %s',[$state]));
+					$task->save();
+					return false;
 				}
 
 			} catch (\Throwable $e) {

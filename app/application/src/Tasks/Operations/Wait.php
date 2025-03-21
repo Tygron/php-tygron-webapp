@@ -6,12 +6,20 @@
 
 		protected static int $WAIT_TIME = 3600;
 
+		public function getInputParameters() {
+			return [
+				'waitTime' => 3600,
+			];
+		}
+
+
 		public function run( \Tasks\Task $task ) {
 			$waitTime = $task->getData()['waitTime'] ?? self::$WAIT_TIME;
 
 			$currentTime = \Utils\Time::getCurrentTimestamp();
+			$endTime = $currentTime + $waitTime;
 			$readableStartTime = \Utils\Time::getReadableDateTime($currentTime);
-			$readableEndTime = \Utils\Time::getReadableDateTime($waitTime);
+			$readableEndTime = \Utils\Time::getReadableDateTime($endTime);
 			$task->log(get_text( 'Started wait at: %s', [$readableStartTime] ));
 			$task->log(get_text( 'Wait until: %s',[$readableEndTime] ));
 			$task->save();
