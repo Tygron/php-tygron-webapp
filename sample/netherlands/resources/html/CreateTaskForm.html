@@ -2,11 +2,14 @@
 
 <head>
 
-	<script src='assets/js/jquery-3.7.1.min.js'></script>
-	<script src='assets/js/location-selector.js'></script>
+        <script src='assets/vendor/jquery/jquery-3.7.1.min.js'></script>
 
-	<script src='assets/js/leaflet/leaflet-src.js'></script>
+        <script src='assets/vendor/leaflet/leaflet-src.js'></script>
+        <script src='assets/vendor/proj4js/proj4.js'></script>
+        <script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
 
+        <script src='assets/js/location-selector.js'></script>
+        <script src='assets/js/crs.js'></script>
 
 	<script>
 		var locSelector = null
@@ -60,7 +63,7 @@
 	</script>
 
 	<link rel='stylesheet' type='text/css' href='assets/css/location-selector.css' />
-	<link rel='stylesheet' type='text/css' href='assets/js/leaflet/leaflet.css' />
+	<link rel='stylesheet' type='text/css' href='assets/vendor/leaflet/leaflet.css' />
 
 	<style>
 		body {
@@ -187,6 +190,7 @@
 					<span>From source</span>
 					<select name='selectType' onchange='changeSelectType(this, true)'>
 						<option value='' selected>None</option>
+						<option value='fromSize'>Based on size</option>
 						<option value='upload'>Upload</option>
 						<option value='cbs-buurten' >CBS Buurten</option>
 						<option value='cbs-wijken' >CBS Wijken</option>
@@ -194,17 +198,24 @@
 					</select>
 					<script>
 						changeSelectType = function(selectObject, clear) {
-							if (clear) {
-								locSelector.clearAreaOfInterest();
-
-							}
 							selectObject = $(selectObject)[0];
 							let selection = selectObject.options[selectObject.selectedIndex].value;
+
 							if (selection == 'upload') {
 								selection = '';
 								$('.uploadOption').css('visibility', 'visible');
 							} else {
 								$('.uploadOption').css('visibility', 'hidden');
+							}
+
+							if (selection == 'fromSize') {
+								locSelector.config['generateAOI'] = true;
+ 							} else {
+								locSelector.config['generateAOI'] = false;
+							}
+
+							if (clear) {
+								locSelector.clearAreaOfInterest();
 							}
 							locSelector.setSelectable(selection);
 						};
@@ -231,14 +242,20 @@
 					</script>
 				</label></div>
 
+				<div><label>
+					<span>Buffered:</span>
+					<input type='number' name='bufferSize' min='0' max='2500' step='1'></input>
+				</label></div>
+
+
 			</div>
 
 			<div class='settingBlock locationSettings'>
 				<h4>Project Area:</h4>
 				<div><label>
 					<span>Size:</span>
-					<input type='number' name='sizeX' min='500' max='5000' step='500'></input>
-					<input type='number' name='sizeY' min='500' max='5000' step='500'></input>
+					<input type='number' name='sizeX' min='500' max='5000' step='1'></input>
+					<input type='number' name='sizeY' min='500' max='5000' step='1'></input>
 				</label></div>
 
 				<div style='display:none;'>
