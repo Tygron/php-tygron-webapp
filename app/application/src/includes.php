@@ -9,6 +9,8 @@
 	include_once 'html.php';
 	include_once 'logging.php';
 
+	SimpleAutoloaderAddSourceDirectory( $CUSTOM_SRC_DIR, true );
+
 	\Assets\AssetReader::addSource($CUSTOM_ASSETS_DIR);
 	\Assets\AssetReader::addSource($APP_ASSETS_DIR);
 
