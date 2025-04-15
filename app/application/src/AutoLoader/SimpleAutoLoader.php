@@ -3,7 +3,7 @@
     spl_autoload_extensions(".php"); // comma-separated list
     spl_autoload_register();
 	
-	function SimpleAutoloaderAddSourceDirectory( $dir, bool $debugPrint = false ) {
+	function SimpleAutoloaderAddSourceDirectory( $dir, bool $prepend = false, bool $debugPrint = false ) {
 		spl_autoload_register(function ($class) use ($dir, $debugPrint) {
 			$path = $dir . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 			if (file_exists($path)) {
@@ -18,7 +18,7 @@
 				return;
 			}
 			if ($debugPrint) { echo 'Failed to find '.$path.PHP_EOL; }
-		});
+		}, true, $prepend);
 	}
 	
 ?>
