@@ -11,8 +11,13 @@
 
 			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/stakeholders/')->run();
 			$stakeholders = $curlTask->getContent();
-			$firstStakeholder = (count($stakeholders) > 0) ? $stakeholders[0] : null;
-			$stakeholderToken = $firstStakeholder['webToken'];
+			try {
+				$firstStakeholder = (count($stakeholders) > 0) ? $stakeholders[0] : null;
+				$stakeholderToken = $firstStakeholder['webToken'];
+			} catch (\Throwable $e) {
+				$task->log('Unexpected response for stakeholder: '.json_encode($stakeholders, JSON_PRETTY_PRINT));
+				$stakeholderToken = $token;
+			}
 			$stakeholderToken = substr(  $token, 0, -strlen($stakeholderToken) ) . $stakeholderToken;
 
 			$webViewerPath = 'web/3dmap.html';
