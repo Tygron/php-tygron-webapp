@@ -51,6 +51,8 @@ class LocationSelector {
 		'maxSize'			: 5000,
 		'forceSquareSize'		: false,
 
+		'allowSelectionByFreeClick'	: true,
+
 		'generateAOI'			: false,
 		'shrinkForAOI'			: true,
 		'growForAOI'			: true,
@@ -811,6 +813,12 @@ class LocationSelector {
 			if ( typeof element.setStyle === 'function' ) {
 				element.setStyle(style);
 			}
+			//if ( typeof element.setIcon === 'function' ) {
+			//	element.setIcon(style);
+			//}
+			if ( typeof element.setOpacity === 'function' && typeof style['opacity'] !== 'undefined' ) {
+				element.setOpacity(style['opacity']);
+			}
 			if ( typeof handler === 'function' ) {
 				if ( multipleElements ) {
 					element.eachLayer(function(layer){
@@ -1020,7 +1028,7 @@ class LocationSelector {
 	//* HANDLERS *//
 
 	clickHandler(e) {
-		if ( this.config['skipNextClickHandle'] ) {
+		if ( this.config['skipNextClickHandle'] || !this.config['allowSelectionByFreeClick']) {
 			delete this.config['skipNextClickHandle'];
 			return;
 		}
