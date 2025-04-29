@@ -13,7 +13,9 @@
 				setcookie('authenticationToken', $authenticationToken);
 			}
 
-			if ( !empty($AUTHENTICATION_TOKEN && $authenticationToken != $AUTHENTICATION_TOKEN)) {
+			$acceptableTokens = is_array($AUTHENTICATION_TOKEN) ? $AUTHENTICATION_TOKEN : [$AUTHENTICATION_TOKEN];
+
+			if ( !empty($AUTHENTICATION_TOKEN) && !in_array($authenticationToken, $acceptableTokens) ) {
 				$asset = \Assets\AssetReader::getAsset(
 					'login.html',
 					'html'
