@@ -942,7 +942,7 @@ class LocationSelector {
 			throw 'No container for Leaflet';
 		}
 		let id = $(this.dom['mapContainer']).attr('id');
-		if (id == '') {
+		if ( (id == '') || (typeof id == 'undefined') ) {
 			id = 'leafletMap';
 			$(this.dom['mapContainer']).attr('id', id);
 		}
