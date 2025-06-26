@@ -1,6 +1,6 @@
 # PHP-template-runner
 
-Generic PHP application for running a template in an arbitrary location
+Generic PHP application for running a Tygron Template Project in an arbitrary location.
 
 ## Deployment
 
