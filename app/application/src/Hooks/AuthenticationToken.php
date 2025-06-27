@@ -18,7 +18,7 @@
 
 			if ( !empty($AUTHENTICATION_TOKEN) && !in_array($authenticationToken, $acceptableTokens) ) {
 				$asset = \Assets\AssetReader::getAsset(
-					'login.html',
+					'Login.html',
 					'html'
 				);
 				$renderableAsset = new \Rendering\RenderableAsset();
