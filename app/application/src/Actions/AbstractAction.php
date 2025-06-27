@@ -25,7 +25,6 @@
                                         + $this->getFixedParameters()
                                         + $parameters
                                         + $this->getDefaultParameters()
-					+ $this->getConfigParameters()
                                 ;
                 }
 
@@ -60,7 +59,7 @@
 			return $injections;
 		}
 
-		protected function getConfigParameters() {
+		protected function getRenderParameters() {
 			global $CONFIG_PARAMETERS;
 			return $CONFIG_PARAMETERS;
 		}
@@ -79,7 +78,7 @@
 				);
 			$renderableAsset = new \Rendering\RenderableAsset();
 			$renderableAsset->setAsset($asset);
-			$renderableAsset->setData($data);
+			$renderableAsset->setData( ($data ?? []) + $this->getRenderParameters() );
 			return $renderableAsset;
 		}
 	}
