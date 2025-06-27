@@ -25,6 +25,7 @@
                                         + $this->getFixedParameters()
                                         + $parameters
                                         + $this->getDefaultParameters()
+					+ $this->getConfigParameters()
                                 ;
                 }
 
@@ -57,6 +58,11 @@
 				}
 			}
 			return $injections;
+		}
+
+		protected function getConfigParameters() {
+			global $CONFIG_PARAMETERS;
+			return $CONFIG_PARAMETERS;
 		}
 
 		protected function getRenderable( string $assetName = null, array|null $data = null ) {

@@ -16,7 +16,9 @@
 
 	//Variables can be overwritten.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
+	$APPLICATION_WEBHOST		??=	$_SERVER['HTTP_HOST'];
 	$APPLICATION_WEBBASE		??=	'/';
+	$APPLICATION_WEB_PROTOCOL	??=	'https';
 
 	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'resources'] );
 	$CUSTOM_ASSETS_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_RESOURCES_DIR, 'assets'] );
@@ -36,6 +38,9 @@
 	$SAFE_CHARACTERS 		??= 	'[a-zA-Z0-9\-_]';
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
+
+	$CONFIG_PARAMETERS ??=[];
+	$CONFIG_PARAMETERS['baseUrl'] = ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. $APPLICATION_WEBHOST . $APPLICATION_WEBBASE;
 
 	//Hooks are run upon each request, and allow for authentication checks, parameter translations, request logging, etc
 	$HOOKS ??= [
