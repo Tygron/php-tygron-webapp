@@ -52,6 +52,7 @@ class LocationSelector {
 		'forceSquareSize'		: false,
 
 		'allowSelectionByFreeClick'	: true,
+		'crsDefaultForFileUpload'	: 4326,
 
 		'generateAOI'			: false,
 		'shrinkForAOI'			: true,
@@ -1054,7 +1055,11 @@ class LocationSelector {
 		let self = this;
 		file.text().then( function(fileText) {
 			let geojson = JSON.parse(fileText);
-			let crs = self.computeCrsFromGeoJson(geojson);
+			let crs = self.config['crsDefaultForFileUpload'];
+			try {
+				crs = self.computeCrsFromGeoJson(geojson);
+			} catch (e) {
+			}
 			let geometries = geojson.features ?? null;
 			if ( !geometries || geometries.length == 0 ) {
 				return;
