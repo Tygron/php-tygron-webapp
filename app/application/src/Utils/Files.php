@@ -113,7 +113,11 @@
 			}
 			$dir = '';
 			foreach ($pathParts as $part) {
-				$dir = $dir . DIRECTORY_SEPARATOR . $part;
+				if ($dir == '' && str_contains($part, ':') ) {
+					$dir = $part;
+				} else {
+					$dir = $dir . DIRECTORY_SEPARATOR . $part;
+				}
 				if ( is_file($dir) ) {
 					throw new \Exception('Could not ensure directory because it is a file: '.$path);
 				}
