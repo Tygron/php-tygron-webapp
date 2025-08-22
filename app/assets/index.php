@@ -3,10 +3,10 @@
 	include_once implode(DIRECTORY_SEPARATOR, ['..','application','src','includes.php']);
 
 	$assetName = $_GET['file'] ?? '';
-	$resourceType = null;
+	$assetType = null;
 
-	if ( str_contains($assetName, DIRECTORY_SEPARATOR) ) {
-		$assetName = explode(DIRECTORY_SEPARATOR, $assetName);
+	if ( str_contains($assetName, '/') ) {
+		$assetName = explode('/', $assetName);
 		$assetType = array_shift($assetName);
 		$assetName = implode(DIRECTORY_SEPARATOR, $assetName);
 	}
@@ -15,7 +15,7 @@
 	try {
 		$asset = \Assets\AssetReader::getPublicAsset(
 				$assetName,
-				$assetType
+				$assetType ?? ''
 			);
 	} catch (\Exception $e) {
 		exit('Asset not found');
