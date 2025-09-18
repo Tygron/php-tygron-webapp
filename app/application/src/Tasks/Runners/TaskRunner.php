@@ -94,6 +94,10 @@
 						log_message(get_text('The task has reached completion'));
 					}
 				} catch (\Throwable $e) {
+					if ( $e->getMessage() == 'TYGRON_COOLDOWN' ) {
+						log_message(get_text('Cannot check completion, because connection is on cooldown') );
+                                        	return false;
+	                                }
 					$this->handleOperationException($task, $operation, $e);
 				}
 			}
@@ -123,6 +127,12 @@
 					$task->save();
 				}
 			} catch (\Throwable $e) {
+				if ( $e->getMessage() == 'TYGRON_COOLDOWN' ) {
+					log_message(get_text('Operation aborted, because connection is on cooldown') );
+					$task->setStartedOperation($currentOperation.' (on cooldown)');
+					$task->save();
+					return false;
+				}
 				$this->handleOperationException($task, $operation, $e);
 			}
 			return true;

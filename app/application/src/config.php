@@ -13,6 +13,7 @@
 
 	$APP_RESOURCES_DIR 		  =	implode(DIRECTORY_SEPARATOR, [$APP_DIR, 'resources'] );
 	$APP_ASSETS_DIR			  =	implode(DIRECTORY_SEPARATOR, [$APP_RESOURCES_DIR, 'assets']);
+	$APP_CRON_DIR			  =	implode(DIRECTORY_SEPARATOR, [$APP_DIR, 'cron'] );
 
 	//Variables can be overwritten.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
@@ -23,11 +24,13 @@
 	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'resources'] );
 	$CUSTOM_ASSETS_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_RESOURCES_DIR, 'assets'] );
 	$CUSTOM_SRC_DIR			??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'src'] );
+	$CUSTOM_CRON_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'cron'] );
+
 
 	$WORKSPACE_DIR 			??=	implode(DIRECTORY_SEPARATOR, ['','var','workspace']);
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
 	$WORKSPACE_CREDENTIALS_DIR 	??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'credentials']);
-
+	$WORKSPACE_LOCK_DIR		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'locks']);
 
 	$CREDENTIALS_FILE_DEFAULT 	??=	'credentials-default.json';
 	$LANGUAGE_DEFAULT 		??=	'EN';
@@ -38,6 +41,10 @@
 	$SAFE_CHARACTERS 		??= 	'[a-zA-Z0-9\-_]';
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
+	$AUTORUN_TOKEN			??=	'';
+	$CRON_TASKS			??=	['runtasks.php'];
+
+	$COOLDOWN_SECONDS		??=	60;
 
 	$CONFIG_PARAMETERS ??=[];
 	$CONFIG_PARAMETERS['baseUrl'] = ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. $APPLICATION_WEBHOST . $APPLICATION_WEBBASE;
@@ -85,4 +92,7 @@
 		];
 
 	\Utils\Time::$DEFAULT_TIMEZONE = $TIMEZONE_DEFAULT;
+
+	\Curl\TygronLockCurlTask::setCooldownLockFile($WORKSPACE_LOCK_DIR.DIRECTORY_SEPARATOR.'tygron.lock');
+	\Curl\TygronLockCurlTask::setCooldownTimeInSeconds($COOLDOWN_SECONDS);
 ?>

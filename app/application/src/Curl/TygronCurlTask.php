@@ -30,6 +30,8 @@
 
 		public static function get( array|string $credentials, string $platform, string $path, string|array $data = null, bool $json = true ) {
 			$curlTask = new \Curl\TygronCurlTask();
+			$curlTask = new static();
+
 			$curlTask
 				->setMethod('GET')
 				->setUrl($platform, $path)
@@ -48,6 +50,8 @@
 
                 public static function post( array|string $credentials, string $platform, string $path, string|array $data = null, bool $json = true ) {
                         $curlTask = new \Curl\TygronCurlTask();
+			$curlTask = new static();
+
                         $curlTask
 				->setMethod('POST')
                         	->setUrl($platform, $path)
