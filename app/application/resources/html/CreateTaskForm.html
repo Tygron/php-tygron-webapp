@@ -30,28 +30,28 @@
 		<style>
 			body {
 				margin: 0px;
-				padding: 1em 1em;
-			}
-			img.logo {
-				max-height:100px;
+				padding: 0px;
 			}
 			div.logos {
 				width: 100%;
 			}
-			div.logosBottom {
-			        position: absolute;
+			div.logos {
 			        bottom: 1em;
 			        left: 1em;
 			        right: 1em;
 			        width: unset;
 			}
-
-			body {
-				margin: 	0px;
-				padding: 	0px;
+			div.logos > p,
+			div.logos > img {
+				display:inline-block;
+				margin-right: 1em;
 			}
 			img.logo {
-				max-height:	60px;
+				max-height:60px;
+			}
+			div.logos .logo {
+				max-height:     60px;
+				max-width:      100px;
 			}
 			
 			div.applicationContainer {
@@ -178,7 +178,7 @@
 				</div>
 				</form>
 
-			<div class='bottombar'>
+			<div class='bottomBar'>
 				<div class='logos'>
 					<p>Powered by: </p>
 					<img class='logo' src='assets/images/tygron_logo.png'>

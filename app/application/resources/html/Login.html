@@ -6,51 +6,93 @@
 		<style>
 			body {
 				margin: 0px;
-				padding: 1em 1em;
-			}
-			img.logo {
-				max-height:60px;
-			}
-			form div label span {
-				display: inline-block;
-				width: 15em;
+				padding: 0px;
 			}
 			div.logos {
 				width: 100%;
 			}
-			div.logosBottom {
-			        position: absolute;
-			        bottom: 1em;
-			        left: 1em;
-			        right: 1em;
-			        width: unset;
+			div.logos {
+				bottom: 1em;
+				left: 1em;
+				right: 1em;
+				width: unset;
 			}
-		        div.logosBottom .logo {
-		                max-width: 100px;
+			div.logos > p,
+			div.logos > img {
+				display: inline-block;
+				margin-right: 1em;
+			}
+			img.logo {
+				max-height:	60px;
+			}
+		        div.logos .logo {
+				max-height:	60px;
+		                max-width:	100px;
 		        }
+
+			div.applicationContainer {
+				display: flex;
+				flex-direction: column;
+
+				min-height:     100%;
+				width:          100%;
+			}
+			div.applicationContainer div.topBar {
+				min-height:             2em;
+			}
+			div.applicationContainer .mainSection {
+				flex-basis: 1em;
+				flex-grow: 1;
+
+				align-items: stretch;
+
+				display: flex;
+				flex-direction: row;
+
+				margin: 0px;
+				padding: 1em;
+			}
+			div.applicationContainer div.topBar,
+			div.applicationContainer div.bottomBar {
+				padding: 0.5em;
+			}
+
+			form div label span {
+				display: inline-block;
+				width: 15em;
+			}
 
 		</style>
 	</head>
 
 	<body>
 
-		<div class='logos logosTop'>
-			<hr>
-		</div>
+		<div class='applicationContainer'>
 
-			<p>Experimental. Please log in</p>	
+			<div class='topBar'>
+				<h2>
+					Web Application
+				</h2>
+			</div>
 
-			<form method='POST' action=''>
+			<div class='mainsection'>
+				<div>
+					<p>Please log in</p>	
+					<form method='POST' action=''>
+					<div><label><span>Authentication token:</span><input type='password' name='authenticationToken' value=''/></label></div>
+					<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
+					</form>
+				</div>
+			</div>
 
-			<div><label><span>Token:</span><input type='password' name='authenticationToken' value=''/></label></div>
-			<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
 
-			</form>
+			<div class='bottomBar'>
+				<div class='logos'>
+					<p>Powered by: </p>
+					<img class='logo' src='assets/images/tygron_logo.png'>
+				</div>
+			</div>
 
-		<div class='logos logosBottom'>
-			<hr>
-			<p>Powered by: </p>
-			<img class='logo' src='assets/images/tygron_logo.png'>
 		</div>
 
 	</body>
