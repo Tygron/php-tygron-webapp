@@ -3,63 +3,16 @@
 	<head>
 		<base href='{{ baseUrl }}'>
 
+		<link rel='stylesheet' type='text/css' href='assets/css/webapp.css' />
+
 		<style>
-			body {
-				margin: 0px;
-				padding: 0px;
-			}
-			div.logos {
-				width: 100%;
-			}
-			div.logos {
-				bottom: 1em;
-				left: 1em;
-				right: 1em;
-				width: unset;
-			}
-			div.logos > p,
-			div.logos > img {
-				display: inline-block;
-				margin-right: 1em;
-			}
-			img.logo {
-				max-height:	60px;
-			}
-		        div.logos .logo {
-				max-height:	60px;
-		                max-width:	100px;
-		        }
-
-			div.applicationContainer {
-				display: flex;
-				flex-direction: column;
-
-				min-height:     100%;
-				width:          100%;
-			}
-			div.applicationContainer div.topBar {
-				min-height:             2em;
-			}
-			div.applicationContainer .mainSection {
-				flex-basis: 1em;
-				flex-grow: 1;
-
-				align-items: stretch;
-
-				display: flex;
-				flex-direction: row;
-
-				margin: 0px;
+			div.applicationContainer .mainSection > div {
 				padding: 1em;
 			}
-			div.applicationContainer div.topBar,
-			div.applicationContainer div.bottomBar {
-				padding: 0.5em;
-			}
-
 			form div label span {
 				display: inline-block;
 				width: 15em;
+				padding-bottom: 0.5em;
 			}
 
 		</style>
@@ -77,7 +30,7 @@
 
 			<div class='mainsection'>
 				<div>
-					<p>Please log in</p>	
+					<h4>Please log in</h4>	
 					<form method='POST' action=''>
 					<div><label><span>Authentication token:</span><input type='password' name='authenticationToken' value=''/></label></div>
 					<div><label><span>Submit:</span><input name='submit' value='Submit' type='submit'/></label></div>
