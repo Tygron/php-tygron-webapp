@@ -41,7 +41,7 @@
 	$SAFE_CHARACTERS 		??= 	'[a-zA-Z0-9\-_]';
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
-	$AUTORUN_TOKEN			??=	'';
+	$CLI_TOKEN			??=	'';
 	$CRON_TASKS			??=	['runtasks.php'];
 
 	$COOLDOWN_SECONDS		??=	60;

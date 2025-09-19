@@ -20,8 +20,8 @@
 	//The (default) timezone for human-readable date-times.
 	$TIMEZONE_DEFAULT = 'Europe/Amsterdam';
 
-	//Verification token to run auto-updated with
-	$AUTORUN_TOKEN = null; //Set to a random character string
+	//Verification token to run cron tasks with
+	$CLI_TOKEN = null; //Set to a random character string
 
 	//Whether to keep task files of tasks which have resulted in an error.
 	$KEEP_TASKS_WITH_ERROR = true;
