@@ -3,6 +3,7 @@ docker-compose-override.yaml
 /app/custom/*
 
 /workspace/*
+!/workspace/*.sh
 /cron/*
 
 !sample-*
