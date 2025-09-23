@@ -6,6 +6,7 @@
 
 		private $taskName = null;
 		private $hasOperated = false;
+		private $standOffTimeInSeconds = 0;
 
 		public function __construct( $parameters = null ) {
 
@@ -13,6 +14,10 @@
 
 		public function setTask( $taskName ) {
 			$this->taskName = $taskName;
+		}
+
+		public function setStandOffTimeInSeconds( int $standOffTimeInSeconds ) {
+			$this->standOffTimeInSeconds = $standOffTimeInSeconds;
 		}
 
 		public function getHasOperated() {
@@ -69,6 +74,13 @@
 		}
 
 		protected function getTaskShouldBeRun( $task ) {
+			$lastTime = $task->getLastOperationTime();
+			$currentTime = \Utils\Time::getCurrentTimestamp();
+
+			if ( ($lastTime + $this->standOffTimeInSeconds) > $currentTime) {
+				return false;
+			}
+
 			return !$task->getCompleted();
 		}
 
@@ -94,7 +106,7 @@
 						log_message(get_text('The task has reached completion'));
 					}
 
-				} catch (\Curl\TygronLockException $e) {
+				} catch (\Curl\CooldownException $e) {
 					log_message(get_text('Cannot check completion, because connection is on cooldown') );
 					return false;
 				} catch(\Throwable $e) {
@@ -113,7 +125,7 @@
 			$ready = null;
 			try {
 				$ready = $operation->checkReadyForOperation();
-			} catch ( \Curl\TygronLockException $e ) {
+			} catch ( \Curl\CooldownException $e ) {
 				log_message(get_text('Check aborted, because connection is on cooldown'));
 				return false;
 			}
@@ -132,7 +144,7 @@
 					$task->setOperationResult($result);
 					$task->save();
 				}
-			} catch (\Curl\TygronLockException $e) {
+			} catch (\Curl\CooldownException $e) {
 				log_message(get_text('Operation aborted, because connection is on cooldown') );
 				$task->setStartedOperation($currentOperation.' (on cooldown)');
 				$task->save();
@@ -144,9 +156,9 @@
 		}
 
 		protected function handleOperationException( $task, $operation, $exception ) {
-				$task->setError($exception);
-				$task->startCleanup();
-				$task->save();
+			$task->setError($exception);
+			$task->startCleanup();
+			$task->save();
 		}
 	}
 

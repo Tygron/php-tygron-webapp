@@ -17,7 +17,7 @@
 				throw new \Exception('No credentials provided');
 			}
 
-			$curlTask = \Curl\TygronLockCurlTask::post($credentials, $credentials['platform'], 'api/event/user/get_my_login_key', [])->runLocked();
+			$curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/user/get_my_login_key', [])->run();
 			if ( !$curlTask->getResponseIsSuccess() ) {
 				throw new \Exception('Credentials were invalid');
 			}

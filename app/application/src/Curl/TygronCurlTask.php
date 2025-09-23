@@ -1,7 +1,19 @@
 <?php
 	namespace Curl;
 
-	class TygronCurlTask extends CurlTask {
+	class TygronCurlTask extends LockingCurlTask {
+
+		private static $tygronLockName = 'tygronCurl';
+		private static $tygronRetries = 5;
+		private static $tygronCooldownTimeInSeconds = 10;
+
+		public static function setLockName( string $lockName ) { self::$tygronLockName = $lockName; }
+		public static function setRetries( int $retries ) { self::$tygronRetries = $retries; }
+		public static function setCooldownTimeInSeconds( int $cooldownTimeInSeconds ) { self::$tygronCooldownTimeInSeconds = $cooldownTimeInSeconds; }
+
+		public function __construct() {
+			$this->setLockSettings(self::$tygronLockName, self::$tygronRetries, self::$tygronCooldownTimeInSeconds);
+		}
 
 		public function setCredentials( string $username, string $password ) {
 			$auth = $username.':'.$password;
@@ -28,8 +40,11 @@
 			return parent::setUrl($url);
 		}
 
+		public function mustCooldown() {
+			return in_array( $this->getStatus(), [401, 403]);
+		}
+
 		public static function get( array|string $credentials, string $platform, string $path, string|array $data = null, bool $json = true ) {
-			$curlTask = new \Curl\TygronCurlTask();
 			$curlTask = new static();
 
 			$curlTask
@@ -49,7 +64,6 @@
 		}
 
                 public static function post( array|string $credentials, string $platform, string $path, string|array $data = null, bool $json = true ) {
-                        $curlTask = new \Curl\TygronCurlTask();
 			$curlTask = new static();
 
                         $curlTask

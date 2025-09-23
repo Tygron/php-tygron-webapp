@@ -20,6 +20,7 @@
 		} else {
 			try {
 				$tasksRunner = new \Tasks\Runners\TasksRunner();
+				$tasksRunner->setStandOffTimeInSeconds( $TASKS_STANDOFF_IN_SECONDS );
 				$tasksRunner->run();
 			} catch ( \Throwable $e ) {
 				log_message(get_text('Encountered an error while running all tasks: %s',[$e->getMessage()]));

@@ -5,8 +5,14 @@
 
 	class TasksRunner {
 
+		private $standOffTimeInSeconds = 0;
+
 		public function __construct( $parameters = null ) {
 
+		}
+
+		public function setStandOffTimeInSeconds( int $standOffTimeInSeconds) {
+			$this->standOffTimeInSeconds = $standOffTimeInSeconds;
 		}
 
 		public function run() {
@@ -48,6 +54,7 @@
 			try {
 				$taskRunner = new TaskRunner();
 				$taskRunner->setTask($taskName);
+				$taskRunner->setStandOffTimeInSeconds($this->standOffTimeInSeconds);
 				$taskRunner->run();
 				$operated = $taskRunner->getHasOperated();
 			} catch( \Throwable $e ) {

@@ -43,6 +43,7 @@
 
 	$CLI_TOKEN			??=	'';
 	$CRON_TASKS			??=	['runtasks.php'];
+	$TASKS_STANDOFF_IN_SECONDS	??=	10;
 
 	$COOLDOWN_SECONDS		??=	60;
 
@@ -93,6 +94,6 @@
 
 	\Utils\Time::$DEFAULT_TIMEZONE = $TIMEZONE_DEFAULT;
 
-	\Curl\TygronLockCurlTask::setCooldownLockFile($WORKSPACE_LOCK_DIR.DIRECTORY_SEPARATOR.'tygron.lock');
-	\Curl\TygronLockCurlTask::setCooldownTimeInSeconds($COOLDOWN_SECONDS);
+	\Curl\LockingCurlTask::setLockLocation($WORKSPACE_LOCK_DIR);
+	\Curl\TygronCurlTask::setCooldownTimeInSeconds($COOLDOWN_SECONDS);
 ?>
