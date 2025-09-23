@@ -93,11 +93,11 @@
 					if ( $task->getCompleted() ) {
 						log_message(get_text('The task has reached completion'));
 					}
-				} catch (\Throwable $e) {
-					if ( $e->getMessage() == 'TYGRON_COOLDOWN' ) {
-						log_message(get_text('Cannot check completion, because connection is on cooldown') );
-                                        	return false;
-	                                }
+
+				} catch (\Curl\TygronLockException $e) {
+					log_message(get_text('Cannot check completion, because connection is on cooldown') );
+					return false;
+				} catch(\Throwable $e) {
 					$this->handleOperationException($task, $operation, $e);
 				}
 			}
@@ -110,7 +110,13 @@
 				log_message(get_text('The current operation is %s, and should already be running',[$currentOperation]));
 				return false;
 			}
-			$ready = $operation->checkReadyForOperation();
+			$ready = null;
+			try {
+				$ready = $operation->checkReadyForOperation();
+			} catch ( \Curl\TygronLockException $e ) {
+				log_message(get_text('Check aborted, because connection is on cooldown'));
+				return false;
+			}
 			if ( is_string($ready) ) {
 				throw new \Exception( get_text('Task in state to start operation, but not ready: %s. Reason: %s',[$currentOperation, $ready]));
 			} else if (!$ready) {
@@ -126,13 +132,12 @@
 					$task->setOperationResult($result);
 					$task->save();
 				}
-			} catch (\Throwable $e) {
-				if ( $e->getMessage() == 'TYGRON_COOLDOWN' ) {
-					log_message(get_text('Operation aborted, because connection is on cooldown') );
-					$task->setStartedOperation($currentOperation.' (on cooldown)');
-					$task->save();
-					return false;
-				}
+			} catch (\Curl\TygronLockException $e) {
+				log_message(get_text('Operation aborted, because connection is on cooldown') );
+				$task->setStartedOperation($currentOperation.' (on cooldown)');
+				$task->save();
+				return false;
+			} catch(\Throwable $e) {
 				$this->handleOperationException($task, $operation, $e);
 			}
 			return true;

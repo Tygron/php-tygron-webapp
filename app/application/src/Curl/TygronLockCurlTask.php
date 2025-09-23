@@ -46,6 +46,7 @@
 				throw new \Exception('Failed to obtain handle for file: '.$file.' error: '.error_get_last());
 			}
 
+			$thrownException = null;
 			$this->setIsOnCooldown(true);
 			for( $retry = self::$cooldownRetries; $retry>0;$retry-- ) {
 				if ( flock($lockFileHandle, LOCK_EX) ) {
@@ -54,7 +55,7 @@
 						try {
 							parent::run();
 						} catch (\Throwable $e) {
-
+							$thrownException = $e;
 						}
 						if ( in_array($this->getStatus(),[401,403]) ) {
 							rewind($lockFileHandle);
@@ -71,8 +72,11 @@
 				}
 			}
 			fclose($lockFileHandle);
-			if ($this->isOnCooldown() && self::$throwExceptionOnCooldown) {
-				throw new \Exception('TYGRON_COOLDOWN');
+			if ( !is_null($thrownException) ) {
+				throw $thrownException;
+			}
+			if ( $this->isOnCooldown() && self::$throwExceptionOnCooldown ) {
+				throw new TygronLockException('Calls to Tygron Platoform on cooldown');
 			}
 			return $this;
 		}
