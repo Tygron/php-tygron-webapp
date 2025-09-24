@@ -27,6 +27,26 @@
 			}
 		</style>
 
+		<script>
+			var url = '{{ baseUrl }}?action=UpdateTask&taskName={{ taskName }}';
+			setTimeout(function(){
+				var xmlHttp = new XMLHttpRequest();
+				xmlHttp.onreadystatechange = function() {
+					if (xmlHttp.readyState == 4 ) {
+						if( xmlHttp.status == 200 ) {
+							console.log('Update polled');
+						} else {
+							console.log('Update returned error');
+						}
+					}
+				}
+				xmlHttp.open("GET", url); // true for asynchronous
+				xmlHttp.send(null);
+			}, 1000);
+
+		</script>
+
+
 	</head>
 
 	<body>
