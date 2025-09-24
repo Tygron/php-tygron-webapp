@@ -1,6 +1,8 @@
 docker-compose-override.yaml
 
 /app/custom/*
+!/app/custom/*/
+/app/custom/*/*
 
 /workspace/*
 !/workspace/*/
@@ -10,11 +12,5 @@ docker-compose-override.yaml
 
 !/workspace/*.sh
 
-!sample-*
-!.gitkeep
-
-!/workspace/*/.gitkeep
-
-!/app/custom/*/.gitkeep
-!/app/custom/*/sample-*
-
+!**/sample-*
+!**/.gitkeep
