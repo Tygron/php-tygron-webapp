@@ -1,311 +1,266 @@
 <html>
 
-<head>
+	<head>
 
-	<base href='{{ baseUrl }}'>
+		<base href='{{ baseUrl }}'>
 
-        <script src='assets/vendor/jquery/jquery-3.7.1.min.js'></script>
+	        <script src='assets/vendor/jquery/jquery-3.7.1.min.js'></script>
 
-        <script src='assets/vendor/leaflet/leaflet-src.js'></script>
-        <script src='assets/vendor/proj4js/proj4.js'></script>
-        <script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
+	        <script src='assets/vendor/leaflet/leaflet-src.js'></script>
+	        <script src='assets/vendor/proj4js/proj4.js'></script>
+	        <script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
 
-        <script src='assets/js/location-selector.js'></script>
-        <script src='assets/js/crs.js'></script>
+	        <script src='assets/js/location-selector.js'></script>
+	        <script src='assets/js/crs.js'></script>
 
-	<script>
-		var locSelector = null
-		$( function(){ 
+		<script>
+			var locSelector = null
+			$( function(){ 
 
-				locSelector = new LocationSelector();
-				locSelector.createLocationSelector({
-						'dom' : { 'inputsParent' : '.locationSettings' },
-						'selectables' : { 
-								'cbs-buurten' : {
-										'name'	: 'CBS Buurten 2024',
-										'type'	: 'wfs',
-										'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
-										'parameters' : {
-											'version'	: '2.0.0',
-											'typeNames'	: 'wijkenenbuurten:buurten',
-											'swapxy'   	: 'true',
+					locSelector = new LocationSelector();
+					locSelector.createLocationSelector({
+							'dom' : { 'inputsParent' : '.locationSettings' },
+							'selectables' : { 
+									'cbs-buurten' : {
+											'name'	: 'CBS Buurten 2024',
+											'type'	: 'wfs',
+											'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
+											'parameters' : {
+												'version'	: '2.0.0',
+												'typeNames'	: 'wijkenenbuurten:buurten',
+												'swapxy'   	: 'true',
+											},
+											'swapxy' : true,
+											'zoomLevel' : 14,
 										},
-										'swapxy' : true,
-										'zoomLevel' : 14,
-									},
-								'cbs-wijken' : {
-										'name'	: 'CBS Buurten 2024',
-										'type'	: 'wfs',
-										'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
-										'parameters' : {
-											'version'	: '2.0.0',
-											'typeNames'	: 'wijkenenbuurten:wijken',
-											'swapxy'   	: 'true',
+									'cbs-wijken' : {
+											'name'	: 'CBS Buurten 2024',
+											'type'	: 'wfs',
+											'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
+											'parameters' : {
+												'version'	: '2.0.0',
+												'typeNames'	: 'wijkenenbuurten:wijken',
+												'swapxy'   	: 'true',
+											},
+											'swapxy' : true,
+											'zoomLevel' : 13,
 										},
-										'swapxy' : true,
-										'zoomLevel' : 13,
-									},
-								'cbs-gemeenten' : {
-										'name'	: 'CBS Buurten 2024',
-										'type'	: 'wfs',
-										'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
-										'parameters' : {
-											'version'	: '2.0.0',
-											'typeNames'	: 'wijkenenbuurten:gemeenten',
-											'swapxy'   	: 'true',
+									'cbs-gemeenten' : {
+											'name'	: 'CBS Buurten 2024',
+											'type'	: 'wfs',
+											'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
+											'parameters' : {
+												'version'	: '2.0.0',
+												'typeNames'	: 'wijkenenbuurten:gemeenten',
+												'swapxy'   	: 'true',
+											},
+											'swapxy' : true,
+											'zoomLevel' : 12,
 										},
-										'swapxy' : true,
-										'zoomLevel' : 12,
-									},
-								
-							},
-					});
-					locSelector.setSelectable('');
-			});
-	</script>
-
-	<link rel='stylesheet' type='text/css' href='assets/css/location-selector.css' />
-	<link rel='stylesheet' type='text/css' href='assets/vendor/leaflet/leaflet.css' />
-
-	<style>
-		body {
-			margin: 0px;
-			padding: 1em 1em;
-		}
-		img.logo {
-			max-height:100px;
-		}
-		div.logos {
-			width: 100%;
-		}
-		div.logosBottom {
-		        position: absolute;
-		        bottom: 1em;
-		        left: 1em;
-		        right: 1em;
-		        width: unset;
-		}
-
-		body {
-			margin: 	0px;
-			padding: 	0px;
-		}
-		img.logo {
-			max-height:	60px;
-		}
-		
-		div.applicationContainer {
-			display: flex;
-			flex-direction: column;
-
-			min-height:	100%;
-			width:		100%;
-		}
-		div.applicationContainer div.topBar {
-			min-height:		2em;
-		}
-		div.applicationContainer .mainSection {
-			flex-basis: 1em;
-			flex-grow: 1;
-
-			align-items: stretch;
-
-			display: flex;
-			flex-direction: row;
-
-			margin: 0px;
-		}
-		div.applicationContainer div.topBar,
-		div.applicationContainer div.bottomBar {
-			padding: 0.5em;
-
-			background-color: darkturquoise;
-			color:white;
-		}
-
-		div.applicationContainer .mainSection .settings {
-			flex-basis: 1em;
-			flex-grow: 1;
-
-			display: flex;
-			flex-direction: column;
-			
-			max-width: 25%;
-			min-width: 30em;
-
-			background-color: lightblue;
-		}
-		form div label span {
-			display: inline-block;
-			width: 10em;
-		}
-		div.applicationContainer .mainSection .settings .settingBlock {
-			padding: 1em;
-		}
-		div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
-			flex-basis: 0px;
-			flex-grow: 1;
-		}
-
-
-		div.applicationContainer .mainSection .map {
-			flex-basis: 1em;
-			flex-grow: 1;
-	
-			display: flex;
-		}
-	</style>
-
-</head>
-
-<body>
-
-<div class='applicationContainer'>
-	<div class='topbar'>
-		<h2>
-			Web Application
-		</h2>
-	</div>
-
-	
-	<form class='mainSection' method='POST' action='index.php'>
-	
-		<div class='settings'>
-			<input type = 'hidden' name='action' value='CreateTask' />
-			
-			<div class='settingBlock'>
-				<h4>Application:</h4>
-				<div><label>
-					<span>Theme:</span>
-					<select name='theme'>
-						<option value='heat' selected>Heat</option>
-						<option value='green'>Green</option>
-					</select>
-				</label></div>
-
-			</div>
-
-			<div class='settingBlock'>
-				<h4>Area of Interest</h4>
-
-				<div><label>
-					<span>From source</span>
-					<select name='selectType' onchange='changeSelectType(this, true)'>
-						<option value='' selected>None</option>
-						<option value='fromSize'>Based on size</option>
-						<option value='upload'>Upload</option>
-						<option value='cbs-buurten' >CBS Buurten</option>
-						<option value='cbs-wijken' >CBS Wijken</option>
-						<option value='cbs-gemeenten' >CBS Gemeenten</option>
-					</select>
-					<script>
-						changeSelectType = function(selectObject, clear) {
-							selectObject = $(selectObject)[0];
-							let selection = selectObject.options[selectObject.selectedIndex].value;
-
-							if (selection == 'upload') {
-								selection = '';
-								$('.uploadOption').css('visibility', 'visible');
-							} else {
-								$('.uploadOption').css('visibility', 'hidden');
-							}
-
-							if (selection == 'fromSize') {
-								locSelector.config['generateAOI'] = true;
- 							} else {
-								locSelector.config['generateAOI'] = false;
-							}
-
-							if (clear) {
-								locSelector.clearAreaOfInterest();
-							}
-							locSelector.setSelectable(selection);
-						};
-						$( function(){ 
-							changeSelectType('[name=\'selectType\']', false);
+									
+								},
 						});
+						locSelector.setSelectable('');
+				});
+		</script>
 
-					</script>
-				</label></div>
+		<link rel='stylesheet' type='text/css' href='assets/css/location-selector.css' />
+		<link rel='stylesheet' type='text/css' href='assets/vendor/leaflet/leaflet.css' />
 
-				<div class='uploadOption'><label>
-					<span>Upload GeoJSON</span>
-					<input name='areaOfInterestFile' 
-						type='file'
-						title=' '
-						placeholder='File'
-						onchange='uploadHandler(event)'>
-					</input>
-					<script>
-						uploadHandler = function(e) {
-							locSelector.uploadHandler(e);
-							e.target.value = null;
-						}
-					</script>
-				</label></div>
+		<link rel='stylesheet' type='text/css' href='assets/css/webapp.css' />
 
-				<div><label>
-					<span>Buffered:</span>
-					<input type='number' name='bufferSize' min='0' max='2500' step='1'></input>
-				</label></div>
+		<style>
+			div.applicationContainer div.topBar,
+			div.applicationContainer div.bottomBar {
+				padding: 0.5em;
+
+				background-color: darkturquoise;
+				color:white;
+			}
+
+			div.applicationContainer .mainSection .settings {
+				flex-basis: 1em;
+				flex-grow: 1;
+
+				display: flex;
+				flex-direction: column;
+
+				max-width: 25%;
+				min-width: 30em;
+
+				background-color: lightblue;
+			}
+			form div label span {
+				display: inline-block;
+				width: 10em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock {
+				padding: 1em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
+				flex-basis: 0px;
+				flex-grow: 1;
+			}
 
 
-			</div>
+			div.applicationContainer .mainSection .map {
+				flex-basis: 1em;
+				flex-grow: 1;
 
-			<div class='settingBlock locationSettings'>
-				<h4>Project Area:</h4>
-				<div><label>
-					<span>Size:</span>
-					<input type='number' name='sizeX' min='500' max='5000' step='1'></input>
-					<input type='number' name='sizeY' min='500' max='5000' step='1'></input>
-				</label></div>
+				display: flex;
+			}
+		</style>
 
-				<div style='display:none;'>
-					<input name='zoomLevel' value='10' />
-					<input name='location'>
-					<input name='areaOfInterest'>
-					<input name='areaOfInterestAttributes'>
-					<input name='crs'>
-					<input name='polygon'>
-					<input name='selectionBounds'>
+	</head>
+
+	<body>
+
+	<div class='applicationContainer'>
+		<div class='topbar'>
+			<h2>
+				Web Application
+			</h2>
+		</div>
+
+		
+		<form class='mainSection' method='POST' action='index.php'>
+		
+			<div class='settings'>
+				<input type = 'hidden' name='action' value='CreateTask' />
+				
+				<div class='settingBlock'>
+					<h4>Application:</h4>
+					<div><label>
+						<span>Theme:</span>
+						<select name='theme'>
+							<option value='heat' selected>Heat</option>
+							<option value='green'>Green</option>
+						</select>
+					</label></div>
+
+				</div>
+
+				<div class='settingBlock'>
+					<h4>Area of Interest</h4>
+
+					<div><label>
+						<span>From source</span>
+						<select name='selectType' onchange='changeSelectType(this, true)'>
+							<option value='' selected>None</option>
+							<option value='fromSize'>Based on size</option>
+							<option value='upload'>Upload</option>
+							<option value='cbs-buurten' >CBS Buurten</option>
+							<option value='cbs-wijken' >CBS Wijken</option>
+							<option value='cbs-gemeenten' >CBS Gemeenten</option>
+						</select>
+						<script>
+							changeSelectType = function(selectObject, clear) {
+								selectObject = $(selectObject)[0];
+								let selection = selectObject.options[selectObject.selectedIndex].value;
+
+								if (selection == 'upload') {
+									selection = '';
+									$('.uploadOption').css('visibility', 'visible');
+								} else {
+									$('.uploadOption').css('visibility', 'hidden');
+								}
+
+								if (selection == 'fromSize') {
+									locSelector.config['generateAOI'] = true;
+	 							} else {
+									locSelector.config['generateAOI'] = false;
+								}
+
+								if (clear) {
+									locSelector.clearAreaOfInterest();
+								}
+								locSelector.setSelectable(selection);
+							};
+							$( function(){ 
+								changeSelectType('[name=\'selectType\']', false);
+							});
+
+						</script>
+					</label></div>
+
+					<div class='uploadOption'><label>
+						<span>Upload GeoJSON</span>
+						<input name='areaOfInterestFile' 
+							type='file'
+							title=' '
+							placeholder='File'
+							onchange='uploadHandler(event)'>
+						</input>
+						<script>
+							uploadHandler = function(e) {
+								locSelector.uploadHandler(e);
+								e.target.value = null;
+							}
+						</script>
+					</label></div>
+
+					<div><label>
+						<span>Buffered:</span>
+						<input type='number' name='bufferSize' min='0' max='2500' step='1'></input>
+					</label></div>
+
+
+				</div>
+
+				<div class='settingBlock locationSettings'>
+					<h4>Project Area:</h4>
+					<div><label>
+						<span>Size:</span>
+						<input type='number' name='sizeX' min='500' max='5000' step='1'></input>
+						<input type='number' name='sizeY' min='500' max='5000' step='1'></input>
+					</label></div>
+
+					<div style='display:none;'>
+						<input name='zoomLevel' value='10' />
+						<input name='location'>
+						<input name='areaOfInterest'>
+						<input name='areaOfInterestAttributes'>
+						<input name='crs'>
+						<input name='polygon'>
+						<input name='selectionBounds'>
+					</div>
+
+				</div>
+
+
+				<div class='settingBlock'>
+					<h4>Credentials:</h4>
+					<div><label>
+						<span>Server:</span>
+						<select name='platform'>
+							<option value='engine' selected>LTS (engine)</option>
+							<option value='power'>LTS (power)</option>
+						</select>
+					</label></div>
+					<div><label><span>Username:</span><input name='username' value='' /></label></div>
+					<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+				</div>
+
+				<div class='settingBlock stretchBlock'>
+				</div>
+				<div class='settingBlock'>
+					<h4>Submit request:</h4>
+					<div><label><span></span><input name='submit' value='Start' type='submit'/></label></div>
 				</div>
 
 			</div>
-
-
-			<div class='settingBlock'>
-				<h4>Credentials:</h4>
-				<div><label>
-					<span>Server:</span>
-					<select name='platform'>
-						<option value='engine' selected>LTS (engine)</option>
-						<option value='power'>LTS (power)</option>
-					</select>
-				</label></div>
-				<div><label><span>Username:</span><input name='username' value='' /></label></div>
-				<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+			<div id='locationSelection' class='map locationSelection'>
 			</div>
+			</form>
 
-			<div class='settingBlock stretchBlock'>
+		<div class='bottombar'>
+			<div class='logos'>
+				<p>Powered by: </p>
+				<img class='logo' src='assets/images/tygron_logo.png'>
 			</div>
-			<div class='settingBlock'>
-				<h4>Submit request:</h4>
-				<div><label><span></span><input name='submit' value='Start' type='submit'/></label></div>
-			</div>
-
-		</div>
-		<div id='locationSelection' class='map locationSelection'>
-		</div>
-		</form>
-
-	<div class='bottombar'>
-		<div class='logos'>
-			<p>Powered by: </p>
-			<img class='logo' src='assets/images/tygron_logo.png'>
 		</div>
 	</div>
-</div>
 
-</body>
+	</body>
 
 </html>
