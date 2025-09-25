@@ -42,6 +42,7 @@
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
 	$CLI_TOKEN			??=	'';
+	$CRON_LAST_RUN_FILE		??=	'last-run';
 	$CRON_TASKS			??=	['runtasks.php'];
 	$TASKS_STANDOFF_IN_SECONDS	??=	10;
 

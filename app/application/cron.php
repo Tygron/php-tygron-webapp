@@ -4,6 +4,13 @@
 
 	if ($RUNNING_FROM_CLI || get_clean_user_input('cli_token') === $CLI_TOKEN) {
 
+		if ( !empty($CRON_LAST_RUN_FILE) ) {
+			\Utils\Files::writeFile(
+					[$WORKSPACE_DIR, $CRON_LAST_RUN_FILE],
+					\Utils\Time::GetCurrentTimestamp()
+				);
+		}
+
 		foreach ( $CRON_TASKS as $index => $jobName) {
 			$filePath = $CUSTOM_CRON_DIR.DIRECTORY_SEPARATOR.$jobName;
 			if ( !file_exists($filePath) ) {
