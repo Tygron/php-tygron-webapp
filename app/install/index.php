@@ -17,11 +17,6 @@
 		exit($e->getMessage());
 	}
 
-	$outputs=[];
-	$outputMessage = '';
-	function logCheck(&$outputTable, &$outputMessage, $title, $description, $result, $message) {
-	}
-
 	//PHP Version
 	$newOutput = ['title'=>'','description'=>'','result'=>'','message'=>''];
 	try {
