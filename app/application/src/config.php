@@ -20,6 +20,7 @@
 	$APPLICATION_WEBHOST		??=	$_SERVER['HTTP_HOST'];
 	$APPLICATION_WEBBASE		??=	'/';
 	$APPLICATION_WEB_PROTOCOL	??=	'https';
+	$APPLICATION_WEB_FULL_URL	??=	 ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. $APPLICATION_WEBHOST . $APPLICATION_WEBBASE;
 
 	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'resources'] );
 	$CUSTOM_ASSETS_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_RESOURCES_DIR, 'assets'] );
@@ -42,14 +43,14 @@
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
 	$CLI_TOKEN			??=	'';
-	$CRON_LAST_RUN_FILE		??=	'last-run';
+	$CRON_LAST_RUN_FILE		??=	'last-cron';
 	$CRON_TASKS			??=	['runtasks.php'];
 	$TASKS_STANDOFF_IN_SECONDS	??=	10;
 
 	$COOLDOWN_SECONDS		??=	60;
 
 	$CONFIG_PARAMETERS ??=[];
-	$CONFIG_PARAMETERS['baseUrl'] = ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. $APPLICATION_WEBHOST . $APPLICATION_WEBBASE;
+	$CONFIG_PARAMETERS['baseUrl'] = $APPLICATION_WEB_FULL_URL;
 
 	//Hooks are run upon each request, and allow for authentication checks, parameter translations, request logging, etc
 	$HOOKS ??= [

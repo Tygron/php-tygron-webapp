@@ -18,6 +18,7 @@
 				$assetType ?? ''
 			);
 	} catch (\Exception $e) {
+		http_response_code(404);
 		exit('Asset not found');
 	}
 	$renderableAsset = new \Rendering\RenderableAsset();
