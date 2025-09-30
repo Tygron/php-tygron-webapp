@@ -457,7 +457,8 @@
 						$this->getCredentials()['useDefaultCredentials']??false,
 						$this->getCredentials()['platform']??null,
 						$this->getCredentials()['username']??null,
-						$this->getCredentials()['password']??null
+						$this->getCredentials()['password']??null,
+						$this->getCredentials()['mfa']??null,
 					);
 
 				$this->setCredentialsFile($credentialsFile);

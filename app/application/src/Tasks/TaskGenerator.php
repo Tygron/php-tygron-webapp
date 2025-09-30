@@ -35,12 +35,13 @@
 
 					case 'credentials':
 						try {
-							$credentials = $parameters['credentials']??null;
+							$credentials = $parameters['credentials']		??	null;
 							$credentials ??= self::normalizeCredentials(
-									$parameters['useDefaultCredentials']??null,
-									$parameters['username']??null,
-									$parameters['password']??null,
-									$parameters['platform']??null
+									$parameters['useDefaultCredentials']	??	null,
+									$parameters['username']			??	null,
+									$parameters['password']			??	null,
+									$parameters['mfa']			??	null,
+									$parameters['platform']			??	null,
 								);
 							$result[$key] = $credentials;
 						} catch ( \Throwable $e ) {
@@ -110,13 +111,14 @@
 		}
 
 
-		public static function normalizeCredentials( string|bool $useDefaultCredentials = null, string $username = null, string $password = null, string $platform = null ) {
+		public static function normalizeCredentials( string|bool $useDefaultCredentials = null, string $username = null, string $password = null, string $mfa = null, string $platform = null ) {
 			if ( (!empty($platform)) &&(!empty($username)) && (!empty($password)) ) {
 				return [
 						'useDefaultCredentials'	=>	false,
 						'platform'		=>	$platform,
 						'username'		=>	$username,
 						'password'		=>	$password,
+						'mfa'			=>	$mfa,
 					];
 			} else if ( $useDefaultCredentials === 'true' || $useDefaultCredentials === true ) {
 				return [

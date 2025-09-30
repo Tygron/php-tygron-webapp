@@ -28,17 +28,17 @@
 			return $fileName.self::$CREDENTIALSFILE_POSTFIX;
 		}
 
-		public static function credentialsToFile( string $fileName, bool $useDefaultCredentials = false, string $platform = null, string $username = null, string $password = null ) {
-			self::validateCredentials( $useDefaultCredentials, $platform, $username, $password );
+		public static function credentialsToFile( string $fileName, bool $useDefaultCredentials = false, string $platform = null, string $username = null, string $password = null, string $mfa = null ) {
+			self::validateCredentials( $useDefaultCredentials, $platform, $username, $password, $mfa );
 			if ( $useDefaultCredentials ) {
 				return self::getDefaultCredentialsFileName();
 			} else {
-				return self::createCredentialsFile( $fileName, $platform, $username, $password);
+				return self::createCredentialsFile( $fileName, $platform, $username, $password, $mfa );
 			}
 		}
 
 
-		public static function validateCredentials( bool $useDefaultCredentials = false, string $platform = null, string $username = null, string $password = null ) {
+		public static function validateCredentials( bool $useDefaultCredentials = false, string $platform = null, string $username = null, string $password = null, string $mfa = null ) {
 			if ( $useDefaultCredentials ) {
 				if (is_null(self::loadCredentialsFile(self::getDefaultCredentialsFileName())) ) {
 					throw new \Exception('No default credentials available');
@@ -82,7 +82,7 @@
 			}
 		}
 
-		public static function createCredentialsFile( string $fileName, string $platform, string $username, string $password) {
+		public static function createCredentialsFile( string $fileName, string $platform, string $username, string $password, string $mfa = null ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
 			if ( $fileName == self::getDefaultCredentialsFileName() ) {
@@ -91,10 +91,11 @@
 
 			$fileName = self::generateCredentialsFileName($fileName);
 			\Utils\Files::WriteJsonFile([$WORKSPACE_CREDENTIALS_DIR, $fileName], [
-				'platform' => $platform,
-				'username' => $username,
-				'password' => $password,
-				'created' => \Utils\Time::getCurrentTimestamp(),
+				'platform' 	=> $platform,
+				'username' 	=> $username,
+				'password' 	=> $password,
+				'mfa'		=> $mfa,
+				'created' 	=> \Utils\Time::getCurrentTimestamp(),
 			]);
 			return $fileName;
 		}
