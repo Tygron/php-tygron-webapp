@@ -4,14 +4,15 @@
 
 		<base href='{{ baseUrl }}'>
 
-	        <script src='assets/vendor/jquery/jquery-3.7.1.min.js'></script>
+		<script src='assets/vendor/jquery/jquery-3.7.1.min.js'></script>
 
-	        <script src='assets/vendor/leaflet/leaflet-src.js'></script>
-	        <script src='assets/vendor/proj4js/proj4.js'></script>
-	        <script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
+		<script src='assets/vendor/leaflet/leaflet-src.js'></script>
+		<script src='assets/vendor/proj4js/proj4.js'></script>
+		<script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
 
-	        <script src='assets/js/location-selector.js'></script>
-	        <script src='assets/js/crs.js'></script>
+		<script src='assets/js/credentials.js'></script>
+		<script src='assets/js/location-selector.js'></script>
+		<script src='assets/js/crs.js'></script>
 
 		<script>
 			var locSelector = null
@@ -97,6 +98,9 @@
 			div.applicationContainer .mainSection .settings .settingBlock {
 				padding: 1em;
 			}
+			div.applicationContainer .mainSection .settings .settingBlock .settingSubBlock {
+				margin : 0.25em 0em;
+			}
 			div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
 				flex-basis: 0px;
 				flex-grow: 1;
@@ -115,151 +119,199 @@
 
 	<body>
 
-	<div class='applicationContainer'>
-		<div class='topbar'>
-			<h2>
-				Web Application
-			</h2>
-		</div>
+		<div class='applicationContainer'>
+			<div class='topbar'>
+				<h2>
+					Web Application
+				</h2>
+			</div>
 
-		
-		<form class='mainSection' method='POST' action='index.php'>
-		
-			<div class='settings'>
-				<input type = 'hidden' name='action' value='CreateTask' />
-				
-				<div class='settingBlock'>
-					<h4>Application:</h4>
-					<div><label>
-						<span>Theme:</span>
-						<select name='theme'>
-							<option value='heat' selected>Heat</option>
-							<option value='green'>Green</option>
-						</select>
-					</label></div>
+			
+			<form class='mainSection' method='POST' action='index.php'>
+			
+				<div class='settings'>
+					<input type = 'hidden' name='action' value='CreateTask' />
+					
+					<div class='settingBlock'>
+						<h4>Application:</h4>
+						<div><label>
+							<span>Theme:</span>
+							<select name='theme'>
+								<option value='heat' selected>Heat</option>
+								<option value='green'>Green</option>
+							</select>
+						</label></div>
 
-				</div>
+					</div>
 
-				<div class='settingBlock'>
-					<h4>Area of Interest</h4>
+					<div class='settingBlock'>
+						<h4>Area of Interest</h4>
 
-					<div><label>
-						<span>From source</span>
-						<select name='selectType' onchange='changeSelectType(this, true)'>
-							<option value='' selected>None</option>
-							<option value='fromSize'>Based on size</option>
-							<option value='upload'>Upload</option>
-							<option value='cbs-buurten' >CBS Buurten</option>
-							<option value='cbs-wijken' >CBS Wijken</option>
-							<option value='cbs-gemeenten' >CBS Gemeenten</option>
-						</select>
-						<script>
-							changeSelectType = function(selectObject, clear) {
-								selectObject = $(selectObject)[0];
-								let selection = selectObject.options[selectObject.selectedIndex].value;
+						<div><label>
+							<span>From source</span>
+							<select name='selectType' onchange='changeSelectType(this, true)'>
+								<option value='' selected>None</option>
+								<option value='fromSize'>Based on size</option>
+								<option value='upload'>Upload</option>
+								<option value='cbs-buurten' >CBS Buurten</option>
+								<option value='cbs-wijken' >CBS Wijken</option>
+								<option value='cbs-gemeenten' >CBS Gemeenten</option>
+							</select>
+							<script>
+								changeSelectType = function(selectObject, clear) {
+									selectObject = $(selectObject)[0];
+									let selection = selectObject.options[selectObject.selectedIndex].value;
 
-								if (selection == 'upload') {
-									selection = '';
-									$('.uploadOption').css('visibility', 'visible');
-								} else {
-									$('.uploadOption').css('visibility', 'hidden');
+									if (selection == 'upload') {
+										selection = '';
+										$('.uploadOption').css('visibility', 'visible');
+									} else {
+										$('.uploadOption').css('visibility', 'hidden');
+									}
+
+									if (selection == 'fromSize') {
+										locSelector.config['generateAOI'] = true;
+									} else {
+										locSelector.config['generateAOI'] = false;
+									}
+
+									if (clear) {
+										locSelector.clearAreaOfInterest();
+									}
+									locSelector.setSelectable(selection);
+								};
+								$( function(){ 
+									changeSelectType('[name=\'selectType\']', false);
+								});
+
+							</script>
+						</label></div>
+
+						<div class='uploadOption'><label>
+							<span>Upload GeoJSON</span>
+							<input name='areaOfInterestFile' 
+								type='file'
+								title=' '
+								placeholder='File'
+								onchange='uploadHandler(event)'>
+							</input>
+							<script>
+								uploadHandler = function(e) {
+									locSelector.uploadHandler(e);
+									e.target.value = null;
 								}
+							</script>
+						</label></div>
 
-								if (selection == 'fromSize') {
-									locSelector.config['generateAOI'] = true;
-	 							} else {
-									locSelector.config['generateAOI'] = false;
-								}
+						<div><label>
+							<span>Buffered:</span>
+							<input type='number' name='bufferSize' min='0' max='2500' step='1'></input>
+						</label></div>
 
-								if (clear) {
-									locSelector.clearAreaOfInterest();
-								}
-								locSelector.setSelectable(selection);
-							};
-							$( function(){ 
-								changeSelectType('[name=\'selectType\']', false);
-							});
 
-						</script>
-					</label></div>
+					</div>
 
-					<div class='uploadOption'><label>
-						<span>Upload GeoJSON</span>
-						<input name='areaOfInterestFile' 
-							type='file'
-							title=' '
-							placeholder='File'
-							onchange='uploadHandler(event)'>
-						</input>
-						<script>
-							uploadHandler = function(e) {
-								locSelector.uploadHandler(e);
-								e.target.value = null;
+					<div class='settingBlock locationSettings'>
+						<h4>Project Area:</h4>
+						<div><label>
+							<span>Size:</span>
+							<input type='number' name='sizeX' min='500' max='5000' step='1'></input>
+							<input type='number' name='sizeY' min='500' max='5000' step='1'></input>
+						</label></div>
+
+						<div style='display:none;'>
+							<input name='zoomLevel' value='10' />
+							<input name='location'>
+							<input name='areaOfInterest'>
+							<input name='areaOfInterestAttributes'>
+							<input name='crs'>
+							<input name='polygon'>
+							<input name='selectionBounds'>
+						</div>
+
+					</div>
+
+
+					<div id='credentials' class='settingBlock'>
+						<h4>Credentials:</h4>
+						<div class='settingSubBlock'>
+							<div><label>
+								<span>Server:</span>
+								<select name='platform'>
+								<option value='engine' selected>LTS (engine)</option>
+								<option value='power'>LTS (power)</option>
+								</select>
+							</label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><label><span>Username:</span><input name='username' value='' /></label></div>
+							<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+							<div class='mfa hidden'><label><span>SMS Code:</span><input name='mfa' value='' placeholder=''></label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><label><span></span><input class='validateCredentialsButton' name='validateCredentials' value='Validate credentials' type='button' onclick='validateStart()'/></label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><span class='credentialsValidateFeedback'></span></div>
+						</div>
+						<style>
+							.mfa.hidden {
+								visibility: hidden;
 							}
+						</style>
+						<script>
+							clearFeedback = function() {
+								$('.credentialsValidateFeedback').html('&nbsp;');
+							}
+							validateStart = function() {
+								validateFeedback(null, 'Validating...');
+								testCredentials($("#credentials"), validateFeedback);
+							}
+							validateFeedback = function(result, message) {
+								if (result === 'mfa') {
+									$('.mfa.hidden').removeClass('hidden');
+								}
+								$('.credentialsValidateFeedback').html(message);
+							}
+							clearFeedback();
+
+							$(document).ready(function() {
+								if ( $('[name="mfa"]').val() ) {
+									$('.mfa.hidden').removeClass('hidden');							
+								}
+								$('form').keydown(function(event){
+									if (event.keyCode == 13) {
+										if ( $(event.target).closest('#credentials').length>0 ) {
+											$('.validateCredentialsButton').trigger('click');
+										}
+										event.preventDefault();
+										return false;
+									}
+								});
+							});
 						</script>
-					</label></div>
 
-					<div><label>
-						<span>Buffered:</span>
-						<input type='number' name='bufferSize' min='0' max='2500' step='1'></input>
-					</label></div>
+					</div>
 
-
-				</div>
-
-				<div class='settingBlock locationSettings'>
-					<h4>Project Area:</h4>
-					<div><label>
-						<span>Size:</span>
-						<input type='number' name='sizeX' min='500' max='5000' step='1'></input>
-						<input type='number' name='sizeY' min='500' max='5000' step='1'></input>
-					</label></div>
-
-					<div style='display:none;'>
-						<input name='zoomLevel' value='10' />
-						<input name='location'>
-						<input name='areaOfInterest'>
-						<input name='areaOfInterestAttributes'>
-						<input name='crs'>
-						<input name='polygon'>
-						<input name='selectionBounds'>
+					<div class='settingBlock stretchBlock'>
+					</div>
+					<div class='settingBlock'>
+						<h4>Submit request:</h4>
+						<div><label><span></span><input name='submit' value='Start' type='submit'/></label></div>
 					</div>
 
 				</div>
-
-
-				<div class='settingBlock'>
-					<h4>Credentials:</h4>
-					<div><label>
-						<span>Server:</span>
-						<select name='platform'>
-							<option value='engine' selected>LTS (engine)</option>
-							<option value='power'>LTS (power)</option>
-						</select>
-					</label></div>
-					<div><label><span>Username:</span><input name='username' value='' /></label></div>
-					<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+				<div id='locationSelection' class='map locationSelection'>
 				</div>
+				</form>
 
-				<div class='settingBlock stretchBlock'>
+			<div class='bottombar'>
+				<div class='logos'>
+					<p>Powered by: </p>
+					<img class='logo' src='assets/images/tygron_logo.png'>
 				</div>
-				<div class='settingBlock'>
-					<h4>Submit request:</h4>
-					<div><label><span></span><input name='submit' value='Start' type='submit'/></label></div>
-				</div>
-
-			</div>
-			<div id='locationSelection' class='map locationSelection'>
-			</div>
-			</form>
-
-		<div class='bottombar'>
-			<div class='logos'>
-				<p>Powered by: </p>
-				<img class='logo' src='assets/images/tygron_logo.png'>
 			</div>
 		</div>
-	</div>
 
 	</body>
 

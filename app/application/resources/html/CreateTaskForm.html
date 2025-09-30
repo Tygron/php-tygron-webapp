@@ -10,6 +10,7 @@
 		<script src='assets/vendor/proj4js/proj4.js'></script>
 		<script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
 
+		<script src='assets/js/credentials.js'></script>
 		<script src='assets/js/location-selector.js'></script>
 		<script src='assets/js/crs.js'></script>
 
@@ -56,6 +57,9 @@
 			}
 			div.applicationContainer .mainSection .settings .settingBlock {
 				padding: 1em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock .settingSubBlock {
+				margin : 0.25em 0em;
 			}
 			div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
 				flex-basis: 0px;
@@ -109,17 +113,65 @@
 					</div>
 
 
-					<div class='settingBlock'>
+					<div id='credentials' class='settingBlock'>
 						<h4>Credentials:</h4>
-						<div><label>
-							<span>Server:</span>
-							<select name='platform'>
+						<div class='settingSubBlock'>
+							<div><label>
+								<span>Server:</span>
+								<select name='platform'>
 								<option value='engine' selected>LTS (engine)</option>
 								<option value='power'>LTS (power)</option>
-							</select>
-						</label></div>
-						<div><label><span>Username:</span><input name='username' value='' /></label></div>
-						<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+								</select>
+							</label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><label><span>Username:</span><input name='username' value='' /></label></div>
+							<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+							<div class='mfa hidden'><label><span>SMS Code:</span><input name='mfa' value='' placeholder=''></label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><label><span></span><input class='validateCredentialsButton' name='validateCredentials' value='Validate credentials' type='button' onclick='validateStart()'/></label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><span class='credentialsValidateFeedback'></span></div>
+						</div>
+						<style>
+							.mfa.hidden {
+								visibility: hidden;
+							}
+						</style>
+						<script>
+							clearFeedback = function() {
+								$('.credentialsValidateFeedback').html('&nbsp;');
+							}
+							validateStart = function() {
+								validateFeedback(null, 'Validating...');
+								testCredentials($("#credentials"), validateFeedback);
+							}
+							validateFeedback = function(result, message) {
+								if (result === 'mfa') {
+									$('.mfa.hidden').removeClass('hidden');
+								}
+								$('.credentialsValidateFeedback').html(message);
+							}
+							clearFeedback();
+
+							$(document).ready(function() {
+								if ( $('[name="mfa"]').val() ) {
+									$('.mfa.hidden').removeClass('hidden');							
+								}
+								$('form').keydown(function(event){
+									if (event.keyCode == 13) {
+										if ( $(event.target).closest('#credentials').length>0 ) {
+											$('.validateCredentialsButton').trigger('click');
+										}
+										event.preventDefault();
+										return false;
+									}
+								});
+							});
+						</script>
+
 					</div>
 					<div class='settingBlock stretchBlock'>
 					</div>
