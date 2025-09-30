@@ -15,8 +15,11 @@
 			$this->setLockSettings(self::$tygronLockName, self::$tygronRetries, self::$tygronCooldownTimeInSeconds);
 		}
 
-		public function setCredentials( string $username, string $password ) {
+		public function setCredentials( string $username, string $password, string $mfa = null ) {
 			$auth = $username.':'.$password;
+			if ( !empty($mfa) ) {
+				$auth.=':'.$mfa;
+			}
 
 			$b64Auth = base64_encode($auth);
 			return $this->setAuthHeader( $b64Auth, 'Basic' );
@@ -58,7 +61,7 @@
 			if ( is_string($credentials) ) {
 				$curlTask->setParameters(['token'=>$credentials]);
 			} else if ( is_array($credentials) ) {
-				$curlTask->setCredentials($credentials['username'], $credentials['password']);
+				$curlTask->setCredentials($credentials['username'], $credentials['password'], $credentials['mfa']??null);
 			}
 			return $curlTask;
 		}
@@ -77,7 +80,7 @@
                         if ( is_string($credentials) ) {
                                 $curlTask->setParameters(['token'=>$credentials]);
                         } else if ( is_array($credentials) ) {
-                                $curlTask->setCredentials($credentials['username'],$credentials['password']);
+                                $curlTask->setCredentials($credentials['username'],$credentials['password'], $credentials['mfa']??null);
                         }
 			return $curlTask;
                 }
