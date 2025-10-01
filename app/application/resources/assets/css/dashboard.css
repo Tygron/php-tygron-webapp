@@ -1,0 +1,50 @@
+body {
+	height:		100%;
+	width:		100%;
+	margin:		0px;
+	padding:	0px;
+
+}
+
+.dashboard {
+
+}
+
+.mainSection > div {
+	box-sizing:	border-box;
+
+	flex-grow:	0;
+
+	padding:	0.5em;
+}
+.dashboard .sideInfo {
+	min-width:	20em;
+	max-width:	20%;
+
+	box-sizing:	border-box;
+	padding:	0.5em;
+	
+}
+
+.dashboard .content {
+	position:	relative;
+	
+	flex-basis:	1em;
+	flex-grow:	10;
+}
+
+.window {
+	position:	relative;
+	box-sizing:	border-box;
+
+	height:		100%;
+	width:		100%;
+
+	border-radius:	0.5em;
+	overflow:	hidden;
+}
+.window > * {
+	position:	relative;
+	height:		100%;
+	width:		100%;
+}

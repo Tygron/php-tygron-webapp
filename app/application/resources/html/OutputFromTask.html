@@ -3,6 +3,9 @@
 	<head>
 		<base href='{{ baseUrl }}'>
 
+		<link rel="stylesheet" type="text/css" href="assets/css/webapp.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/dashboard.css">
+		
 		<style>
 			body {
 				height:		100%;
@@ -11,17 +14,38 @@
 				margin:		0px;
 			}
 			iframe {
-				position:	absolute;
-				width:		100%;
-				height:		100%;
-
-				border:		0px;
 			}
 		</style>
 	</head>
 
 	<body>
-		<iframe src='{{ webViewer3DHtml }}'>
+		<div class='applicationContainer dashboard'>
+			<div class='topBar'>
+				<h2>Web Application</h2>
+			</div>
+
+			<div class='mainSection'>
+				<div class='sideInfo'>
+					<p>
+						This Project is current running on the Tygron Platform as:
+					</p>
+					<strong>{{projectName}}</strong>
+					<p>
+						If you wish to preserve or edit this project, access the running session via the Tygron Platform Client Application ( {{platform}} ).
+					</p>
+				</div>
+				<div class='content'>
+					<iframe class='window' src='https://{{ platform }}.tygron.com/web/3dmap.html?token={{ webToken }}'></iframe>
+				</div>
+			</div>
+
+			<div class='bottomBar'>
+				<div class='logos'>
+					<p>Powered by:</p>
+					<img class='logo' src='assets/images/tygron_logo.png'>
+				</div>
+			</div>		
+		</div>
 	</body>
 
 </html>
