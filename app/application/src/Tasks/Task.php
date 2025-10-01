@@ -170,6 +170,9 @@
 			}
 			$this->setCurrentOperation($this->getOperations()[$operationIndex]);
 		}
+		public function retryCurrentOperation(string $cause = 'retry') {
+			$this->setStartedOperation( $this->getCurrentOperation() . '(retry:  ' . $cause.')');
+		}
 		public function startCleanup() {
 			if ( count($this->getCleanupOperations()) > 0 ) {
 				$operationIndex = array_search($this->getCurrentOperation(), $this->getCleanupOperations());
