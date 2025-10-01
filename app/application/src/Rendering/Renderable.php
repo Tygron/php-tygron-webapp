@@ -51,7 +51,7 @@
 
 		public function render() {
 			if (!$this->validate()) {
-				throw new Exception('Renderable not ready');
+				throw new \Exception('Renderable not ready');
 			}
 			$rendered = Renderer::getRendered( $this->template, $this->data);
 			$this->rendered = $rendered;
