@@ -9,6 +9,14 @@
 		public static function writeFile( string|array $path, $content ) {
 			$path = self::makePath($path);
 
+			$unwritableCause = self::isWritable($path, true, true);
+			if ( !($unwritableCause === true) ) {
+				if ( empty($unwritableCause) ) {
+					$unwritableCause = 'The reason is unknown.';
+				}
+				throw new \Exception($unwritableCause);
+			}
+
 			self::ensureDirectory($path);
 
 			$stringContent = strval($content);
@@ -125,6 +133,32 @@
 					mkdir($dir);
 				}
 			}
+		}
+
+		public static function isWritable( string|array $path, bool $isFile = true, bool $returnCause = true ) {
+			$testPath = self::makePath($path);
+			if ( is_file($testPath) ) {
+				if ( !$isFile ) {
+					return !$returnCause ? false : 'Path \''.$testPath.'\' not writable. Is a file, not a directory.';
+				} else if ( !is_writable($path) ) {
+					return !$returnCause ? false : 'Path \''.$testPath.'\' not writable. File is not writable.';
+				}
+				return true;
+			}
+
+			for ( $pathParts = explode(DIRECTORY_SEPARATOR, $testPath) ; count($pathParts) > 0 ; array_pop($pathParts) ) {
+				$testPath = self::makePath($pathParts);
+				if ( is_file($testPath) ) {
+					return (!$returnCause) ? false : 'Path not writable as subpath \''.$testPath.'\' is a file.';
+				} else if ( is_dir($testPath) ) {
+					if ( !is_writable($testPath) ) {
+						return (!$returnCause) ? false : 'Path not writable as subpath \''.$testpath.'\' is not writable.';
+					}
+					return true;
+				}
+			}
+
+			return $returnCause ? false : 'Path \''.$path.'\' has no known origin.';
 		}
 
 		public static function deleteFile( string|array $files, string $directory = '' ) {

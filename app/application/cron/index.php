@@ -1,6 +1,6 @@
 <?php
 
-	include_once "../src/includes.php";
+	include_once implode(DIRECTORY_SEPARATOR,[__DIR__,'..','src','includes.php']);
 
 
 	if ( $RUNNING_FROM_CLI ) {
@@ -11,10 +11,17 @@
 	}
 
 	if ( !empty($CRON_LAST_RUN_FILE) ) {
-		\Utils\Files::writeFile(
+		try {
+			\Utils\Files::writeFile(
 				[$WORKSPACE_DIR, $CRON_LAST_RUN_FILE],
 				\Utils\Time::GetCurrentTimestamp()
 			);
+			$registeredTime = \Utils\Files::readFile( [$WORKSPACE_DIR, $CRON_LAST_RUN_FILE] );
+			echo get_text ( 'Registered new cron run time: %s', [$registeredTime] );
+		} catch ( \Throwable $e ) {
+			echo get_text( 'Could not register latest cron run time. Reason: %s', [$e->getMessage()] );
+		}
+		echo '<hr>';
 	}
 
 	foreach ( $CRON_TASKS as $index => $jobName) {
@@ -30,7 +37,5 @@
 		echo '<hr>';
 		include_once($filePath);
 	}
-
-	//}
 
 ?>
