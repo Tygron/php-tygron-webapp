@@ -1,8 +1,6 @@
 <?php
 	namespace Tasks\Runners;
 
-	include_once "src/includes.php";
-
 	class TasksRunner {
 
 		private $standOffTimeInSeconds = 0;

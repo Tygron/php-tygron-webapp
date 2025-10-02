@@ -17,10 +17,10 @@
 
 	//Variables can be overwritten.
 	//To overwrite, find the "config" folder, create a copy of sample-config.php named config.php and make the desires changes there.
-	$APPLICATION_WEBHOST		??=	$_SERVER['HTTP_HOST'];
+	$APPLICATION_WEBHOST		??=	$_SERVER['HTTP_HOST'] ?? 'localhost';
 	$APPLICATION_WEBBASE		??=	'/';
 	$APPLICATION_WEB_PROTOCOL	??=	'https';
-	$APPLICATION_WEB_FULL_URL	??=	 ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. $APPLICATION_WEBHOST . $APPLICATION_WEBBASE;
+	$APPLICATION_WEB_FULL_URL	??=	 ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. preg_replace('#/+#','/',$APPLICATION_WEBHOST . '/' . $APPLICATION_WEBBASE);
 
 	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'resources'] );
 	$CUSTOM_ASSETS_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_RESOURCES_DIR, 'assets'] );
