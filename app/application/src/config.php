@@ -42,6 +42,7 @@
 	$SAFE_CHARACTERS 		??= 	'[a-zA-Z0-9\-_]';
 	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
 
+	//Cron tasks should be run automatically by touching the application/cron endpoint. The CLI_TOKEN should be an alphanumeric string to authenticate a scheduler with, or null to allow any source (using null is not recommended).
 	$CLI_TOKEN			??=	'';
 	$CRON_LAST_RUN_FILE		??=	'last-cron';
 	$CRON_TASKS			??=	['runtasks.php'];
