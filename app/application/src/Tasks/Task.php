@@ -26,6 +26,7 @@
 
 				'taskOperations'	=>	[],
 				'cleanupOperations'	=>	[],
+				'currentOperationIndex'	=>	0,
 				'currentOperation'	=>	'',
 				'startedOperation'	=>	'',
 				'operationFeedback'	=>	null,
@@ -82,8 +83,10 @@
 						$this->setCleanupOperations($value);
 						break;
 
+					case 'currentOperationIndex':
+						$this->setCurrentOperationIndex($value);
+						break;
 					case 'currentOperation':
-						$this->setCurrentOperation($value);
 						break;
 					case 'startedOperation':
 						$this->setStartedOperation($value);
@@ -159,7 +162,7 @@
 			$this->data['cleanupOperations'] = $operations;
 		}
 		public function setToNextOperation() {
-			$operationIndex = array_search($this->getCurrentOperation(), $this->getOperations());
+			$operationIndex = $this->getCurrentOperationIndex();
 			$operationIndex+=1;
 			if ( $operationIndex >= count($this->getTaskOperations()) ) {
 				$this->setTaskCompleted(true);
@@ -168,25 +171,32 @@
 				$this->setCompleted(true);
 				return;
 			}
-			$this->setCurrentOperation($this->getOperations()[$operationIndex]);
+			$this->setCurrentOperationIndex($operationIndex);
 		}
 		public function retryCurrentOperation(string $cause = 'retry') {
 			$this->setStartedOperation( $this->getCurrentOperation() . '(retry:  ' . $cause.')');
 		}
 		public function startCleanup() {
-			if ( count($this->getCleanupOperations()) > 0 ) {
-				$operationIndex = array_search($this->getCurrentOperation(), $this->getCleanupOperations());
-				if ($operationIndex===false) {
-					$this->setCurrentOperation($this->getCleanupOperations()[0]);
-				}
-			} else {
+			if ( count($this->getCleanupOperations()) === 0 ) {
 				throw new \Exception('No cleanup operations defined');
 			}
+			$taskOperationsCount = count($this->getTaskOperations());
+			if ( $this->getCurrentOperationIndex() < $taskOperationsCount ) {
+				$this->setCurrentOperationIndex($taskOperationsCount);
+			}
 		}
-		public function setCurrentOperation( string $operation ) {
+		public function setCurrentOperationIndex( int $operationIndex ) {
+			$operation = $this->getOperationByIndex( $operationIndex );
+			if ( is_null($operation) ) {
+				throw new \Exception('Operation index exceeds list of operations');
+			}
+			$this->data['currentOperationIndex'] = $operationIndex;
 			$this->data['currentOperation'] = $operation;
 			$this->setOperationFeedback(null);
 			$this->setOperationResult(null);
+		}
+		public function setCurrentOperation( string $operation ) {
+			throw new \Exception('Cannot set current operation by name');
 		}
 		public function setStartedOperation( string $operation ) {
 			$this->data['startedOperation'] = $operation;
@@ -251,7 +261,7 @@
 				return;
 			}
 			if ( empty($this->getCurrentOperation()) && count($this->getOperations())>0 ) {
-				$this->setCurrentOperation($this->getFirstOperation());
+				$this->setCurrentOperationIndex(0);
 			}
 			$this->data['initialized'] = true;
 			$this->setCreationTime(\Utils\Time::getCurrentTimestamp());
@@ -321,7 +331,6 @@
 		public function getCompletionTime() {
 			return $this->data['creationTime'];
 		}
-
 		public function getOperations() {
 			return array_merge($this->getTaskOperations(), $this->getCleanupOperations());
 		}
@@ -331,8 +340,14 @@
 		public function getCleanupOperations() {
 			return $this->data['cleanupOperations'];
 		}
+		public function getOperationByIndex( int $index = 0 ) {
+			return $this->getOperations()[$index] ?? null;
+		}
 		public function getFirstOperation() {
-			return (count($this->getOperations())>0) ? $this->getOperations()[0] : null;
+			return $this->getOperationByIndex(0);
+		}
+		public function getCurrentOperationIndex() {
+			return $this->data['currentOperationIndex'];
 		}
 		public function getCurrentOperation() {
 			if ( $this->getCompleted() ) {
