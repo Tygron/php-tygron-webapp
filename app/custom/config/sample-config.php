@@ -21,6 +21,7 @@
 	$TIMEZONE_DEFAULT = 'Europe/Amsterdam';
 
 	//Verification token to run cron tasks with
+	//The CLI_TOKEN should be an alphanumeric string to authenticate a scheduler with, or null to allow any source (using null is not recommended).
 	$CLI_TOKEN = null; //Set to a random character string
 
 	//Whether to keep task files of tasks which have resulted in an error.
