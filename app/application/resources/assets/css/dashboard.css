@@ -17,16 +17,15 @@ body {
 
 	padding:	0.5em;
 }
-.dashboard .sideInfo {
+.dashboard .sideBar {
 	min-width:	20em;
-	max-width:	20%;
 
 	box-sizing:	border-box;
 	padding:	0.5em;
 	
 }
 
-.dashboard .content {
+.dashboard .mainContent {
 	position:	relative;
 	
 	flex-basis:	1em;
