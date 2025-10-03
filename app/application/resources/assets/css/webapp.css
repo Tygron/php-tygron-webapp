@@ -43,9 +43,31 @@ div.applicationContainer .mainSection {
 	align-items: stretch;
 
 	display: flex;
-	flex-direction: row;
 
 	margin: 0px;
+}
+div.applicationContainer .mainSection .sideBar {
+	min-width:	30em;
+}
+@media (orientation: landscape) {
+	div.applicationContainer .mainSection {
+		flex-direction:	row;
+	}
+	div.applicationContainer .mainSection .sideBar {
+		max-width:	25%;
+	}
+
+}
+@media (orientation: portrait) {
+	div.applicationContainer .mainSection {
+		flex-direction:	column;
+	}
+	div.applicationContainer .mainSection .mainContent {
+		min-height:	100vw;
+	}
+	div.applicationContainer .mainSection .sideBar {
+		width:		100%;
+	}
 }
 div.applicationContainer div.topBar,
 div.applicationContainer div.bottomBar {

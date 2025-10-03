@@ -14,8 +14,6 @@
 		<script src='assets/js/location-selector.js'></script>
 		<script src='assets/js/crs.js'></script>
 
-
-
 		<script>
 			var locSelector = null
 			$( function(){ 
@@ -33,22 +31,11 @@
 		<style>
 			div.applicationContainer div.topBar,
 			div.applicationContainer div.bottomBar {
-				padding: 0.5em;
-
 				background-color: darkturquoise;
 				color:white;
 			}
 
 			div.applicationContainer .mainSection .settings {
-				flex-basis: 1em;
-				flex-grow: 1;
-
-				display: flex;
-				flex-direction: column;
-				
-				max-width: 25%;
-				min-width: 30em;
-
 				background-color: lightblue;
 			}
 			form div label span {
@@ -89,7 +76,7 @@
 			
 			<form class='mainSection' method='POST' action='index.php'>
 			
-				<div class='settings'>
+				<div class='sideBar settings'>
 					<input type = 'hidden' name='action' value='CreateTask' />
 					
 					<div class='settingBlock'>
@@ -181,9 +168,9 @@
 					</div>
 
 				</div>
-				<div id='locationSelection' class='map locationSelection'>
+				<div id='locationSelection' class='mainContent map locationSelection'>
 				</div>
-				</form>
+			</form>
 
 			<div class='bottomBar'>
 				<div class='logos'>
