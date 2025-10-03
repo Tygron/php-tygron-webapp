@@ -88,7 +88,6 @@
 	//When rendering assets such as html, css, js files, include originating file and dir as comment or other meta information.
 	$DEBUG_ASSETS_METADATA ??= false;
 
-
 	//
 	$CONTENT_HEADERS ??= [];
 	$CONTENT_HEADERS['js'] ??= [
