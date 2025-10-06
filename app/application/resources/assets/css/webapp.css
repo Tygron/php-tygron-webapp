@@ -47,6 +47,9 @@ div.applicationContainer .mainSection {
 	margin: 0px;
 }
 div.applicationContainer .mainSection .sideBar {
+	display:	flex;
+	flex-direction: column;
+
 	min-width:	30em;
 }
 @media (orientation: landscape) {

@@ -73,8 +73,6 @@
 		<style>
 			div.applicationContainer div.topBar,
 			div.applicationContainer div.bottomBar {
-				padding: 0.5em;
-
 				background-color: darkturquoise;
 				color:white;
 			}
@@ -88,6 +86,10 @@
 			}
 			div.applicationContainer .mainSection .settings .settingBlock {
 				padding: 1em;
+				padding-bottom: 0em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock:last-child {
+				padding-bottom: 2em;
 			}
 			div.applicationContainer .mainSection .settings .settingBlock .settingSubBlock {
 				margin : 0.25em 0em;
@@ -95,6 +97,7 @@
 			div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
 				flex-basis: 0px;
 				flex-grow: 1;
+				padding: 0em;
 			}
 
 
@@ -133,6 +136,11 @@
 							</select>
 						</label></div>
 
+						<div><label>
+							<span>Project name:</span>
+							<input name='projectName' maxlength='20'>
+						</label></div>
+
 					</div>
 
 					<div class='settingBlock locationSettings'>
@@ -140,7 +148,7 @@
 
 						<div><label>
 							<span>From source</span>
-							<select name='selectType' onchange='changeSelectType(this, true)'>
+							<select name='selectType' onchange='changeSelectType(this, true);'>
 								<option value='' selected>None</option>
 								<option value='fromSize'>Based on size</option>
 								<option value='upload'>Upload</option>
