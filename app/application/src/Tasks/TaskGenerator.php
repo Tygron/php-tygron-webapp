@@ -4,6 +4,8 @@
 
 	class TaskGenerator {
 
+		protected static int $RANDOM_CHARACTERS = 4;
+
 		public static array $DEFAULT_PARAMETERS = [
 
 			'taskName'=>'',
@@ -30,7 +32,7 @@
 			foreach ( $defaults as $key=>$value ) {
 				switch($key) {
 					case 'taskName':
-						$result[$key] = self::generateTaskName( $parameters['name']??null );
+						$result[$key] = self::generateTaskName( $parameters['name']??null, self::$RANDOM_CHARACTERS );
 						break;
 
 					case 'credentials':
@@ -99,15 +101,16 @@
 			return $parameters;
 		}
 
-		public static function generateTaskName( string $providedName = null ) {
+		public static function generateTaskName( string $providedName = null, int $randomCharacters = 0 ) {
 			if ( is_null($providedName) ) {
 				return null;
 			}
-			$name = \Utils\Time::getReadableDateTime();
-			if ( !empty($providedName) ) {
-				return $name.'-'.$providedName;
-			}
-			return $name;
+
+			$time = \Utils\Time::getReadableDateTime();
+			$providedName = empty($providedName) ? '' : ('-'.$providedName);
+			$random = ($randomCharacters <=0) ? '' : ('-'.   substr(bin2hex(random_bytes($randomCharacters)), 0, $randomCharacters)  );
+
+			return $time.$providedName.$random;
 		}
 
 
