@@ -9,7 +9,7 @@
 				'Workspace subdirectories writable',
 				'The directories in the workspace must be writable',
 			);
-			$this->setOrder(7);
+			$this->setOrder(6);
 		}
 
 		public function test() {

@@ -9,7 +9,7 @@
 				'URL Rewrites enabled',
 				'URL rewriting is required for resolving assets and clean web paths',
 			);
-			$this->setOrder(4);
+			$this->setOrder(7);
 		}
 
 		public function test() {
@@ -52,6 +52,7 @@
 
 		public function getFixes() {
 			$message = 'URL rewriting not working. Check whether the module is installed, enabled, and allowed<br>';
+			$message = '(If running from a subfolder, ensure the config file has the APPLICATION_WEB_FULL_URL set correctly.)<br>';
 
                         $instructions = [];
                         $instructions['For Apache:'] = [

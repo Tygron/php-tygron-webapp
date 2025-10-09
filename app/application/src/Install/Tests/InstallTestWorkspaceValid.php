@@ -9,7 +9,7 @@
 				'Workspace directory is set up',
 				'A workspace directory is defined and is writable',
 			);
-			$this->setOrder(6);
+			$this->setOrder(5);
 		}
 
 		public function test() {

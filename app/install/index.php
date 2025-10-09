@@ -22,11 +22,11 @@
 		$output[] = \Install\Tests\InstallTestPHPVersion::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestExtentionFileInfo::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestExtentionCurl::runStatic()->getOutputAsArray();
-		$output[] = \Install\Tests\InstallTestCurlSuccess::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestUrlRewriting::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestCustomConfig::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestWorkspaceValid::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestWorkspaceSubdirsValid::runStatic()->getOutputAsArray();
+		$output[] = \Install\Tests\InstallTestCurlSuccess::runStatic()->getOutputAsArray();
 		$output[] = \Install\Tests\InstallTestCronRunning::runStatic()->getOutputAsArray();
 	} catch(\Throwable $e) {
 		$output[] = ['title'=>'Exception while testing','description'=>'An unexpected exception occured','message'=>$e->getMessage()];

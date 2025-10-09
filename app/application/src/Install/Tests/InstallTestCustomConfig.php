@@ -9,7 +9,7 @@
 				'Custom config file set up',
 				'A custom config file is required for deployment-specific configurations',
 			);
-			$this->setOrder(5);
+			$this->setOrder(4);
 		}
 
 		public function test() {
