@@ -1,0 +1,51 @@
+<html>
+
+	<head>
+		<base href='{{ baseUrl }}'>
+
+		<link rel="stylesheet" type="text/css" href="assets/css/webapp.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/dashboard.css">
+		
+		<style>
+			body {
+				height:		100%;
+				width:		100%;
+				padding:	0px;
+				margin:		0px;
+			}
+			iframe {
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class='applicationContainer dashboard'>
+			<div class='topBar'>
+				<h2>Community of Practice - Web Applicatie</h2>
+			</div>
+
+			<div class='mainSection'>
+				<div class='sideBar sideInfo'>
+					<p>
+						Je project draait nu op het Tygron Platform als:
+					</p>
+					<strong>{{projectName}}</strong>
+					<p>
+						Als je je project wilt bewaren of aanpassen, dan kan dat via de Tygron Platform Client Applicatie ( {{platform}} ).
+					</p>
+				</div>
+				<div class='mainContent content'>
+					<iframe class='window' src='https://{{ platform }}.tygron.com/web/3dmap.html?token={{ webToken }}'></iframe>
+				</div>
+			</div>
+
+			<div class='bottomBar'>
+				<div class='logos'>
+					<p>Powered by:</p>
+					<img class='logo' src='assets/images/tygron_logo.png'>
+				</div>
+			</div>		
+		</div>
+	</body>
+
+</html>

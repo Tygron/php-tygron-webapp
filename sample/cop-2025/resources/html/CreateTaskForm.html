@@ -1,0 +1,341 @@
+<html>
+
+	<head>
+
+		<base href='{{ baseUrl }}'>
+
+		<script src='assets/vendor/jquery/jquery-3.7.1.min.js'></script>
+
+		<script src='assets/vendor/leaflet/leaflet-src.js'></script>
+		<script src='assets/vendor/proj4js/proj4.js'></script>
+		<script src='assets/vendor/proj4leaflet/proj4leaflet.js'></script>
+
+		<script src='assets/js/credentials.js'></script>
+		<script src='assets/js/location-selector.js'></script>
+		<script src='assets/js/crs.js'></script>
+
+		<script>
+			var locSelector = null
+			$( function(){ 
+
+					locSelector = new LocationSelector();
+					locSelector.createLocationSelector({
+							'dom' : { 'inputsParent' : '.locationSettings' },
+							'defaults' : {  
+									'coordinate' : { crs : '3857', x: 568560, y: 6816083 },
+									'size' : 1000,
+								},
+							'config' : {
+									'maxSize' : 2500,
+								},
+							'selectables' : { 
+									'cbs-buurten' : {
+											'name'	: 'CBS Buurten 2024',
+											'type'	: 'wfs',
+											'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
+											'parameters' : {
+												'version'	: '2.0.0',
+												'typeNames'	: 'wijkenenbuurten:buurten',
+												'swapxy'   	: 'true',
+											},
+											'swapxy' : true,
+											'zoomLevel' : 14,
+										},
+									'cbs-wijken' : {
+											'name'	: 'CBS Buurten 2024',
+											'type'	: 'wfs',
+											'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
+											'parameters' : {
+												'version'	: '2.0.0',
+												'typeNames'	: 'wijkenenbuurten:wijken',
+												'swapxy'   	: 'true',
+											},
+											'swapxy' : true,
+											'zoomLevel' : 13,
+										},
+									'cbs-gemeenten' : {
+											'name'	: 'CBS Buurten 2024',
+											'type'	: 'wfs',
+											'url' 	: 'https://service.pdok.nl/cbs/wijkenbuurten/2024/wfs/v1_0',
+											'parameters' : {
+												'version'	: '2.0.0',
+												'typeNames'	: 'wijkenenbuurten:gemeenten',
+												'swapxy'   	: 'true',
+											},
+											'swapxy' : true,
+											'zoomLevel' : 12,
+										},
+									
+								},
+						});
+						locSelector.setSelectable('');
+				});
+		</script>
+
+		<link rel='stylesheet' type='text/css' href='assets/css/location-selector.css' />
+		<link rel='stylesheet' type='text/css' href='assets/vendor/leaflet/leaflet.css' />
+
+		<link rel='stylesheet' type='text/css' href='assets/css/webapp.css' />
+
+		<style>
+			div.applicationContainer div.topBar,
+			div.applicationContainer div.bottomBar {
+				background-color: darkturquoise;
+				color:white;
+			}
+
+			div.applicationContainer .mainSection .settings {
+				background-color: lightblue;
+			}
+			form div label span {
+				display: inline-block;
+				width: 10em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock {
+				padding: 1em;
+				padding-bottom: 0em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock:last-child {
+				padding-bottom: 2em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock .settingSubBlock {
+				margin : 0.25em 0em;
+			}
+			div.applicationContainer .mainSection .settings .settingBlock.stretchBlock {
+				flex-basis: 0px;
+				flex-grow: 1;
+				padding: 0em;
+			}
+
+
+			div.applicationContainer .mainSection .map {
+				flex-basis: 1em;
+				flex-grow: 1;
+
+				display: flex;
+			}
+		</style>
+
+	</head>
+
+	<body>
+
+		<div class='applicationContainer'>
+			<div class='topbar'>
+				<h2>
+					Community of Practice - Web Applicatie
+				</h2>
+			</div>
+
+			
+			<form class='mainSection' method='POST' action='index.php'>
+			
+				<div class='sideBar settings'>
+					<input type = 'hidden' name='action' value='CreateTask' />
+					
+					<div class='settingBlock'>
+						<h4>Applicatie:</h4>
+						<div><label>
+							<span>Theme:</span>
+							<select name='theme'>
+								<option value='heat' selected>Hitte</option>
+								<option value='green'>Groen</option>
+							</select>
+						</label></div>
+
+						<div><label>
+							<span>Projectnaam:</span>
+							<input name='projectName' maxlength='20'>
+						</label></div>
+
+					</div>
+
+					<div class='settingBlock locationSettings'>
+						<h4>Interessegebied</h4>
+
+						<div><label>
+							<span>Bron</span>
+							<select name='selectType' onchange='changeSelectType(this, true);'>
+								<option value='' selected>Geen</option>
+								<!--option value='fromSize'>Vanaf rand</option-->
+								<!--option value='upload'>Upload</option-->
+								<option value='cbs-buurten' >CBS Buurten</option>
+								<!--option value='cbs-wijken' >CBS Wijken</option-->
+								<!--option value='cbs-gemeenten' >CBS Gemeenten</option-->
+							</select>
+							<script>
+								changeSelectType = function(selectObject, clear) {
+									selectObject = $(selectObject)[0];
+									let selection = selectObject.options[selectObject.selectedIndex].value;
+
+									if (selection == 'upload') {
+										selection = '';
+										$('.uploadOption').css('visibility', 'visible');
+									} else {
+										$('.uploadOption').css('visibility', 'hidden');
+									}
+
+									if (selection == 'fromSize') {
+										locSelector.config['generateAOI'] = true;
+									} else {
+										locSelector.config['generateAOI'] = false;
+									}
+
+									if (clear) {
+										locSelector.clearAreaOfInterest();
+									}
+									locSelector.setSelectable(selection);
+								};
+								$( function(){ 
+									changeSelectType('[name=\'selectType\']', false);
+								});
+
+							</script>
+						</label></div>
+
+						<div class='uploadOption'><label>
+							<span>Upload GeoJSON</span>
+							<input name='areaOfInterestFile' 
+								type='file'
+								title=' '
+								placeholder='File'
+								onchange='uploadHandler(event)'>
+							</input>
+							<script>
+								uploadHandler = function(e) {
+									locSelector.uploadHandler(e);
+									e.target.value = null;
+								}
+							</script>
+						</label></div>
+
+						<div style='display:none;'><label>
+							<span>Buffer:</span>
+							<input type='number' name='bufferSize' min='0' max='2500' step='1'></input>
+						</label></div>
+
+
+					</div>
+
+					<div class='settingBlock locationSettings'>
+						<h4>Project afmetingen:</h4>
+						<div><label>
+							<span>Grootte:</span>
+							<input type='number' name='sizeX' min='1000' max='2500' step='1'></input>
+							<input type='number' name='sizeY' min='1000' max='2500' step='1'></input>
+						</label></div>
+
+						<div style='display:none;'>
+							<input name='zoomLevel' value='10' />
+							<input name='location'>
+							<input name='areaOfInterest'>
+							<input name='areaOfInterestAttributes'>
+							<input name='crs'>
+							<input name='polygon'>
+							<input name='selectionBounds'>
+						</div>
+
+					</div>
+
+
+					<div id='credentials' class='settingBlock'>
+						<h4>Inloggegevens:</h4>
+						<div class='settingSubBlock'>
+							<div><label>
+								<span>Server:</span>
+								<select name='platform'>
+								<option value='engine' selected>LTS (engine)</option>
+								<option value='power'>LTS (power)</option>
+								</select>
+							</label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><label><span>Username:</span><input name='username' value='' /></label></div>
+							<div><label><span>Password:</span><input name='password' value='' type='password' /></label></div>
+							<div class='mfa hidden'><label><span>SMS Code:</span><input name='mfa' value='' placeholder=''></label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><label><span></span><input class='validateCredentialsButton' name='validateCredentials' value='Controleer inloggegevens' type='button' onclick='validateStart()'/></label></div>
+						</div>
+						<div class='settingSubBlock'>
+							<div><span class='credentialsValidateFeedback'></span></div>
+						</div>
+						<style>
+							.mfa.hidden {
+								visibility: hidden;
+							}
+						</style>
+						<script>
+							clearFeedback = function() {
+								$('.credentialsValidateFeedback').html('&nbsp;');
+							}
+							validateStart = function() {
+								validateFeedback(null, 'Validating...');
+								testCredentials($("#credentials"), validateFeedback);
+							}
+							validateFeedback = function(result, message) {
+								if (result === 'mfa') {
+									$('.mfa.hidden').removeClass('hidden');
+								}
+								switch (result) {
+									case 'valid':
+										$('.credentialsValidateFeedback').html('Inloggegevens bevestigd!');
+										break;
+									case 'invalid':
+										$('.credentialsValidateFeedback').html('Inloggegevens onjuist');
+										break;
+									case 'mfa':
+										$('.credentialsValidateFeedback').html('Voer je SMS code in');
+										break;
+								}
+
+								$('.credentialsValidateFeedback').html(message);
+								if (result === 'valid') {
+									$('[value="Start"]').prop('disabled', false);
+								} else {
+									$('[value="Start"]').prop('disabled', true);
+								}
+							}
+							clearFeedback();
+
+							$(document).ready(function() {
+								if ( $('[name="mfa"]').val() ) {
+									$('.mfa.hidden').removeClass('hidden');							
+								}
+								$('form').keydown(function(event){
+									if (event.keyCode == 13) {
+										if ( $(event.target).closest('#credentials').length>0 ) {
+											$('.validateCredentialsButton').trigger('click');
+										}
+										event.preventDefault();
+										return false;
+									}
+								});
+							});
+						</script>
+
+					</div>
+
+					<div class='settingBlock stretchBlock'>
+					</div>
+					<div class='settingBlock'>
+						<h4>Maak je project aan!</h4>
+						<div><label><span></span><input name='submit' disabled='true' value='Start' type='submit' style='font-size:1.75em;border-radius:0.25em;'/></label></div>
+					</div>
+
+				</div>
+				<div id='locationSelection' class='mainContent map locationSelection'>
+				</div>
+			</form>
+
+			<div class='bottombar'>
+				<div class='logos'>
+					<p>Powered by: </p>
+					<img class='logo' src='assets/images/tygron_logo.png'>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+</html>
