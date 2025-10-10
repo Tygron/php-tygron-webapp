@@ -168,13 +168,7 @@ class LocationSelector {
 		}
 	}
 	setSize(size) {
-		let cappedSize = {
-				'width':	Math.min( this.config['maxSize'], Math.max(this.config['minSize'], Math.ceil(size.width ?? size)) ),
-				'height':	Math.min( this.config['maxSize'], Math.max(this.config['minSize'], Math.ceil(size.height ?? size)) ),
-			};
-		if ( this.config['forceSquareSize'] ) {
-			cappedSize = Math.max(cappedSize.width, cappedSize.height);
-		}
+		let cappedSize = this.computeCappedSize(size);
 		this.selection['size'] = cappedSize;
 		this.processSelectionData();
 	}
@@ -247,6 +241,16 @@ class LocationSelector {
 		return size;
 	}
 
+	computeCappedSize( size ) {
+		let cappedSize = {
+			'width':        Math.min( this.config['maxSize'], Math.max(this.config['minSize'], Math.ceil(size.width ?? size)) ),
+			'height':       Math.min( this.config['maxSize'], Math.max(this.config['minSize'], Math.ceil(size.height ?? size)) ),
+		};
+		if ( this.config['forceSquareSize'] ) {
+			cappedSize = Math.max(cappedSize.width, cappedSize.height);
+		}
+		return cappedSize;
+	}
 
 	//* DATA CONVERSION *//
 
@@ -709,9 +713,14 @@ class LocationSelector {
 			if ( (!ignoreNull) && (value === null) ) {
 				continue;
 			}
+
 			if ( ['coordinate','polygon','areaOfInterest'].includes(key) ) {
 				value = this.convertToLeaflet(value);
 			}
+			if ( ['size'].includes(key) ) {
+				value = this.computeCappedSize(value);
+			}
+
 			this.selection[key] = value;
 		}
 	}
