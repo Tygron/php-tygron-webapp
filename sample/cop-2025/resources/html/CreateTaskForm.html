@@ -279,13 +279,13 @@
 								}
 								switch (result) {
 									case 'valid':
-										$('.credentialsValidateFeedback').html('Inloggegevens bevestigd!');
+										message = 'Inloggegevens bevestigd!';
 										break;
 									case 'invalid':
-										$('.credentialsValidateFeedback').html('Inloggegevens onjuist');
+										message = 'Inloggegevens onjuist';
 										break;
 									case 'mfa':
-										$('.credentialsValidateFeedback').html('Voer je SMS code in');
+										message = 'Voer je SMS code in';
 										break;
 								}
 
