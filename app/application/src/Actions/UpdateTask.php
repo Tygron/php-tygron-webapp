@@ -20,7 +20,7 @@
                                 $taskRunner->setTask($taskName);
                                 $result = $taskRunner->run();
                         } catch ( \Throwable $e) {
-				//$result = $e->getMessage();
+				$result = $e->getMessage();
 			}
 			echo 'Output: '.$result;
 		}

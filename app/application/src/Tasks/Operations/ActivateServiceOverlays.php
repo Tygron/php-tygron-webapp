@@ -29,19 +29,7 @@
 		}
 
 		public function checkReady( \Tasks\Task $task ) {
-			try {
-				$token = $task->getApiToken();
-
-				//TODO: Check whether project still running
-
-				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/info')->run();
-				if ($curlTask->getContent()['state']=='NORMAL') {
-					return true;
-				}
-
-			} catch (\Throwable $e) {
-				return $e->getMessage();
-			}
+			return !empty($task->getApiToken( $task ));
 		}
 
 		public function checkComplete( \Tasks\Task $task ) {

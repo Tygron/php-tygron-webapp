@@ -73,6 +73,7 @@
 				'heat' => [ // If "theme" is "heat"
 					'template'	=>	'demo_heat_stress',
 					'name'		=>	'heat',
+					'taskOperations'=>	["ValidateCredentialsFile", "CreateNewProject","ActivateServiceOverlays","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"]
 				],
 				'green' => [ // If "theme" is "green"
 					'template'	=>	'demo_3-30-300',
