@@ -55,7 +55,6 @@
 			$templatePanelIds = [];
 			foreach ( $curlTask->getContent() as $key => $value ) {
 				if ( !is_null($value['mapLink'] ?? null) ) {
-					var_dump($value['id']);
 					array_push($templatePanelIds, $value['id']);
 				}
 			}

@@ -14,11 +14,13 @@
 				return 'Task not found';
 			}
 
+			$result = get_text('No output (possible error?)');
                         try {
                                 $taskRunner = new \Tasks\Runners\TaskRunner();
                                 $taskRunner->setTask($taskName);
                                 $result = $taskRunner->run();
                         } catch ( \Throwable $e) {
+				//$result = $e->getMessage();
 			}
 			echo 'Output: '.$result;
 		}
