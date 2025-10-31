@@ -22,6 +22,9 @@ let testCredentials = function(credentialsDom, callback, platform, username, pas
 		return;
 	}
 
+	credentials['username'] = credentials['username'].toLowerCase();
+	$credentialsDom.find('[name="username"]').val( credentials['username'].toLowerCase() );
+
 	if ( (!credentials['mfa']) || credentials.length == 0 ) {
 		credentials['mfa'] = 'SMS';
 	}
