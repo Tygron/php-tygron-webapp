@@ -11,24 +11,24 @@
 			self::_addAssetSourceDir($sources, $publicSource);
 		}
 
-		public static function getAsset( string $assetName, string $assetType = null ) {
-			return self::getPrivateAsset( $assetName, $assetType );
+		public static function getAsset( string|array $assetNames, string $assetType = null ) {
+			return self::getPrivateAsset( $assetNames, $assetType );
 		}
 
-		public static function getPublicAsset( string $assetName, string $assetType = null ) {
+		public static function getPublicAsset( string|array $assetNames, string $assetType = null ) {
 			$sources = self::getAssetSources(
 					$assetType,
 					self::$DEFAULT_PUBLIC_ASSET_DIR
 				);
-			return self::_getAsset( $assetName, $assetType, $sources );
+			return self::_getAsset( $assetNames, $assetType, $sources );
 		}
 
-		public static function getPrivateAsset( string $assetName, string $assetType = null) {
+		public static function getPrivateAsset( string|array $assetNames, string $assetType = null) {
 			$sources = self::getAssetSources(
 					$assetType,
 					array_merge( self::$DEFAULT_PUBLIC_ASSET_DIR, self::$DEFAULT_PRIVATE_ASSET_DIR )
 				);
-			return self::_getAsset( $assetName, $assetType, $sources );
+			return self::_getAsset( $assetNames, $assetType, $sources );
 		}
 
 		public static function getAssetSources( string $assetType = null, string|array $assetDir = null) {
@@ -39,31 +39,35 @@
 			return self::_getAssetSources( $assetType, $assetDir);
 		}
 
-		protected static function _getAsset( string $assetName, string $assetType, array $assetSources ) {
-			foreach ( $assetSources as $index => $source ) {
-				$fileContent = null;
-				$fileFound = null;
-				try {
-					$fileContent = \Utils\Files::readFile([$source, $assetName]);
-					$fileMimeType = \Utils\Files::readFileMimeType([$source, $assetName]);
-
-				} catch ( \Throwable $e ) {
-					continue;
-				}
-
-				$asset = new \Assets\Asset(
-						$fileContent,
-						$fileMimeType,
-
-						$assetName,
-						$source,
-
-						$assetType,
-					);
-				return $asset;
+		protected static function _getAsset( string|array $assetNames, string $assetType, array $assetSources ) {
+			if ( !is_array($assetNames) ) {
+				$assetNames = [$assetNames];
 			}
-			throw new \Exception(get_text('Asset not found in %s location(s): %s', [count($assetSources), $assetName]));
+			foreach ( $assetNames as $index => $assetName ) {
+				foreach ( $assetSources as $index => $source ) {
+					$fileContent = null;
+					$fileFound = null;
+					try {
+						$fileContent = \Utils\Files::readFile([$source, $assetName]);
+						$fileMimeType = \Utils\Files::readFileMimeType([$source, $assetName]);
 
+					} catch ( \Throwable $e ) {
+						continue;
+					}
+
+					$asset = new \Assets\Asset(
+							$fileContent,
+							$fileMimeType,
+
+							$assetName,
+							$source,
+
+							$assetType,
+						);
+					return $asset;
+				}
+			}
+			throw new \Exception( get_text('Asset not found in %s location(s): %s', [count($assetSources), implode(', ', $assetNames)] ));
 		}
 
 		protected static function _getAssetSources( string $assetType = null, string|array $assetDir ) {
