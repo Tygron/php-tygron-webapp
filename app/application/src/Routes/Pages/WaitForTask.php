@@ -1,8 +1,8 @@
 <?php
 
-	namespace Actions;
+	namespace Routes\Pages;
 
-	class WaitForTask extends AbstractAction {
+	class WaitForTask extends AbstractPage {
 
 		public function run( array $parameters = null ) {
 			global $_INPUTS;
@@ -18,7 +18,7 @@
 
 			if ( $task->getTaskCompleted() ) {
 
-				$renderable = $this->getRenderable( 'Redirect', ['action' => 'OutputFromTask&task='.$taskName] );
+				$renderable = $this->getRenderable( 'Redirect', ['path' => '/OutputFromTask&task='.$taskName] );
 				return $renderable->getRendered();
 
 			}

@@ -29,21 +29,21 @@
 
 
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
-	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [];
-	$ACTION_PARAMETERS_FIXED['CreateTask']['useDefaultCredentials'] = false;
-	$ACTION_PARAMETERS_FIXED['CreateTask']['template'] = 'demo_heat_stress';
-	$ACTION_PARAMETERS_FIXED['CreateTask']['taskOperations'] = ["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","ActivateServiceOverlays","OutputWebToken", "SetTaskComplete", "Wait"];
-	$ACTION_PARAMETERS_FIXED['CreateTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['useDefaultCredentials'] = false;
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['template'] = 'demo_heat_stress';
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations'] = ["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","ActivateServiceOverlays","OutputWebToken", "SetTaskComplete", "Wait"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
 
 	//When an action is performed, the parameters defined here are offered as defaults and available for change.
-	$ACTION_PARAMETERS_DEFAULT['CreateTask'] ??= [];
-	$ACTION_PARAMETERS_DEFAULT['CreateTask']['name'] = 'task';
+	$ROUTE_PARAMETERS_DEFAULT['CreateTask'] ??= [];
+	$ROUTE_PARAMETERS_DEFAULT['CreateTask']['name'] = 'task';
 
 	//When an action is performed, and one of these parameters has a specified value, the parameters provided are injected (overwriting fixed where applicable).
 	//Note that only user-provided inputs are checked to see whether parameters should be injected.
-	$ACTION_PARAMETERS_INJECTION ??= [];
-	$ACTION_PARAMETERS_INJECTION['CreateTask'] ??= [];
-	$ACTION_PARAMETERS_INJECTION['CreateTask']['size'] ??= [
+	$ROUTE_PARAMETERS_INJECTION ??= [];
+	$ROUTE_PARAMETERS_INJECTION['CreateTask'] ??= [];
+	$ROUTE_PARAMETERS_INJECTION['CreateTask']['size'] ??= [
 		'small' => [
 			'name'                  =>      'small',
 			'size'                  =>      [1000,1000],

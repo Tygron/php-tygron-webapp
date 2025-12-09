@@ -4,5 +4,5 @@
 
 	include_once 'application/src/hooks.php';
 
-	include_once 'application/action.php';
+	include_once 'application/handle_request.php';
 ?>

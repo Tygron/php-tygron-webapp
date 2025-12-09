@@ -6,7 +6,7 @@
 
 		public function run() {
 			global $AUTHENTICATION_TOKEN;
-			global $CONFIG_PARAMETERS;
+			global $RENDER_PARAMETERS;
 
 			$authenticationToken = get_clean_user_input('authenticationToken');
 
@@ -23,7 +23,7 @@
 				);
 				$renderableAsset = new \Rendering\RenderableAsset();
 				$renderableAsset->setAsset($asset);
-				$renderableAsset->setData($CONFIG_PARAMETERS);
+				$renderableAsset->setData($RENDER_PARAMETERS);
 				$renderableAsset->output();
 				exit();
 			}

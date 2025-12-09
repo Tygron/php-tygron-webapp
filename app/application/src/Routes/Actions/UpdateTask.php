@@ -1,6 +1,6 @@
 <?php
 
-	namespace Actions;
+	namespace Routes\Actions;
 
 	class UpdateTask extends AbstractAction {
 

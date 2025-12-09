@@ -1,11 +1,12 @@
 <?php
 
-	namespace Actions;
+	namespace Routes\Actions;
 
 	class CreateTask extends AbstractAction {
 
 		public function run( array $parameters = null ) {
 			try {
+				//$parameters = $this->mergeParametersForTask($parameters);
 				$task = \Tasks\TaskGenerator::generate($parameters);
 				$task->validate();
 			} catch ( \Throwable $e ) {
@@ -17,7 +18,7 @@
 			return $this->getRenderable( null, [ 'taskName' => $task->getTaskName() ]);
 		}
 
-		protected function getInputsWithSpecialCharacters() {
+		protected function getMiscInputs() {
 			global $_INPUTS;
 			$inputs = [];
 			if ( array_key_exists('username', $_INPUTS) ) {
@@ -50,6 +51,9 @@
 			return \Tasks\Task::getAllowedParameters();
 		}
 
+		protected function mergeParametersForRoute (array $parameters ) {
+			return $this->mergeParametersForTask( $parameters );
+		}
 		protected function mergeParametersForTask( array $parameters ) {
 			$allowed = $this->getAllowedExtraParameters();
 			$flatMerge = []

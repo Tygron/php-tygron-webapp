@@ -1,8 +1,8 @@
 <?php
 
-	namespace Actions;
+	namespace Routes\Pages;
 
-	class OutputFromTask extends AbstractAction {
+	class OutputFromTask extends AbstractPage {
 
 		public function run( array $parameters = null ) {
 			global $_INPUTS;

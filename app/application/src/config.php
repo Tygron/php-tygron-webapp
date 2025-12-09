@@ -20,7 +20,7 @@
 	$APPLICATION_WEBHOST		??=	$_SERVER['HTTP_HOST'] ?? 'localhost';
 	$APPLICATION_WEBBASE		??=	'/';
 	$APPLICATION_WEB_PROTOCOL	??=	'https';
-	$APPLICATION_WEB_FULL_URL	??=	 ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. preg_replace('#/+#','/',$APPLICATION_WEBHOST . '/' . $APPLICATION_WEBBASE);
+	$APPLICATION_WEB_FULL_URL	??=	 ($APPLICATION_WEB_PROTOCOL ?? 'http').'://'. preg_replace('#/+#','/',$APPLICATION_WEBHOST . '/' . $APPLICATION_WEBBASE . '/');
 
 	$CUSTOM_RESOURCES_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'resources'] );
 	$CUSTOM_ASSETS_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_RESOURCES_DIR, 'assets'] );
@@ -40,7 +40,10 @@
 	$KEEP_TASKS_WITH_ERROR 		??=	false;
 
 	$SAFE_CHARACTERS 		??= 	'[a-zA-Z0-9\-_]';
-	$DEFAULT_ACTION 		??= 	'CreateTaskForm';
+
+	$ROUTES_NAMESPACE		??=	'Routes';
+	$DEFAULT_ROUTE_NAMESPACE	??=	'Pages';
+	$DEFAULT_ROUTE	 		??= 	'Pages\\CreateTaskForm';
 
 	//Cron tasks should be run automatically by touching the application/cron endpoint. The CLI_TOKEN should be an alphanumeric string to authenticate a scheduler with, or null to allow any source (using null is not recommended).
 	$CLI_TOKEN			??=	'';
@@ -50,8 +53,8 @@
 
 	$COOLDOWN_SECONDS		??=	60;
 
-	$CONFIG_PARAMETERS ??=[];
-	$CONFIG_PARAMETERS['baseUrl'] = $APPLICATION_WEB_FULL_URL;
+	$RENDER_PARAMETERS ??=[];
+	$RENDER_PARAMETERS['baseUrl'] = $APPLICATION_WEB_FULL_URL;
 
 	//Hooks are run upon each request, and allow for authentication checks, parameter translations, request logging, etc
 	$HOOKS ??= [
@@ -59,15 +62,15 @@
 	];
 
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
-	$ACTION_PARAMETERS_FIXED ??= [];
-	$ACTION_PARAMETERS_FIXED['CreateTask'] ??= [];
+	$ROUTE_PARAMETERS_FIXED ??= [];
+	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
 
-	$ACTION_PARAMETERS_FIXED['CreateTask']['taskOperations']	??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"];
-	$ACTION_PARAMETERS_FIXED['CreateTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']	??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
 
 
 	//When an action is performed, these parameters are injected based on the submission of other values.
-	$ACTION_PARAMETERS_INJECTION ??= [
+	$ROUTE_PARAMETERS_INJECTION ??= [
 		'CreateTask'	=> [
 			'theme'	=> [ // If a "theme" parameter is sent...
 				'heat' => [ // If "theme" is "heat"

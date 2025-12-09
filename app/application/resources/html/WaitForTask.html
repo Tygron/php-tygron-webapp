@@ -28,7 +28,7 @@
 		</style>
 
 		<script>
-			var url = '{{ baseUrl }}?action=UpdateTask&taskName={{ taskName }}';
+			var url = '{{ baseUrl }} Actions/UpdateTask?taskName={{ taskName }}';
 			setTimeout(function(){
 				var xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = function() {
