@@ -2,6 +2,8 @@
 
 Generic PHP application for running a Tygron Template Project in an arbitrary location.
 
+This application is offered as-is, under the MIT license. This application is not part of the core Tygron Platform technology.
+
 ## Requirements
 The application is written in PHP. A webserver, docker container, or other environment, should meet the following requiremts:
 * Access via domainname, either on local network or via internet
