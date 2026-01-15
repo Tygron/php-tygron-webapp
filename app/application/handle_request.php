@@ -77,8 +77,11 @@
 			'subPath'=>$subPath,
 		]);
 	$output = $routeObject->startRoute($_INPUTS_CLEANED);
+
 	if ( $output instanceof \Rendering\Renderable ) {
 		$output->output();
+	} else if( is_array($output) ) {
+		echo json_encode($output, JSON_PRETTY_PRINT);
 	} else {
 		echo $output;
 	}
