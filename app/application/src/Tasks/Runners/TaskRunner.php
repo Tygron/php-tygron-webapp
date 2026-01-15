@@ -8,6 +8,8 @@
 		private $hasOperated = false;
 		private $standOffTimeInSeconds = 0;
 
+		private $logs = [];
+
 		public function __construct( $parameters = null ) {
 
 		}
@@ -22,6 +24,14 @@
 
 		public function getHasOperated() {
 			return $this->hasOperated;
+		}
+
+		public function getLogs() {
+			return $this->logs;
+		}
+
+		public function logMessage(string|array $message) {
+			array_push($this->logs, $message);
 		}
 
 		public function run() {
@@ -98,16 +108,16 @@
 			if ($currentOperation == $startedOperation) {
 				try {
 					if ( $operation->checkOperationComplete() ) {
-						log_message(get_text('The current operation %s has completed, switching to next operation',[$currentOperation]));
+						$this->logMessage(get_text('The current operation %s has completed, switching to next operation',[$currentOperation]));
 						$task->setToNextOperation();
 						$task->save();
 					}
 					if ( $task->getCompleted() ) {
-						log_message(get_text('The task has reached completion'));
+						$this->logMessage(get_text('The task has reached completion'));
 					}
 
 				} catch (\Curl\CooldownException $e) {
-					log_message(get_text('Cannot check completion, because connection is on cooldown') );
+					$this->logMessage(get_text('Cannot check completion, because connection is on cooldown') );
 					return false;
 				} catch(\Throwable $e) {
 					$this->handleOperationException($task, $operation, $e);
@@ -119,14 +129,14 @@
 			$currentOperation = $task->getCurrentOperation();
 			$startedOperation = $task->getStartedOperation();
 			if ($currentOperation == $startedOperation) {
-				log_message(get_text('The current operation is %s, and should already be running',[$currentOperation]));
+				$this->logMessage(get_text('The current operation is %s, and should already be running',[$currentOperation]));
 				return false;
 			}
 			$ready = null;
 			try {
 				$ready = $operation->checkReadyForOperation();
 			} catch ( \Curl\CooldownException $e ) {
-				log_message(get_text('Check aborted, because connection is on cooldown'));
+				$this->logMessage(get_text('Check aborted, because connection is on cooldown'));
 				return false;
 			}
 			if ( is_string($ready) ) {
@@ -137,7 +147,7 @@
 			$task->setStartedOperation($currentOperation);
 			$task->setLastOperationTime( \Utils\Time::getCurrentTimestamp() );
 			$task->save();
-			log_message(get_text('The current operation is %s, and is now starting',[$currentOperation]));
+			$this->logMessage(get_text('The current operation is %s, and is now starting',[$currentOperation]));
 			try {
 				$result = $operation->startOperation();
 				if ( isset($result) ) {
@@ -145,7 +155,7 @@
 					$task->save();
 				}
 			} catch (\Curl\CooldownException $e) {
-				log_message(get_text('Operation aborted, because connection is on cooldown') );
+				$this->logMessage(get_text('Operation aborted, because connection is on cooldown') );
 				$task->setStartedOperation($currentOperation.' (on cooldown)');
 				$task->save();
 				return false;

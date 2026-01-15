@@ -4,6 +4,7 @@
 	class TasksRunner {
 
 		private $standOffTimeInSeconds = 0;
+		private $logs = [];
 
 		public function __construct( $parameters = null ) {
 
@@ -11,6 +12,14 @@
 
 		public function setStandOffTimeInSeconds( int $standOffTimeInSeconds) {
 			$this->standOffTimeInSeconds = $standOffTimeInSeconds;
+		}
+
+		public function getLogs() {
+			return $this->logs;
+		}
+
+		public function logMessage(string|array $message) {
+			array_push($this->logs, $message);
 		}
 
 		public function run() {
@@ -30,20 +39,20 @@
 			$operated = false;
 			log_message(get_text('Output:'));
 			foreach ( $taskFileNames as $key => $taskFileName) {
-				log_message('<hr>');
-				log_message(get_text('Start processing file %s', [$taskFileName]));
+				$this->logMessage('<hr>');
+				$this->logMessage(get_text('Start processing file %s', [$taskFileName]));
 				$operated = $this->runTask($taskFileName);
 				if ($operated) {
-					log_message(get_text('Processed file %s, performed operation',[$taskFileName]));
+					$this->logMessage(get_text('Processed file %s, performed operation',[$taskFileName]));
 				} else {
-					log_message(get_text('Processed file %s, no operation',[$taskFileName]));
+					$this->logMessage(get_text('Processed file %s, no operation',[$taskFileName]));
 				}
 				if ( $operated ) {
 					break;
 				}
 			}
 			if ( !$operated) {
-				log_message(get_text('No operation'));
+				$this->logMessage(get_text('No operation'));
 			}
 		}
 
@@ -56,9 +65,9 @@
 				$taskRunner->run();
 				$operated = $taskRunner->getHasOperated();
 			} catch( \Throwable $e ) {
-				log_message(get_text('Encountered an error while running task: %s',[$e->getMessage()]));
-				log_message(get_text('Location: %s, Line: %s',[$e->getFile(),$e->getLine()]));
-				log_message(get_text('Stacktrace: %s',['<pre>'.$e->getTraceAsString().'</pre>']));
+				$this->logMessage(get_text('Encountered an error while running task: %s',[$e->getMessage()]));
+				$this->logMessage(get_text('Location: %s, Line: %s',[$e->getFile(),$e->getLine()]));
+				$this->logMessage(get_text('Stacktrace: %s',['<pre>'.$e->getTraceAsString().'</pre>']));
 			}
 			return $operated;
 		}
