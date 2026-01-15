@@ -4,13 +4,48 @@
 
 	abstract class AbstractRoute {
 
+		private ?string $routeMethod = null;
+		private ?string $routePath = null;
+		private ?string $routeSubPath = null;
+
 		public function name() {
 			return substr(strrchr(get_class($this),'\\'),1);
+		}
+
+		public function setRoutingParameters( array $parameters = null ) {
+			$this->routeMethod = $parameters['method'] ?? null;
+			$this->routePath = $parameters['path'] ?? null;
+			$this->routeSubPath = $parameters['subPath'] ?? null;
+		}
+
+		public function getMethod() {
+			return $this->routeMethod;
+		}
+		public function getPath() {
+			return $this->routePath;
+		}
+		public function getSubPath() {
+			return $this->routeSubPath;
 		}
 
 		public function startRoute( array $parameters = null ) {
 			$parameters = $this->mergeParametersForRoute( array_merge( $parameters, $this->getMiscInputs() ) );
 			return $this->run($parameters);
+		}
+
+		public function loadReroute ( $newRoute, bool $preservePath = false ) {
+			if (is_string($newRoute) ) {
+				$newRoute = explode('/',$newRoute);
+				$newRoute = implode('\\', $newRoute);
+			}
+			$newRoute = new $newRoute();
+
+			$newRoute->setRoutingParameters([
+				'method' => $this->getMethod(),
+				'path' => $preservePath ? $this->getPath() : null,
+				'subPath' => $preservePath ? $this->getSubPath() : null,
+			]);
+			return $newRoute;
 		}
 
 		public abstract function run( array $parameters = null );
