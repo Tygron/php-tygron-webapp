@@ -12,12 +12,12 @@
 			try {
 				$taskRunner->setTask($runSpecificTask);
 				$taskRunner->run();
-				foreach ($taskRunner->getLogs as $key => $value) {
+				foreach ($taskRunner->getLogs() as $key => $value) {
 					log_message($value);
 				}
 
 			} catch ( \Throwable $e ) {
-				foreach ($taskRunner->getLogs as $key => $value) {
+				foreach ($taskRunner->getLogs() as $key => $value) {
 					log_message($value);
 				}
                                 log_message(get_text('Encountered an error while running single task: %s',[$e->getMessage()]));
@@ -29,11 +29,11 @@
 			try {
 				$tasksRunner->setStandOffTimeInSeconds( $TASKS_STANDOFF_IN_SECONDS );
 				$tasksRunner->run();
-				foreach ($tasksRunner->getLogs as $key => $value) {
+				foreach ($tasksRunner->getLogs() as $key => $value) {
 					log_message($value);
 				}
 			} catch ( \Throwable $e ) {
-				foreach ($tasksRunner->getLogs as $key => $value) {
+				foreach ($tasksRunner->getLogs() as $key => $value) {
 					log_message($value);
 				}
 				log_message(get_text('Encountered an error while running all tasks: %s',[$e->getMessage()]));
