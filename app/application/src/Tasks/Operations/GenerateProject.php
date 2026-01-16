@@ -6,6 +6,7 @@
 
 		public function getInputParameters() {
 			return [
+					'crs'		=> null,
 					'location'	=> null,
 					'areaOfInterest' => null
 				];
@@ -23,7 +24,9 @@
 			$task->log(get_text( 'Project size set to: %s', [ implode(', ',$task->getSize()) ] ));
 			$task->save();
 
-			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', [$task->getLocation()[0], $task->getLocation()[1], null, $task->getData('areaOfInterest')])->run();
+			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(), 'api/session/event/editor/start_map_creation', [$task->getLocation()[0], $task->getLocation()[1], null, $task->getData('areaOfInterest')])
+				->setParameters([ 'crs'=>$task->getCrs() ])
+				->run();
 			if ( !$curlTask->getResponseIsSuccess() ) {
 				throw new \Exception($curlTask->getContent());
 			}

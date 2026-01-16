@@ -147,10 +147,10 @@
 		}
 
 
-		public static function generateLocationParameter( array $location=null, string|int $locationX=null, string|int $locationY=null ) {
+		public static function generateLocationParameter( array $location=null, string|int|float $locationX=null, string|int|float $locationY=null ) {
 			if ( is_array($location) ) {
 				if ( (count($location)==2) && is_numeric($location[0]) && is_numeric($location[1]) ) {
-					return [(int)$location[0],(int)$location[1]];
+					return [doubleval($location[0]),doubleval($location[1])];
 				}
 				throw new \Exception('Location must be an array with 2 numeric coordinates');
 			}
@@ -158,7 +158,7 @@
 				throw new \Exception('LocationX must be numeric, and LocationY must be numeric');
 			}
 
-			return [(int)$locationX, (int)$locationY];
+			return [doubleval($locationX), doubleval($locationY)];
 		}
 
 		public static function generateSizeParameter( array|string|int $size=null, string|int $sizeX=null, string|int $sizeY=null ) {

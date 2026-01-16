@@ -17,6 +17,7 @@
 
 				'apiToken'		=>	'',
 
+				'crs'			=>	3857,
 				'location'		=>	null,
 				'size'			=>	[500,500],
 
@@ -64,6 +65,9 @@
 						break;
 					case 'platform':
 						$this->setPlatform($value);
+						break;
+					case 'crs':
+						$this->setCrs($value);
 						break;
 					case 'location':
 						$this->setLocation($value);
@@ -134,6 +138,9 @@
 		}
 		public function setPlatform( string $platform ) {
 			$this->data['platform'] = $platform;
+		}
+		public function setCrs( int|string $crs ) {
+			$this->data['crs'] = $crs;
 		}
 		public function setLocation( array $location ) {
 			$this->data['location'] = $location;
@@ -310,6 +317,9 @@
 		}
 		public function getTemplateName() {
 			return $this->data['templateName'];
+		}
+		public function getCrs() {
+			return $this->data['crs'];
 		}
 		public function getLocation() {
 			return $this->data['location'];
