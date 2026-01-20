@@ -56,6 +56,15 @@
 	}
 	$className = $foundClass;
 
+	$relativeBaseUrl = $routePath;
+	foreach ( [$ROUTES_NAMESPACE, $DEFAULT_ROUTE_NAMESPACE] as $key=> $value ) {
+		$value = $value.'/';
+		if (substr($relativeBaseUrl, 0, strlen($value)) == $value) {
+    			$relativeBaseUrl = substr($relativeBaseUrl, strlen($value));
+		} else {
+			break;
+		}
+	}
 /*\
 	if ( class_exists($className) ) {
 	} else if ( class_exists($classNameDefaulted) ) {
@@ -73,6 +82,7 @@
 
 	$routeObject->setRoutingParameters([
 			'method'=>$_SERVER['REQUEST_METHOD'],
+			'relativeBaseUrl'=>$relativeBaseUrl,
 			'path'=>$routePath,
 			'subPath'=>$subPath,
 		]);
