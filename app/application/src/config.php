@@ -65,7 +65,7 @@
 	$ROUTE_PARAMETERS_FIXED ??= [];
 	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
 
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']	??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']	??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
 	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
 
 
