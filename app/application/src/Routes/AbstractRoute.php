@@ -5,6 +5,7 @@
 	abstract class AbstractRoute {
 
 		private ?string $routeMethod = null;
+		private ?string $routeRelativeBaseUrl = null;
 		private ?string $routePath = null;
 		private ?string $routeSubPath = null;
 
@@ -14,12 +15,16 @@
 
 		public function setRoutingParameters( array $parameters = null ) {
 			$this->routeMethod = $parameters['method'] ?? null;
+			$this->routeRelativeBaseUrl = $parameters['relativeBaseUrl'] ?? null;
 			$this->routePath = $parameters['path'] ?? null;
 			$this->routeSubPath = $parameters['subPath'] ?? null;
 		}
 
 		public function getMethod() {
 			return $this->routeMethod;
+		}
+		public function getRelativeBaseUrl() {
+			return $this->routeRelativeBaseUrl;
 		}
 		public function getPath() {
 			return $this->routePath;
@@ -42,6 +47,7 @@
 
 			$newRoute->setRoutingParameters([
 				'method' => $this->getMethod(),
+				'relativeBaseUrl' => $this->getRelativeBaseUrl(),
 				'path' => $preservePath ? $this->getPath() : null,
 				'subPath' => $preservePath ? $this->getSubPath() : null,
 			]);
@@ -54,35 +60,43 @@
 			return [];
 		}
 
+		protected function getParameterSetName() {
+			return $this->name();
+		}
+
                 protected function mergeParametersForRoute( array $parameters ) {
+			$parameterSetName = $this->getParameterSetName();
                         return []
-                                        + $this->getInjectedParameters()
-                                        + $this->getFixedParameters()
+                                        + $this->getInjectedParameters($parameterSetName)
+                                        + $this->getFixedParameters($parameterSetName)
                                         + $parameters
-                                        + $this->getDefaultParameters()
+                                        + $this->getDefaultParameters($parameterSetName)
                                 ;
                 }
 
-		protected function getDefaultParameters() {
+		protected function getDefaultParameters($parameterSetName = null) {
 			global $ROUTE_PARAMETERS_DEFAULT;
-			if ( array_key_exists($this->name(), $ROUTE_PARAMETERS_DEFAULT ?? [] ) ) {
-				return $ROUTE_PARAMETERS_DEFAULT[$this->name()];
+			$parameterSetName ??= $this->getParameterSetName();
+			if ( array_key_exists( $parameterSetName, $ROUTE_PARAMETERS_DEFAULT ?? [] ) ) {
+				return $ROUTE_PARAMETERS_DEFAULT[$parameterSetName];
 			}
 			return [];
 		}
-		protected function getFixedParameters() {
+		protected function getFixedParameters($parameterSetName = null) {
 			global $ROUTE_PARAMETERS_FIXED;
-			if ( array_key_exists($this->name(), $ROUTE_PARAMETERS_FIXED ?? [] ) ) {
-				return $ROUTE_PARAMETERS_FIXED[$this->name()];
+			$parameterSetName ??= $this->getParameterSetName();
+			if ( array_key_exists( $parameterSetName, $ROUTE_PARAMETERS_FIXED ?? [] ) ) {
+				return $ROUTE_PARAMETERS_FIXED[$parameterSetName];
 			}
 			return [];
 		}
-		protected function getInjectedParameters() {
+		protected function getInjectedParameters($parameterSetName = null) {
 			global $ROUTE_PARAMETERS_INJECTION;
-			if ( !array_key_exists($this->name(), $ROUTE_PARAMETERS_INJECTION ?? [] ) ) {
+			$parameterSetName ??= $this->getParameterSetName();
+			if ( !array_key_exists($parameterSetName, $ROUTE_PARAMETERS_INJECTION ?? [] ) ) {
 				return [];
 			}
-			$injectionRules = $ROUTE_PARAMETERS_INJECTION[$this->name()];
+			$injectionRules = $ROUTE_PARAMETERS_INJECTION[$parameterSetName];
 
 			$injections = [];
 			foreach ($injectionRules as $key => $rulesForKey) {
@@ -97,6 +111,19 @@
 		protected function getRenderParameters() {
 			global $RENDER_PARAMETERS;
 			return $RENDER_PARAMETERS;
+		}
+
+		protected function getRouteRenderValues() {
+			$relativeParentUrl = explode('/', $this->getRelativeBaseUrl());
+			if ( count($relativeParentUrl) > 1) {
+				array_pop($relativeParentUrl);
+			}
+			$relativeParentUrl = implode('/', $relativeParentUrl);
+			return [
+					'relativeBaseUrl' => $this->getRelativeBaseUrl(),
+					'prelativeParentUrl' => $relativeParentUrl,
+					'subPath' => $this->getSubPath(),
+				];
 		}
 
 		protected function getRenderableDefaultNames() {
@@ -126,7 +153,7 @@
 				);
 			$renderableAsset = new \Rendering\RenderableAsset();
 			$renderableAsset->setAsset( $asset );
-			$renderableAsset->setData( ($data ?? []) + $this->getRenderParameters() );
+			$renderableAsset->setData( ($data ?? []) + $this->getRenderParameters() + $this->getRouteRenderValues() );
 			return $renderableAsset;
 		}
 	}

@@ -7,7 +7,7 @@
 		public function run( array $parameters = null ) {
 			global $_INPUTS;
 
-			$taskName = get_clean_user_input('task');
+			$taskName = get_clean_user_input('taskName');
 
 			try {
 				$task = \Tasks\Task::load($taskName);
@@ -21,9 +21,10 @@
 			if ( empty($task->getOutput()) ) {
 
 				$renderable = $this->getRenderable( 'OutputFromTaskError', array_merge($task->getData(),[
-						'taskErrorMessage' => $task->getError()['message'] ?? ''
-					] )
-				);
+						'redirectLink' => 'Pages/CreateTaskForm',
+						'taskErrorMessage' => $task->getError()['message'] ?? '',
+					] ) );
+
 				return $renderable;
 
 			}

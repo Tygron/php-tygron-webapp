@@ -6,16 +6,21 @@
 
 		public function run( array $parameters = null ) {
 			try {
-				//$parameters = $this->mergeParametersForTask($parameters);
 				$task = \Tasks\TaskGenerator::generate($parameters);
 				$task->validate();
 			} catch ( \Throwable $e ) {
-				return $this->getRenderable( 'CreateTaskError', ['message'=>$e->getMessage()] );
+				return $this->getRenderable( 'CreateTaskError', [
+						'message'=>$e->getMessage(),
+						'redirectLink' => 'Pages/CreateTaskForm',
+					] );
 			}
 
 			$task->save();
 
-			return $this->getRenderable( null, [ 'taskName' => $task->getTaskName() ]);
+			return $this->getRenderable( null, [
+					'taskName' => $task->getTaskName(),
+					'redirectLink' => 'Pages/WaitForTask',
+				]);
 		}
 
 		protected function getMiscInputs() {

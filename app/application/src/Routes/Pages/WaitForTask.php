@@ -18,12 +18,16 @@
 
 			if ( $task->getTaskCompleted() ) {
 
-				$renderable = $this->getRenderable( 'Redirect', ['path' => '/OutputFromTask&task='.$taskName] );
+				$renderable = $this->getRenderable( 'Redirect', array_merge( [], [
+						'redirectLink' => 'OutputFromTask?taskName='.$taskName
+					] ) );
 				return $renderable->getRendered();
 
 			}
 
-			$renderable = $this->getRenderable( null, $task->getData() );
+			$renderable = $this->getRenderable( null, [
+					 'actionToRun' => 'Actions/UpdateTask',
+				] + $task->getData() );
 			return $renderable->getRendered();
 		}
 	}
