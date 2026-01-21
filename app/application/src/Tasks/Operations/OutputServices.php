@@ -24,7 +24,7 @@
 			$task->setOutput([
 					'webToken' => $stakeholderToken,
 					'projectName' => $task->getData('projectName'),
-					'wms' => $platformUrl.'web/wms?token='.$webToken,
+					'wms' => $platformUrl.'web/wms?token='.$stakeholderToken,
 				]);
 
 			$task->save();
