@@ -4,7 +4,7 @@
 
 	class UpdateTask extends AbstractAction {
 
-		public function run( array $parameters = null ) {
+		public function run( array $parameters = [] ) {
 			global $_INPUTS;
 
 			$taskName = get_clean_user_input('taskName');

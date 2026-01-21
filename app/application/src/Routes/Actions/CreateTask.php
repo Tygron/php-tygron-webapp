@@ -4,7 +4,7 @@
 
 	class CreateTask extends AbstractAction {
 
-		public function run( array $parameters = null ) {
+		public function run( array $parameters = [] ) {
 			try {
 				$task = \Tasks\TaskGenerator::generate($parameters);
 				$task->validate();

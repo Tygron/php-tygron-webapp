@@ -4,7 +4,7 @@
 
 	class ListTasks extends AbstractAction {
 
-		public function run( array $parameters = null ) {
+		public function run( array $parameters = [] ) {
 			global $_INPUTS;
 
 			$tasks = \Tasks\Task::list();

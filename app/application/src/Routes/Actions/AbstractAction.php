@@ -9,7 +9,7 @@
                         return [ implode(DIRECTORY_SEPARATOR,['Actions', $this->name()]), $this->name() ];
                 }
 
-		protected function runApi( string $apiEndpoint = null, array $parameters = null, string $method = 'POST' ) {
+		protected function runApi( string $apiEndpoint = null, array $parameters = [], string $method = 'POST' ) {
 			$result = $this->loadReroute( $apiEndpoint ?? $this->getApiEndpoint() );
 			$result->setRoutingParameters( ['method'=>$method] );
 			$result = $result->startRoute( $parameters );

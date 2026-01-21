@@ -13,7 +13,7 @@
 			return substr(strrchr(get_class($this),'\\'),1);
 		}
 
-		public function setRoutingParameters( array $parameters = null ) {
+		public function setRoutingParameters( array $parameters = [] ) {
 			$this->routeMethod = $parameters['method'] ?? null;
 			$this->routeRelativeBaseUrl = $parameters['relativeBaseUrl'] ?? null;
 			$this->routePath = $parameters['path'] ?? null;
@@ -33,7 +33,7 @@
 			return $this->routeSubPath;
 		}
 
-		public function startRoute( array $parameters = null ) {
+		public function startRoute( array $parameters = [] ) {
 			$parameters = $this->mergeParametersForRoute( array_merge( $parameters, $this->getMiscInputs() ) );
 			return $this->run($parameters);
 		}
@@ -54,7 +54,7 @@
 			return $newRoute;
 		}
 
-		public abstract function run( array $parameters = null );
+		public abstract function run( array $parameters = [] );
 
 		protected function getMiscInputs( ) {
 			return [];
