@@ -12,10 +12,12 @@
 		}
 
 		public static function getAsset( string|array $assetNames, string $assetType = null ) {
+			$assetType ??= self::_estimateAssetType($assetNames);
 			return self::getPrivateAsset( $assetNames, $assetType );
 		}
 
 		public static function getPublicAsset( string|array $assetNames, string $assetType = null ) {
+			$assetType ??= self::_estimateAssetType($assetNames);
 			$sources = self::getAssetSources(
 					$assetType,
 					self::$DEFAULT_PUBLIC_ASSET_DIR
@@ -24,6 +26,7 @@
 		}
 
 		public static function getPrivateAsset( string|array $assetNames, string $assetType = null) {
+			$assetType ??= self::_estimateAssetType($assetNames);
 			$sources = self::getAssetSources(
 					$assetType,
 					array_merge( self::$DEFAULT_PUBLIC_ASSET_DIR, self::$DEFAULT_PRIVATE_ASSET_DIR )
@@ -37,6 +40,12 @@
 			}
 
 			return self::_getAssetSources( $assetType, $assetDir);
+		}
+
+		protected static function _estimateAssetType( string|array $assetName ) {
+			$assetName = is_array($assetName) ? $assetName[0] ?? '' : $assetName;
+			$ext = pathinfo($assetName, PATHINFO_EXTENSION);
+			return $ext;
 		}
 
 		protected static function _getAsset( string|array $assetNames, string $assetType, array $assetSources ) {

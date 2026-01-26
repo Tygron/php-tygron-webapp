@@ -53,7 +53,7 @@
 			if (!$this->validate()) {
 				throw new \Exception('Renderable not ready');
 			}
-			$rendered = Renderer::getRendered( $this->template, $this->data);
+			$rendered = Renderer::renderFromTemplate( $this->template, $this->data);
 			$this->rendered = $rendered;
 			return $this->rendered;
 		}
