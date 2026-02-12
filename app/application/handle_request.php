@@ -85,6 +85,7 @@
 			'relativeBaseUrl'=>$relativeBaseUrl,
 			'path'=>$routePath,
 			'subPath'=>$subPath,
+			'format'=>get_clean_user_input($FORMAT_PARAMETER_KEY),
 		]);
 	$output = $routeObject->startRoute($_INPUTS_CLEANED);
 

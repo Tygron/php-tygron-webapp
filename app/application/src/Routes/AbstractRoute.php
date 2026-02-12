@@ -8,6 +8,7 @@
 		private ?string $routeRelativeBaseUrl = null;
 		private ?string $routePath = null;
 		private ?string $routeSubPath = null;
+		private ?string $routeFormat = null;
 
 		public function name() {
 			return substr(strrchr(get_class($this),'\\'),1);
@@ -18,6 +19,7 @@
 			$this->routeRelativeBaseUrl = $parameters['relativeBaseUrl'] ?? null;
 			$this->routePath = $parameters['path'] ?? null;
 			$this->routeSubPath = $parameters['subPath'] ?? null;
+			$this->routeFormat = $parameters['format'] ?? null;
 		}
 
 		public function getMethod() {
@@ -50,6 +52,7 @@
 				'relativeBaseUrl' => $this->getRelativeBaseUrl(),
 				'path' => $preservePath ? $this->getPath() : null,
 				'subPath' => $preservePath ? $this->getSubPath() : null,
+				'format' => $this->getRequestedFormat(),
 			]);
 			return $newRoute;
 		}
@@ -106,6 +109,16 @@
 				}
 			}
 			return $injections;
+		}
+
+		protected function getRequestedFormat(string $format = null) {
+			if ( is_null($format) ) {
+				return $this->routeFormat;
+			}
+			if ( is_null($this->routeFormat) ) {
+				return false;
+			}
+			return strtolower($this->routeFormat) == strtolower($format);
 		}
 
 		protected function getRenderParameters() {

@@ -45,6 +45,8 @@
 	$DEFAULT_ROUTE_NAMESPACE	??=	'Pages';
 	$DEFAULT_ROUTE	 		??= 	'Pages\\CreateTaskForm';
 
+	$FORMAT_PARAMETER_KEY		??=	'f';
+
 	//Cron tasks should be run automatically by touching the application/cron endpoint. The CLI_TOKEN should be an alphanumeric string to authenticate a scheduler with, or null to allow any source (using null is not recommended).
 	$CLI_TOKEN			??=	'';
 	$CRON_LAST_RUN_FILE		??=	'last-cron';
