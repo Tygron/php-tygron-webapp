@@ -18,6 +18,7 @@
 		private $url = '';
 		private $parameters = [];
 		private $data = null;
+		private $dataType = 'application/json';
 
 		private $headers = [];
 
@@ -63,6 +64,10 @@
 				$this->data = $data;
 			}
 			return $this;
+		}
+
+		public function setDataType( string $dataType = null ) {
+			$this->dataType = $dataType;
 		}
 
 		public function setHeaders( array $headers ) {
@@ -132,13 +137,15 @@
 
 		protected function prepareForCurl() {
                         $this->requestUrl = $this->prepareUrl($this->url, $this->parameters);
+			$additionalHeaders = [];
                         if ( $this->method == 'GET' ) {
                                 $this->requestUrl = $this->prepareUrl($this->requestUrl, $this->data);
 				$this->requestData = null;
                         } else {
 				$this->requestData = $this->prepareData($this->data);
+				$additionalHeaders = $this->prepareDataTypeHeaders($this->dataType);
 			}
-			$this->requestHeaders = $this->prepareHeaders($this->headers);
+			$this->requestHeaders = $this->prepareHeaders($this->headers + $additionalHeaders);
 		}
 
 
@@ -156,7 +163,27 @@
 
 		protected function prepareData( string|array $data ) {
 			$preparedData = $data;
+			switch ( $this->dataType ) {
+				case 'application/json':
+					return json_encode( $data );
+				case 'application/x-www-form-urlencoded':
+					return http_build_query($data);
+				default:
+					return $data;
+			}
+
 			return $preparedData;
+		}
+
+		protected function prepareDataTypeHeaders( string $dataType ) {
+			$dataType ??= 'application/json';
+			switch ( $dataType ) {
+				case 'application/json':
+				case 'application/x-www-form-urlencoded':
+					return ['Content-Type' => $dataType];
+				default:
+					return ['Content-Type' => $dataType];
+			}
 		}
 
 		protected function prepareHeaders( array $headers ) {
@@ -180,10 +207,10 @@
 
 			if ( $this->method == 'POST' ) {
 				curl_setopt( $ch, CURLOPT_POST, TRUE );
-				curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode($this->requestData) );
+				curl_setopt( $ch, CURLOPT_POSTFIELDS, $this->requestData );
 				curl_setopt( $ch, CURLOPT_HTTPHEADER, array_merge($this->requestHeaders,[
-						'Accept: application/json',
-						"Content-Type: application/json",
+						//'Accept: application/json',
+						//"Content-Type: application/json",
 					] ) );
 			}
 
