@@ -4,6 +4,16 @@
 
 	class ValidateCredentialsFile extends AbstractOperation {
 
+		public function getInputParameters() {
+			return [
+					'username' => null,
+					'password' => null,
+					'platform' => null,
+					'mfa' => null,
+					'useDefaultCredentials' => null,
+				];
+		}
+
 		public function run( \Tasks\Task $task ) {
 			global $WORKSPACE_CREDENTIALS_DIR;
 
