@@ -397,6 +397,14 @@
 			return $this->data['log'];
 		}
 
+		public function sanitize() {
+			$data = $this->data;
+			foreach ( $this->getUnsaveableParameters() as $index=>$key ) {
+				unset($data[$key]);
+			}
+			$this->data = $data;
+		}
+
 		public function validate() {
 			if ( is_null($this->getCredentials()) ) {
 				throw new \Exception('No credentials provided');
@@ -427,6 +435,17 @@
 
 
 
+		public static function getUnsaveableParameters() {
+			return [
+					'username',
+					'password',
+					'mfa',
+					'useDefaultCredentials',
+				];
+		}
+
+
+
 		private static function generateTaskFileName(string $taskName) {
 			if (str_ends_with($taskName, self::$TASKFILE_POSTFIX)) {
 				return $taskName;
@@ -445,8 +464,9 @@
 		}
 		public function save() {
 			global $WORKSPACE_TASK_DIR;
-
 			$this->saveCredentials();
+
+			$this->sanitize();
 
 			\Utils\Files::writeJsonFile([$WORKSPACE_TASK_DIR, $this->getTaskFileName()], $this->getData());
 		}
@@ -496,7 +516,6 @@
 
 		public function deleteCredentials() {
 			global $WORKSPACE_CREDENTIALS_DIR;
-
 
 			if ( \Tasks\TaskCredentials::isDefaultCredentialsFile($this->getCredentialsFileName()) ) {
 				$this->log('Will not delete default credentials file. Only remove reference.');

@@ -39,7 +39,7 @@
 						try {
 							$credentials = $parameters['credentials']		??	null;
 							$credentials ??= self::normalizeCredentials(
-									$parameters['useDefaultCredentials']	??	null,
+									$parameters['useDefaultCredentials']	??	false,
 									$parameters['username']			??	null,
 									$parameters['password']			??	null,
 									$parameters['mfa']			??	null,
@@ -114,7 +114,12 @@
 		}
 
 
-		public static function normalizeCredentials( string|bool $useDefaultCredentials = null, string $username = null, string $password = null, string $mfa = null, string $platform = null ) {
+		public static function normalizeCredentials( string|bool $useDefaultCredentials = false, string $username = null, string $password = null, string $mfa = null, string $platform = null ) {
+			try {
+				TaskCredentials::validateCredentials($useDefaultCredentials, $platform, $username, $password);
+			} catch (\Throwable $e) {
+				throw $e;
+			}
 			if ( (!empty($platform)) &&(!empty($username)) && (!empty($password)) ) {
 				return [
 						'useDefaultCredentials'	=>	false,
@@ -123,13 +128,13 @@
 						'password'		=>	$password,
 						'mfa'			=>	$mfa,
 					];
-			} else if ( $useDefaultCredentials === 'true' || $useDefaultCredentials === true ) {
+			} else if ($useDefaultCredentials) {
 				return [
-						'useDefaultCredentials'	=>	true,
+						'useDefaultCredentials' => $useDefaultCredentials,
 					];
-			} else {
-				throw new \Exception('Credentials required: username, password, platform');
 			}
+
+			throw new \Exception('Credentials required: username, password, platform');
 		}
 
 		public static function generatePlatformName( string $platformName = null) {
