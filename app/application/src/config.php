@@ -91,6 +91,9 @@
 
 	//Debug flags
 
+	//Output file and linenumbers with exceptions where they occur
+	$DEBUG_EXCEPTIONS ??= false;
+
 	//When rendering assets such as html, css, js files, include originating file and dir as comment or other meta information.
 	$DEBUG_ASSETS_METADATA ??= false;
 
