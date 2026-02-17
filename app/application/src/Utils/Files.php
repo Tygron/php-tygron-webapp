@@ -93,6 +93,14 @@
 			return $files;
 		}
 
+		public static function fileExists( string|array $path ) {
+			$path = self::makePath($path);
+			if (!is_file($path)) {
+				return false;
+			}
+			return true;
+		}
+
 		public static function makePath( string|array $path ) {
 			$madePath = '';
 			if ( is_string($path) ) {
