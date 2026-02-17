@@ -35,8 +35,8 @@
 	//Default credentials file configuration.
 	$CREDENTIALS_FILE_DEFAULT 	??=	'credentials-default.json';
 	//In the workspace, there are dedicated folders for default credentials and transient credentials (transient being temporary on a per-task basis).
-	$CREDENTIALS_DEFAULTS_FOLDER	??=	'default',
-	$CREDENTIALS_TRANSIENT_FOLDER	??=	'transient',
+	$CREDENTIALS_DEFAULTS_FOLDER	??=	'default';
+	$CREDENTIALS_TRANSIENT_FOLDER	??=	'transient';
 
 	$LANGUAGE_DEFAULT 		??=	'EN';
 	$TIMEZONE_DEFAULT		??=	'UTC';
