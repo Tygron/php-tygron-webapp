@@ -27,17 +27,19 @@
 	$CUSTOM_SRC_DIR			??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'src'] );
 	$CUSTOM_CRON_DIR		??=	implode(DIRECTORY_SEPARATOR, [$CUSTOM_DIR, 'cron'] );
 
-
 	$WORKSPACE_DIR 			??=	implode(DIRECTORY_SEPARATOR, ['','var','workspace']);
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
 	$WORKSPACE_CREDENTIALS_DIR 	??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'credentials']);
 	$WORKSPACE_LOCK_DIR		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'locks']);
 
+	//Default credentials file configuration.
 	$CREDENTIALS_FILE_DEFAULT 	??=	'credentials-default.json';
+	//In the workspace, there are dedicated folders for default credentials and transient credentials (transient being temporary on a per-task basis).
+	$CREDENTIALS_DEFAULTS_FOLDER	??=	'default',
+	$CREDENTIALS_TRANSIENT_FOLDER	??=	'transient',
+
 	$LANGUAGE_DEFAULT 		??=	'EN';
 	$TIMEZONE_DEFAULT		??=	'UTC';
-
-	$KEEP_TASKS_WITH_ERROR 		??=	false;
 
 	$SAFE_CHARACTERS 		??= 	'[a-zA-Z0-9\-_]';
 
@@ -47,14 +49,19 @@
 
 	$FORMAT_PARAMETER_KEY		??=	'f';
 
-	//Cron tasks should be run automatically by touching the application/cron endpoint. The CLI_TOKEN should be an alphanumeric string to authenticate a scheduler with, or null to allow any source (using null is not recommended).
+	//Cron tasks should be run automatically by touching the application/cron endpoint.
+	// The CLI_TOKEN should be an alphanumeric string to authenticate a scheduler with, or null to allow any source.
+	// (using null is not recommended).
 	$CLI_TOKEN			??=	'';
 	$CRON_LAST_RUN_FILE		??=	'last-cron';
 	$CRON_TASKS			??=	['runtasks.php'];
+	//Minimal interval between task updates
 	$TASKS_STANDOFF_IN_SECONDS	??=	10;
 
+	//Time interval to pause all communiocation when authentication of a task fails, to prevent temporary blocks.
 	$COOLDOWN_SECONDS		??=	60;
 
+	//Parameters always added when rendering
 	$RENDER_PARAMETERS ??=[];
 	$RENDER_PARAMETERS['baseUrl'] = $APPLICATION_WEB_FULL_URL;
 
@@ -63,13 +70,13 @@
 		'AuthenticationToken', //Check whether authenticationtoken is required and valid
 	];
 
+
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ROUTE_PARAMETERS_FIXED ??= [];
 	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
 
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']	??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']		??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
 	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
-
 
 	//When an action is performed, these parameters are injected based on the submission of other values.
 	$ROUTE_PARAMETERS_INJECTION ??= [
@@ -88,21 +95,35 @@
 		],
 	];
 
+	//When for a specified parameter nothing is fixed, injected, or provided, add these defaults
+	$ROUTE_PARAMETERS_DEFAULTS ??= [
+		'CreateTask'	=> [
+			'name'	=>	'unnamed',
+		],
+	];
+
+
 
 	//Debug flags
+	//When an erorr occurs, while running a task, do not delete the task.
+	$KEEP_TASKS_WITH_ERROR 		??=	false;
 
-	//Output file and linenumbers with exceptions where they occur
-	$DEBUG_EXCEPTIONS ??= false;
+	//Output file and linenumbers with exceptions where they occur.
+	$DEBUG_EXCEPTIONS		??=	false;
 
 	//When rendering assets such as html, css, js files, include originating file and dir as comment or other meta information.
-	$DEBUG_ASSETS_METADATA ??= false;
+	$DEBUG_ASSETS_METADATA		??=	false;
 
-	//
+
+
+	//Content headers for outputs
 	$CONTENT_HEADERS ??= [];
 	$CONTENT_HEADERS['js'] ??= [
 			'Content-Type' => 'application/javascript'
 		];
 
+
+	//After setting all the config values, some should be set in a few helper objects
 	\Utils\Time::$DEFAULT_TIMEZONE = $TIMEZONE_DEFAULT;
 
 	\Curl\LockingCurlTask::setLockLocation($WORKSPACE_LOCK_DIR);
