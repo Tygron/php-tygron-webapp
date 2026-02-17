@@ -53,4 +53,10 @@
 			'size'                  =>      [2500,2500],
 		],
 	];
+
+
+        //Output file and linenumbers with exceptions where they occur
+        $DEBUG_EXCEPTIONS ??= false;
+
+
 ?>
