@@ -127,7 +127,7 @@
 		}
 
 		protected function getRouteRenderValues() {
-			$relativeParentUrl = explode('/', $this->getRelativeBaseUrl());
+			$relativeParentUrl = explode('/', $this->getRelativeBaseUrl() ?? '');
 			if ( count($relativeParentUrl) > 1) {
 				array_pop($relativeParentUrl);
 			}
