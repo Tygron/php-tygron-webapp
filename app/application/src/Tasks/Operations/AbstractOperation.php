@@ -39,6 +39,19 @@
 			return $this->task;
 		}
 
+		public function getCredentials() {
+			global $WORKSPACE_CREDENTIALS_DIR;
+
+			$task = $this->getTask();
+			$credentials = \Utils\Files::readJsonFile([$WORKSPACE_CREDENTIALS_DIR, $task->getCredentialsFileName()]);
+
+			if ( !is_array($credentials) ) {
+				throw new \Exception('Failed to interpret credentials file.');
+			}
+
+			return $credentials;
+		}
+
                 public function name() {
                         return substr(strrchr(get_class($this),'\\'),1);
                 }
