@@ -1,0 +1,15 @@
+<html>
+
+	<head>
+		<base href='{{ baseUrl }}'>
+	</head>
+
+	<body>
+		<h4>{{title}}</h4>
+		<p>{{description}}</p>
+		<table>
+			{% for item in processes %}{% include 'api/ogc/processes/processes-process.html' with item %}{% endfor %}
+		</table>
+	</body>
+
+</html>
