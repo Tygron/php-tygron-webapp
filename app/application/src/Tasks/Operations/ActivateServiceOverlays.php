@@ -39,23 +39,30 @@
 			return (count( $this->getServiceOverlayIds( $task ) ) === 0);
 		}
 
+
+
+
 		protected function getServiceOverlayIds( $task ) {
 			$overlayIds = $task->getData('serviceOverlayIds') ?? null;
-			if ( !is_array($overlayIds) ) {
-				$overlayIds = [];
-				$token = $task->getApiToken();
-				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/overlays')->run();
-				foreach ( $curlTask->getContent() as $index => $overlay ) {
-					if ( !(in_array($overlay['type'] ?? null, ['WMS','WCS'])) ) {
-						continue;
-					}
-					if ( !($overlay['active'] === false) ) {
-						continue;
-					}
-					$overlayIds[] = $overlay['id'];
+			$foundOverlayIds = [];
+
+			$token = $task->getApiToken();
+			$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/items/overlays')->run();
+
+			foreach ( $curlTask->getContent() as $index => $overlay ) {
+				$overlayId = $overlay['id'];
+				if ( is_array($overlayIds) && (!in_array($overlayId, $overlayIds)) ) {
+				        continue;
 				}
+				if ( !(in_array($overlay['type'] ?? null, ['WMS','WCS'])) ) {
+					continue;
+				}
+				if ( !($overlay['active'] === false) ) {
+					continue;
+				}
+				$foundOverlayIds[] = $overlay['id'];
 			}
-			return $overlayIds;
+			return $foundOverlayIds;
 		}
 	}
 
