@@ -58,7 +58,7 @@
 				return 'failed';
 			}
 			if ( $task->getTaskCompleted() ) {
-				return 'succesful';
+				return 'successful';
 			}
 			if ( empty($task->getStartedOperation()) ) {
 				return 'accepted';
