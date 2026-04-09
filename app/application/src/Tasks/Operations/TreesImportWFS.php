@@ -58,7 +58,7 @@
 
 			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(),
 					'api/session/event/editorgeoplugin/add',
-					['BUILDING']
+					['STREET_OBJECT']
 				)->run();
 			$pluginId = $curlTask->getContent();
 			$linkId = $this->createGeoLink($task, $heightAttribute);
@@ -75,7 +75,7 @@
 
 			$curlTask = \Curl\TygronCurlTask::post($token, $task->getPlatform(),
 					'api/session/event/editorgeolink/add',
-					['BUILDING', 'Trees link']
+					['STREET_OBJECT', 'Trees link']
 				)->run();
 			$linkId = $curlTask->getContent();
 
