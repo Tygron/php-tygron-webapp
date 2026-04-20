@@ -9,6 +9,8 @@
 		protected static string $PROJECT_NAME = 'projectName';
 		protected $tried = [];
 
+		protected static string $DAILY_LIMIT_ERROR = "Max amount of daily new Projects reached";
+
                 public function getInputParameters() {
                         return [
                                         SELF::$PROJECT_NAME => null,
@@ -41,6 +43,9 @@
 				$attemptName = $this->renameProjectForAttempt($newProjectName);
 			        $curlTask = \Curl\TygronCurlTask::post($credentials, $credentials['platform'], 'api/event/io/save_project_as', [$sessionId, null, $attemptName, false])->run();
 				if ( $curlTask->getStatus() == 400 ) {
+					if ( str_contains($curlTask->getContent(), self::$DAILY_LIMIT_ERROR) ) {
+						throw new \Exception( get_text('Max amount of daily new Projects reached, please try again tomorrow. You can contact Tygron Support for an upgrade of your license.') );
+					}
 					$task->log(get_text('Project name %s: %s', [$attemptName, $curlTask->getContent()]));
 					continue;
 				}

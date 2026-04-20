@@ -49,6 +49,7 @@
 						'processID' => 'task',
 						'jobID' => $task->getTaskName(),
 						'status' => $this->getTaskAsJobStatus($task),
+						'progress' => $this->getTaskAsJobProgress($task),
 					];
 			}
 		}
@@ -64,6 +65,20 @@
 				return 'accepted';
 			}
 			return 'running';
+		}
+
+		protected function getTaskAsJobProgress(\Tasks\Task $task) {
+			if ( $task->getTaskCompleted() ) {
+				return 1;
+			}
+			if ( !empty($task->getError()) ) {
+				return 1;
+			}
+			$steps = count( $task->getTaskOperations() );
+			if ( $steps < 1 ) {
+				return 0;
+			}
+			return round($task->getCurrentOperationIndex() / $steps, 2);
 		}
 
 		protected function getTaskAsJobOutput(\Tasks\Task $task) {
