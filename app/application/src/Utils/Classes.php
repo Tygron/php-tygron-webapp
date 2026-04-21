@@ -23,6 +23,17 @@
 			return $classes;
 		}
 
+		public static function getClassesInOverrideFolders( string|array $path, array $roots = [] ) {
+			$classes = [];
+
+			$paths = \Utils\Files::makeMultiRootPaths( $path, $roots );
+			foreach ( $paths as $key => $rootedPath ) {
+				$classes = array_merge( $classes, self::getClassesInFolder( $rootedPath ) );
+			}
+
+			return $classes;
+		}
+
 	}
 
 

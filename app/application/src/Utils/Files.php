@@ -112,6 +112,32 @@
 			return $madePath;
 		}
 
+		public static function makeMultiRootPaths( string|array $path, array $roots) {
+			$initialPath = realpath(self::makePath($path));
+			$relativePath = null;
+			$realRoots = [];
+			$newPaths = [];
+			foreach ( $roots as $key => $value ) {
+				array_push($realRoots, realpath(self::makePath($value)));
+			}
+			foreach ( $realRoots as $key => $value ) {
+				if (stripos($initialPath, $value) !== 0) {
+					continue;
+				}
+				$relativePath = substr($initialPath, strlen($value) );
+				break;
+			}
+			if ($relativePath == null) {
+				array_push($newPaths, $initialPath);
+			} else {
+				foreach ( $realRoots as $key => $value ) {
+					array_push( $newPaths, self::makePath([$value, $relativePath]) );
+				}
+			}
+			return $newPaths;
+
+		}
+
 		public static function getFileFromPath( string|array $path ) {
 			return basename(self::makePath($path));
 		}

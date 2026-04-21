@@ -32,6 +32,8 @@
 	$WORKSPACE_CREDENTIALS_DIR 	??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'credentials']);
 	$WORKSPACE_LOCK_DIR		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'locks']);
 
+	$CLASS_FIND_ROOT_DIRS		??=	[$SRC_DIR, $CUSTOM_SRC_DIR];
+
 	//Default credentials file configuration.
 	$CREDENTIALS_FILE_DEFAULT 	??=	'credentials-default.json';
 	//In the workspace, there are dedicated folders for default credentials and transient credentials (transient being temporary on a per-task basis).
