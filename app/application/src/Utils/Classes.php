@@ -31,6 +31,7 @@
 				$classes = array_merge( $classes, self::getClassesInFolder( $rootedPath ) );
 			}
 
+			$classes = array_unique($classes);
 			return $classes;
 		}
 
