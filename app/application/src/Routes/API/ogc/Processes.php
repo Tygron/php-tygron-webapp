@@ -48,9 +48,13 @@
 		}
 
 		protected function getProcesses() {
+			global $CLASS_FIND_ROOT_DIRS;
 			if ( is_null($this->PROCESSES) ) {
 				$processes = [];
-				$possibleProcessClasses = \Utils\Classes::getClassesInFolder([__DIR__,'processes']);
+				$processesFolder = [__DIR__,'processes'];
+				$possibleProcessClasses = \Utils\Classes::getClassesInOverrideFolders($processesFolder, $CLASS_FIND_ROOT_DIRS);
+
+				//$possibleProcessClasses = \Utils\Classes::getClassesInFolder([__DIR__,'processes']);
 				foreach ( $possibleProcessClasses as $key => $processClass ) {
 					try {
 						$process = new $processClass();
