@@ -34,6 +34,8 @@
 	$ROUTE_PARAMETERS_FIXED['CreateTask']['template'] = 'demo_heat_stress';
 	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations'] = ["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","ActivateServiceOverlays","OutputServices", "SetTaskComplete", "Wait"];
 	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
+        $ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations'] = ["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+        $ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
 
 	//When an action is performed, the parameters defined here are offered as defaults and available for change.
 	$ROUTE_PARAMETERS_DEFAULT['CreateTask'] ??= [];

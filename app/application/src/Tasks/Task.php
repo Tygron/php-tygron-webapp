@@ -142,7 +142,10 @@
 		public function setCrs( int|string $crs ) {
 			$this->data['crs'] = $crs;
 		}
-		public function setLocation( array $location ) {
+		public function setLocation( array $location = null ) {
+			if ( is_null($location) ) {
+				return;
+			}
 			$this->data['location'] = $location;
 		}
 		public function setSize( array $size ) {
@@ -408,12 +411,6 @@
 		public function validate() {
 			if ( is_null($this->getCredentials()) ) {
 				throw new \Exception('No credentials provided');
-			}
-			if ( empty($this->getTemplateName()) ) {
-				throw new \Exception('No template provided');
-			}
-			if ( empty($this->getLocation()) ) {
-				throw new \Exception('No location provided');
 			}
 		}
 

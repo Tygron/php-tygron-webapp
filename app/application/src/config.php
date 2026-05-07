@@ -77,8 +77,11 @@
 	$ROUTE_PARAMETERS_FIXED ??= [];
 	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
 
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']		??=	["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']		??=	["ValidateCredentialsFile","CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
 	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
+
+	$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations']	??=	["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+	$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
 
 	//When an action is performed, these parameters are injected based on the submission of other values.
 	$ROUTE_PARAMETERS_INJECTION ??= [
