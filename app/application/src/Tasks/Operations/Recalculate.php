@@ -26,7 +26,7 @@
 
 				$curlTask = \Curl\TygronCurlTask::get($token, $task->getPlatform(), 'api/session/info')->run();
 				$state = $curlTask->getContent()['state'];
-				if ( $state=='NORMAL' ) {
+				if ( $state=='NORMAL' || $state=='TESTRUN' ) {
 					return true;
 				} else {
 					$task->log(get_text('Session in unexpected state: %s',[$state]));

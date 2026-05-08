@@ -13,7 +13,7 @@
 		}
 
 		public function getDescription() {
-			return 'Run a calculation of an existing Project';
+			return 'Run a calculation of an existing Project. This will start an existing Project, or optionally join a running one. Note that when joining a Session the state of the Session may be altered by this process.';
 		}
 
 		public function getParameterDefinitions() {
@@ -73,6 +73,43 @@
 					]),
 
 				GenericOGCProcessParameter::create([
+						'name' => 'joinPreferred',
+						'title' => 'Join if already running',
+						'description'=>'If a session of this Project is already running, join it rather than starting a session',
+						'type'=>'boolean',
+
+						'optional'=> true,
+						'defaultValue' => 'false',
+
+						'htmlExampleType'=>'checkbox',
+						'htmlExampleValue'=>'true',
+					]),
+				GenericOGCProcessParameter::create([
+						'name' => 'joinIfNeeded',
+						'title' => 'Join if needed',
+						'description'=>'Prefer starting a session, but if a session cannot be started, join it instead',
+						'type'=>'boolean',
+
+						'optional'=> true,
+						'defaultValue' => 'false',
+
+						'htmlExampleType'=>'checkbox',
+						'htmlExampleValue'=>'true',
+					]),
+				GenericOGCProcessParameter::create([
+						'name' => 'stopTestRun',
+						'title' => 'Stop the testrun',
+						'description'=>'Stop the Testrun if a Session is joined where a Session is running',
+						'type'=>'boolean',
+
+						'optional'=> true,
+						'defaultValue' => 'false',
+
+						'htmlExampleType'=>'checkbox',
+						'htmlExampleValue'=>'true',
+					]),
+
+				GenericOGCProcessParameter::create([
 						'name' => 'measure',
 						'title' => 'Measure',
 						'description'=>'Measure (name or ID) to activate in the Project for calculation',
@@ -126,7 +163,7 @@
 				$inputs['mfa'] = get_clean_user_input('mfa', '[0-9]');
 			}
 			if ( array_key_exists('measure', $_INPUTS) ) {
-				$inputs['measure'] = get_clean_user_input('measure', '[\{\}\[\]\s\+\=\-\_\,\.\'\"\;\\\|\?\!\#\$\%\€\^|&|*a-zA-Z0-9]');
+				$inputs['measure'] = get_clean_user_input('measure', '[\(\)\{\}\[\]\s\+\=\-\_\,\.\'\"\;\\\|\?\!\#\$\%\€\^|&|*a-zA-Z0-9]');
 			}
 			return $inputs;
 		}
