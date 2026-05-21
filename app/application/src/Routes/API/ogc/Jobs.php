@@ -29,7 +29,7 @@
 
 
 		protected function getListOfJobs() {
-			return \Tasks\Task::list();
+			return \Tasks\Task::list($this->getRequestContext());
 		}
 
 		protected function getJobStatus( string $jobId = null ) {
@@ -98,7 +98,7 @@
 
 		protected function getJobData(string $taskId) {
 			try {
-				return \Tasks\Task::load($taskId);
+				return \Tasks\Task::load($taskId, $this->getRequestContext());
 			} catch( \Throwable $e) {
 				throw new \Exception('Job not found');
 			}

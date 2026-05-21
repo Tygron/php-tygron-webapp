@@ -11,7 +11,10 @@
 
 		protected function runApi( string $apiEndpoint = null, array $parameters = [], string $method = 'POST' ) {
 			$result = $this->loadReroute( $apiEndpoint ?? $this->getApiEndpoint() );
-			$result->setRoutingParameters( ['method'=>$method] );
+			$result->setRoutingParameters( [
+					'method'=>$method,
+					'requestContext'=>$this->getRequestcontext()
+				] );
 			$result = $result->startRoute( $parameters );
 			if ( $result['success'] ) {
 				return $result['content'];

@@ -11,6 +11,8 @@
 
 		public static array $DEFAULT_DATA = [
 				'taskName'		=>	'',
+				'contextName'		=>	null,
+
 				'credentialsFile'	=>	'',
 				'templateName'		=>	'',
 				'platform'		=>	'engine',
@@ -56,6 +58,9 @@
 				switch ($key) {
 					case 'taskName':
 						$this->setTaskName($value);
+						break;
+					case 'contextName':
+						$this->setContextName($value);
 						break;
 					case 'credentialsFile':
 						$this->setCredentialsFile($value);
@@ -126,6 +131,9 @@
 
 		public function setTaskName( string $taskName ) {
 			$this->data['taskName'] = $taskName;
+		}
+		public function setContextName( string $contextName = null ) {
+			$this->data['contextName'] = $contextName;
 		}
 		public function setCredentialsFile( string $credentialsFile ) {
 			$this->data['credentialsFile'] = $credentialsFile;
@@ -302,8 +310,11 @@
 		public function getTaskName() {
 			return $this->data['taskName'];
 		}
+		public function getContextName() {
+			return $this->data['contextName'];
+		}
 		public function getTaskFileName() {
-			return self::generateTaskFileName($this->getTaskName());
+			return self::generateTaskFileName($this->getTaskName(), $this->getContextName());
 		}
 		public function getPlatform() {
 			return $this->data['platform'];
@@ -443,7 +454,11 @@
 
 
 
-		private static function generateTaskFileName(string $taskName) {
+		private static function generateTaskFileName(string $taskName, string $contextName = null) {
+			if ( !is_null($contextName) ) {
+				$taskName = $contextName.DIRECTORY_SEPARATOR.$taskName;
+			}
+
 			if (str_ends_with($taskName, self::$TASKFILE_POSTFIX)) {
 				return $taskName;
 			}
@@ -451,12 +466,15 @@
 		}
 
 
-		public static function load( string $taskName ) {
+		public static function load( string $taskName, string $contextName = null ) {
 			global $WORKSPACE_TASK_DIR;
 
-			$fileName = self::generateTaskFileName($taskName);
+			$fileName = self::generateTaskFileName($taskName, $contextName);
 			$taskData = \Utils\Files::readJsonFile([$WORKSPACE_TASK_DIR,$fileName]);
 			$task = new Task($taskData);
+			if ( $task->getContextName() != $contextName ) {
+				$task->move($taskName, $contextName);
+			}
 			return $task;
 		}
 		public function save() {
@@ -466,6 +484,9 @@
 			$this->sanitize();
 
 			\Utils\Files::writeJsonFile([$WORKSPACE_TASK_DIR, $this->getTaskFileName()], $this->getData());
+		}
+		public function move( string $taskName, string $contextName ) {
+			throw new \Exception( 'Moving tasks/jobs is not yet implementes' );
 		}
 		public function delete() {
 			global $WORKSPACE_TASK_DIR;
@@ -483,12 +504,14 @@
 			}
 			return true;
 		}
-		public static function list() {
+		public static function list( string $context = null ) {
 			global $WORKSPACE_TASK_DIR;
 			$tasksDir = $WORKSPACE_TASK_DIR;
 
-			$fileNamesFull = glob($tasksDir . DIRECTORY_SEPARATOR .'*'.self::$TASKFILE_POSTFIX);
-			$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $fileNamesFull);
+			$contextedTasksDir = \Utils\Files::makePath([$WORKSPACE_TASK_DIR, $context]);
+
+			$fileNamesFull = glob($contextedTasksDir . DIRECTORY_SEPARATOR .'*'.self::$TASKFILE_POSTFIX);
+			$fileNames = str_replace($contextedTasksDir . DIRECTORY_SEPARATOR, '', $fileNamesFull);
 			$taskNames = str_replace(self::$TASKFILE_POSTFIX, '', $fileNames);
 
 			return $taskNames;

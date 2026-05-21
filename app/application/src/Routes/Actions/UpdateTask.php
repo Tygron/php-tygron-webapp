@@ -9,7 +9,7 @@
 
 			$taskName = get_clean_user_input('taskName');
 			try {
-				$task = \Tasks\Task::load($taskName);
+				$task = \Tasks\Task::load($taskName, $this->getRequestContext());
 			} catch (\Throwable $e) {
 				return 'Task not found';
 			}
@@ -17,7 +17,7 @@
 			$result = get_text('No output (possible error?)');
                         try {
                                 $taskRunner = new \Tasks\Runners\TaskRunner();
-                                $taskRunner->setTask($taskName);
+                                $taskRunner->setTask($task->getTaskFileName());
                                 $result = $taskRunner->run();
                         } catch ( \Throwable $e) {
 				$result = $e->getMessage();

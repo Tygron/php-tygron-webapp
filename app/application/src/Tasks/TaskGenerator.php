@@ -9,6 +9,7 @@
 		public static array $DEFAULT_PARAMETERS = [
 
 			'taskName'=>'',
+			'contextName'=>null,
 			'credentials'=>[],
 			'templateName'=>'',
 			'platform'=>'engine',

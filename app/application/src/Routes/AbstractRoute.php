@@ -10,6 +10,8 @@
 		private ?string $routeSubPath = null;
 		private ?string $routeFormat = null;
 
+		private ?string $requestContext = null;
+
 		public function name() {
 			return substr(strrchr(get_class($this),'\\'),1);
 		}
@@ -20,6 +22,8 @@
 			$this->routePath = $parameters['path'] ?? null;
 			$this->routeSubPath = $parameters['subPath'] ?? null;
 			$this->routeFormat = $parameters['format'] ?? null;
+
+			$this->requestContext = $parameters['requestContext'] ?? null;
 		}
 
 		public function getMethod() {
@@ -33,6 +37,10 @@
 		}
 		public function getSubPath() {
 			return $this->routeSubPath;
+		}
+
+		public function getRequestContext() {
+			return $this->requestContext;
 		}
 
 		public function startRoute( array $parameters = [] ) {
@@ -53,6 +61,8 @@
 				'path' => $preservePath ? $this->getPath() : null,
 				'subPath' => $preservePath ? $this->getSubPath() : null,
 				'format' => $this->getRequestedFormat(),
+
+				'requestContext' => $this->getRequestContext(),
 			]);
 			return $newRoute;
 		}

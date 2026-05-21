@@ -9,7 +9,7 @@
 
 			$taskName = get_clean_user_input('taskName');
 			try {
-				$task = \Tasks\Task::load($taskName);
+				$task = \Tasks\Task::load($taskName, $this->getRequestContext());
 			} catch (\Throwable $e) {
 				$renderable = $this->getRenderable( 'TaskNotFound', ['taskName' => $taskName, 'message' => $e->getMessage()] );
 				return $renderable->getRendered();

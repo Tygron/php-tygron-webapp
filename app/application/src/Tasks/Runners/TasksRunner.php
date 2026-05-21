@@ -24,14 +24,21 @@
 
 		public function run() {
 			global $WORKSPACE_TASK_DIR;
+			$contextDirs = [];
 			$taskFiles = $this->getTaskFilesFromDir($WORKSPACE_TASK_DIR);
 
 			$this->runTasks( $taskFiles );
 		}
 
 		protected function getTaskFilesFromDir( $tasksDir ) {
-			$fileNamesFull = glob($tasksDir . DIRECTORY_SEPARATOR .'*'.\Tasks\Task::$TASKFILE_POSTFIX);
-			$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $fileNamesFull);
+			$files = \Utils\Files::getContentsOfSubDirectories( $tasksDir, 2, false, false );
+			$taskFileNamesFull = array_filter( $files, function($value) {
+					return str_ends_with($value, \Tasks\Task::$TASKFILE_POSTFIX);
+				} );
+			$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $taskFileNamesFull);
+
+			//$fileNamesFull = glob($tasksDir . DIRECTORY_SEPARATOR .'*'.\Tasks\Task::$TASKFILE_POSTFIX);
+			//$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $fileNamesFull);
 			return $fileNames;
 		}
 
@@ -56,11 +63,11 @@
 			}
 		}
 
-		protected function runTask( $taskName ) {
+		protected function runTask( $taskFileName ) {
 			$operated = false;
 			try {
 				$taskRunner = new TaskRunner();
-				$taskRunner->setTask($taskName);
+				$taskRunner->setTask($taskFileName);
 				$taskRunner->setStandOffTimeInSeconds($this->standOffTimeInSeconds);
 				$taskRunner->run();
 				$operated = $taskRunner->getHasOperated();

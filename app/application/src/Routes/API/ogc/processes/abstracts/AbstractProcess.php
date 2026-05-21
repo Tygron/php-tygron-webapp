@@ -12,6 +12,7 @@
 				$method = 'POST';
 			}
 			$result = null;
+			$parameters = array_merge($parameters,['contextName'=>$this->getRequestContext()]);
 			switch( $method ) {
 				case 'POST':
 					$result = $this->runPost($parameters);
