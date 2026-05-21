@@ -473,7 +473,7 @@
 			$taskData = \Utils\Files::readJsonFile([$WORKSPACE_TASK_DIR,$fileName]);
 			$task = new Task($taskData);
 			if ( $task->getContextName() != $contextName ) {
-				$task->move($taskName, $contextName);
+				//$task->move($taskName, $contextName);
 			}
 			return $task;
 		}
@@ -485,7 +485,7 @@
 
 			\Utils\Files::writeJsonFile([$WORKSPACE_TASK_DIR, $this->getTaskFileName()], $this->getData());
 		}
-		public function move( string $taskName, string $contextName ) {
+		public function move( string $taskName, string $contextName = null ) {
 			throw new \Exception( 'Moving tasks/jobs is not yet implementes' );
 		}
 		public function delete() {

@@ -113,12 +113,21 @@
 
 			$injections = [];
 			foreach ($injectionRules as $key => $rulesForKey) {
-				$inputValue = get_clean_user_input($key);
+				$inputValue = $this->getInputForInjection($key);
 				if ( array_key_exists($inputValue, $rulesForKey) ) {
 					$injections = array_merge($injections, $rulesForKey[$inputValue]);
 				}
 			}
 			return $injections;
+		}
+
+		private function getInputForInjection( string $key ) {
+			switch ( $key ) {
+				case 'requestContext':
+					return $this->getRequestContext();
+				default:
+					return get_clean_user_input( $key );
+			}
 		}
 
 		protected function getRequestedFormat(string $format = null) {

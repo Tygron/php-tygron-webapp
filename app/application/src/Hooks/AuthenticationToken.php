@@ -30,6 +30,7 @@
 				$renderableAsset->output();
 				exit();
 			}
+
 			if ( is_null($WORKSPACE_CONTEXT) && array_key_exists($authenticationToken, $CONTEXT_BY_AUTHENTICATION_TOKEN ?? []) ) {
 				$WORKSPACE_CONTEXT = $CONTEXT_BY_AUTHENTICATION_TOKEN[$authenticationToken];
 			}
