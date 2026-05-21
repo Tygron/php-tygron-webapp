@@ -86,6 +86,8 @@
 			'path'=>$routePath,
 			'subPath'=>$subPath,
 			'format'=>get_clean_user_input($FORMAT_PARAMETER_KEY),
+
+			'requestContext'=>$WORKSPACE_CONTEXT,
 		]);
 	$output = $routeObject->startRoute($_INPUTS_CLEANED);
 

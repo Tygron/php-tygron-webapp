@@ -31,6 +31,7 @@
 	$WORKSPACE_TASK_DIR 		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'tasks']);
 	$WORKSPACE_CREDENTIALS_DIR 	??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'credentials']);
 	$WORKSPACE_LOCK_DIR		??=	implode(DIRECTORY_SEPARATOR, [$WORKSPACE_DIR, 'locks']);
+	$WORKSPACE_CONTEXT		??=	null;
 
 	$CLASS_FIND_ROOT_DIRS		??=	[$SRC_DIR, $CUSTOM_SRC_DIR];
 
@@ -71,6 +72,9 @@
 	$HOOKS ??= [
 		'AuthenticationToken', //Check whether authenticationtoken is required and valid
 	];
+	//Parameters for hooks:
+	$CONTEXT_BY_AUTHENTICATION_TOKEN	??=	null;
+	$AUTHENTICATION_TOKEN			??=	is_array($CONTEXT_BY_AUTHENTICATION_TOKEN) ? array_keys($CONTEXT_BY_AUTHENTICATION_TOKEN) : null ;
 
 
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
