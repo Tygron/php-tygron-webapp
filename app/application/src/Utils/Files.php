@@ -93,6 +93,38 @@
 			return $files;
 		}
 
+		public static function getContentsOfSubDirectories( string|array $path, int $levels = 1, bool $hidden = false, bool $filesOnly = true ) {
+			$path = self::makePath($path);
+			if (!is_dir($path)) {
+				throw new \Exception('Path is not a directory: '.strval($path));
+			}
+
+			$resultContents = [];
+			$fileContents = array_diff(scandir($path),['.','..']);
+
+			foreach ( $fileContents as $key => $contentItem ) {
+				if ( !$hidden && substr($contentItem,0,1) === '.' ) {
+					continue;
+				}
+				$possibleSubPath = self::makePath([$path, $contentItem]);
+
+				if ( is_dir( $possibleSubPath ) ) {
+					if ( is_null($levels) || ($levels > 0) ) {
+						$subContents = self::getContentsOfSubDirectories( $possibleSubPath, (is_null($levels) ? null: $levels-1), $hidden );
+						foreach ( $subContents as $subKey => $subValue ) {
+							$resultContents[] = self::makePath([$contentItem, $subValue]);
+						}
+					}
+					if ( !$filesOnly ) {
+						$resultContents[] = $contentItem.DIRECTORY_SEPARATOR;
+					}
+				} else if ( is_file( $possibleSubPath ) ) {
+					$resultContents[] = $contentItem;
+				}
+			}
+			return $resultContents;
+		}
+
 		public static function fileExists( string|array $path ) {
 			$path = self::makePath($path);
 			if (!is_file($path)) {
