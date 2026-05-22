@@ -77,40 +77,10 @@
 	$AUTHENTICATION_TOKEN			??=	is_array($CONTEXT_BY_AUTHENTICATION_TOKEN) ? array_keys($CONTEXT_BY_AUTHENTICATION_TOKEN) : null ;
 
 
-	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
-	$ROUTE_PARAMETERS_FIXED ??= [];
-	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
-
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']		??=	["ValidateCredentialsFile","CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
-
-	$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations']	??=	["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
-	$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['cleanupOperations']	??=	["DeleteCredentialsFile","DeleteTaskFile"];
-
-	//When an action is performed, these parameters are injected based on the submission of other values.
-	$ROUTE_PARAMETERS_INJECTION ??= [
-		'CreateTask'	=> [
-			'theme'	=> [ // If a "theme" parameter is sent...
-				'heat' => [ // If "theme" is "heat"
-					'template'	=>	'demo_heat_stress',
-					'name'		=>	'heat',
-					'taskOperations'=>	["ValidateCredentialsFile", "CreateNewProject","ActivateServiceOverlays","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"]
-				],
-				'green' => [ // If "theme" is "green"
-					'template'	=>	'demo_3-30-300',
-					'name'		=>	'green',
-				],
-			],
-		],
-	];
-
-	//When for a specified parameter nothing is fixed, injected, or provided, add these defaults
-	$ROUTE_PARAMETERS_DEFAULTS ??= [
-		'CreateTask'	=> [
-			'name'	=>	'unnamed',
-		],
-	];
-
+	//Parameters for overal routes
+	$ROUTE_PARAMETERS_INJECTION	??= []; //Allow reading (other) parameters, and if it matches, inject or overwrite parameters
+	$ROUTE_PARAMETERS_FIXED		??= []; //These parameters cannot be overwritten by external requests (but can be overwritten by injection)
+	$ROUTE_PARAMETERS_DEFAULT	??= []; //If an external request does not provice these parameters, use these defaults.
 
 
 	//Debug flags
@@ -137,4 +107,55 @@
 
 	\Curl\LockingCurlTask::setLockLocation($WORKSPACE_LOCK_DIR);
 	\Curl\TygronCurlTask::setCooldownTimeInSeconds($COOLDOWN_SECONDS);
+
+
+
+	//Sample configuration out-of-the-box. To overwrite, set $OUT_OF_BOX_CONFIG to false
+	$OUT_OF_BOX_CONFIG ??= true;
+
+	if ( $OUT_OF_BOX_CONFIG ?? true ) {
+
+		//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
+		$ROUTE_PARAMETERS_FIXED ??= [];
+		$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
+
+		$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']			??=	["ValidateCredentialsFile","CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+		$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations']	??=	["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+
+		//Using regex for hitting multiple routes/actions
+		$ROUTE_PARAMETERS_FIXED['.*Task']['cleanupOperations']			??=	["DeleteCredentialsFile","DeleteTaskFile"];
+
+
+
+		//When an action is performed, these parameters are injected based on the submission of other values.
+		$ROUTE_PARAMETERS_INJECTION ??= [
+			'CreateTask'	=> [
+				'theme'	=> [ // If a "theme" parameter is sent...
+					'heat' => [ // If "theme" is "heat"
+						'template'	=>	'demo_heat_stress',
+						'name'		=>	'heat',
+						'taskOperations'=>	["ValidateCredentialsFile", "CreateNewProject","ActivateServiceOverlays","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"]
+					],
+					'green' => [ // If "theme" is "green"
+						'template'	=>	'demo_3-30-300',
+						'name'		=>	'green',
+					],
+				],
+			],
+		];
+
+
+
+		//When for a specified parameter nothing is fixed, injected, or provided, add these defaults
+		$ROUTE_PARAMETERS_DEFAULTS ??= [
+			'CreateTask'	=> [
+				'name'	=>	'unnamed',
+			],
+		];
+
+	}
+
+
+
+
 ?>
