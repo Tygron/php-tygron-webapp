@@ -88,15 +88,16 @@
 	//When an action is performed, and one of these parameters has a specified value, the parameters provided are injected (overwriting fixed where applicable).
 	//Note that only user-provided inputs are checked to see whether parameters should be injected.
 
+	$ROUTE_PARAMETERS_INJECTION['*'] = [
+		'requestContext' => [
+			'context1'	=> [ 'useDefaultCredentials' => 'default-credentials1.json', ],
+			'context2'	=> [ 'useDefaultCredentials' => 'default-credentials2.json', ],
+		],
+	];
 	$ROUTE_PARAMETERS_INJECTION['CreateTask'] = [
-			'size'	=> [
-					'small' => [
-						'name'	=>	'small',
-						'size'	=>	[1000,1000],
-				],
-					'large' => [
-						'name'	=>	'large',
-						'size'	=>	[2500,2500],
-				],
+		'size'	=> [
+			'small'		=> [ 'name'	=> 'small',	'size'	=> [1000,1000], ],
+			'large'		=> [ 'name'	=> 'large',	'size'	=> [2500,2500], ],
 		];
+	];
 ?>
