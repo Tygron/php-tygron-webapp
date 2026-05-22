@@ -922,13 +922,17 @@ class LocationSelector {
 		let $elY	= $(this.inputs[elY]);
 
 		if ( $el.length > 0 ) {
-			try {
-				if (data instanceof Object) {
-					data = JSON.stringify(data);
+			if ( ($el.attr('type') == 'number') && ( keyX in data ) ) {
+				$el.val(data[keyX]);
+			} else {
+				try {
+					if (data instanceof Object) {
+						data = JSON.stringify(data);
+					}
+				} catch (err) {
 				}
-			} catch (err) {
+				$el.val(data);
 			}
-			$el.val(data);
 		} else if ( ($elX.length > 0) && ($elY.length > 0) ) {
 			if ( (typeof data == 'object') && (keyX in data) && (keyY in data) ) {
 				$elX.val(data[keyX]);
