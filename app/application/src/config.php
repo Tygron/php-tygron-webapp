@@ -121,7 +121,7 @@
 		$ROUTE_PARAMETERS_FIXED['ExistingTask'] ??= [];
 		$ROUTE_PARAMETERS_FIXED['.*Task'] 	??= [];
 
-		$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']			??=	["ValidateCredentialsFile","CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
+		$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']			??=	["ValidateCredentialsFile","CreateNewProject","GenerateProject","KeepAlive","OutputServices","Recalculate","DeleteCredentialsFile","SetTaskComplete","Wait"];
 		$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations']	??=	["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
 
 		//Using regex for hitting multiple routes/actions
@@ -130,34 +130,25 @@
 
 
 		//When an action is performed, these parameters are injected based on the submission of other values.
-		$ROUTE_PARAMETERS_INJECTION ??= [
-			'CreateTask'	=> [
-				'theme'	=> [ // If a "theme" parameter is sent...
-					'heat' => [ // If "theme" is "heat"
-						'template'	=>	'demo_heat_stress',
-						'name'		=>	'heat',
-						'taskOperations'=>	["ValidateCredentialsFile", "CreateNewProject","ActivateServiceOverlays","GenerateProject","KeepAlive","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"]
-					],
-					'green' => [ // If "theme" is "green"
-						'template'	=>	'demo_3-30-300',
-						'name'		=>	'green',
-					],
+		$ROUTE_PARAMETERS_INJECTION['CreateTask'] ??= [
+			'theme'	=> [ // If a "theme" parameter is sent...
+				'heat' => [ // If "theme" is "heat"
+					'template'	=>	'demo_heat_stress',
+					'name'		=>	'heat',
+					'taskOperations'=>	["ValidateCredentialsFile", "CreateNewProject","ActivateServiceOverlays","GenerateProject","KeepAlive","Recalculate","OutputWebToken","DeleteCredentialsFile","SetTaskComplete","Wait"]
+				],
+				'green' => [ // If "theme" is "green"
+					'template'	=>	'demo_3-30-300',
+					'name'		=>	'green',
 				],
 			],
 		];
 
-
-
 		//When for a specified parameter nothing is fixed, injected, or provided, add these defaults
-		$ROUTE_PARAMETERS_DEFAULTS ??= [
-			'CreateTask'	=> [
-				'name'	=>	'unnamed',
-			],
+		$ROUTE_PARAMETERS_DEFAULTS['CreateTask'] ??= [
+			'name'	=>	'unnamed',
 		];
 
 	}
-
-
-
 
 ?>

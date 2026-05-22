@@ -47,19 +47,20 @@
 	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 	$ROUTE_PARAMETERS_FIXED['CreateTask'] = [
 			'template'		=> 'demo_heat_stress',
-			'taskOperations'	= [
+			'taskOperations'	=> [
 					"ValidateCredentialsFile",
 					"CreateNewProject",
 					"ActivateServiceOverlays",
 					"GenerateProject",
 					"KeepAlive",
+					"Recalculate",
 					"OutputServices",
 					"SetTaskComplete",
 					"Wait",
 				],
 		];
 	$ROUTE_PARAMETERS_FIXED['ExistingProjectTask'] = [
-			'taskOperations'	= [
+			'taskOperations'	=> [
 					"ValidateCredentialsFile",
 					"StartProject",
 					"KeepAlive",
@@ -73,7 +74,7 @@
 		];
 	$ROUTE_PARAMETERS_FIXED['*'] = [
 			'useDefaultCredentials'	=> false,
-			'cleanupOperations'	= [
+			'cleanupOperations'	=> [
 					'DeleteCredentialsFile',
 					'DeleteTaskFile',
 				],
