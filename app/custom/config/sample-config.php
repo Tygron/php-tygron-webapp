@@ -8,10 +8,17 @@
 	$WORKSPACE_DIR = '/var/workspace/';
 
 	//Authentication token. If set, this token must be provided before access to the application proper.
+	//Authentication token can be a string, or an array ov valid authentication tokens
 	$AUTHENTICATION_TOKEN = '';
+	//Instead, an array of contexts indexed by authentication token can be provided as well.
+	//Contexts will cause Task files to be organizes into separate folders, preventing task access between contexts
+	//When this is defined and AUTHENTICATION_TOKEN is null, AUTHENTICATION_TOKEN is auto-derived
+	$CONTEXT_BY_AUTHENTICATIONTOKEN = [ 'token1' => 'context1', 'token2' => 'context2' ];
+
+
 
 	//The name of the default credentials file. When set, users needn't provide their own Tygron Platform credentials.
-	//Should be placed in the workspace folder, in a subfolder named "credentials".
+	//Should be placed in the workspace folder, in a subfolder named "credentials/default".
 	$CREDENTIALS_FILE_DEFAULT = 'credentials-default.json';
 
 	//The (default) language to use for texts and messages.
@@ -27,38 +34,69 @@
 	//Whether to keep task files of tasks which have resulted in an error.
 	$KEEP_TASKS_WITH_ERROR = true;
 
-
-	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
-	$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['useDefaultCredentials'] = false;
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['template'] = 'demo_heat_stress';
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations'] = ["ValidateCredentialsFile", "CreateNewProject","GenerateProject","KeepAlive","ActivateServiceOverlays","OutputServices", "SetTaskComplete", "Wait"];
-	$ROUTE_PARAMETERS_FIXED['CreateTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
-        $ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations'] = ["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
-        $ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['cleanupOperations'] = ["DeleteCredentialsFile","DeleteTaskFile"];
-
-	//When an action is performed, the parameters defined here are offered as defaults and available for change.
-	$ROUTE_PARAMETERS_DEFAULT['CreateTask'] ??= [];
-	$ROUTE_PARAMETERS_DEFAULT['CreateTask']['name'] = 'task';
-
-	//When an action is performed, and one of these parameters has a specified value, the parameters provided are injected (overwriting fixed where applicable).
-	//Note that only user-provided inputs are checked to see whether parameters should be injected.
-	$ROUTE_PARAMETERS_INJECTION ??= [];
-	$ROUTE_PARAMETERS_INJECTION['CreateTask'] ??= [];
-	$ROUTE_PARAMETERS_INJECTION['CreateTask']['size'] ??= [
-		'small' => [
-			'name'                  =>      'small',
-			'size'                  =>      [1000,1000],
-		],
-		'large' => [
-			'name'                  =>      'large',
-			'size'                  =>      [2500,2500],
-		],
-	];
-
-
         //Output file and linenumbers with exceptions where they occur
         $DEBUG_EXCEPTIONS ??= false;
 
 
+
+
+
+	//Disable the out-of-the-box parameter rules, allowing full customization
+	$OUT_OF_BOX_CONFIG = false;
+
+	//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
+	$ROUTE_PARAMETERS_FIXED['CreateTask'] = [
+			'template'		=> 'demo_heat_stress',
+			'taskOperations'	= [
+					"ValidateCredentialsFile",
+					"CreateNewProject",
+					"ActivateServiceOverlays",
+					"GenerateProject",
+					"KeepAlive",
+					"OutputServices",
+					"SetTaskComplete",
+					"Wait",
+				],
+		];
+	$ROUTE_PARAMETERS_FIXED['ExistingProjectTask'] = [
+			'taskOperations'	= [
+					"ValidateCredentialsFile",
+					"StartProject",
+					"KeepAlive",
+					"Recalculate",
+					"ActivateMeasure",
+					"OutputServices",
+					"DeleteCredentialsFile",
+					"SetTaskComplete",
+					"Wait",
+				],
+		];
+	$ROUTE_PARAMETERS_FIXED['*'] = [
+			'useDefaultCredentials'	=> false,
+			'cleanupOperations'	= [
+					'DeleteCredentialsFile',
+					'DeleteTaskFile',
+				],
+		];
+
+	//When an action is performed, the parameters defined here are offered as defaults and available for change.
+	$ROUTE_PARAMETERS_DEFAULT['*'] = [
+			'name'			=>	'task',
+		];
+
+
+	//When an action is performed, and one of these parameters has a specified value, the parameters provided are injected (overwriting fixed where applicable).
+	//Note that only user-provided inputs are checked to see whether parameters should be injected.
+
+	$ROUTE_PARAMETERS_INJECTION['CreateTask'] = [
+			'size'	=> [
+					'small' => [
+						'name'	=>	'small',
+						'size'	=>	[1000,1000],
+				],
+					'large' => [
+						'name'	=>	'large',
+						'size'	=>	[2500,2500],
+				],
+		];
 ?>

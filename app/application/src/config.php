@@ -117,7 +117,9 @@
 
 		//When an action is performed, the parameters defined here cannot be overwritten by an end-user.
 		$ROUTE_PARAMETERS_FIXED ??= [];
-		$ROUTE_PARAMETERS_FIXED['CreateTask'] ??= [];
+		$ROUTE_PARAMETERS_FIXED['CreateTask']	??= [];
+		$ROUTE_PARAMETERS_FIXED['ExistingTask'] ??= [];
+		$ROUTE_PARAMETERS_FIXED['.*Task'] 	??= [];
 
 		$ROUTE_PARAMETERS_FIXED['CreateTask']['taskOperations']			??=	["ValidateCredentialsFile","CreateNewProject","GenerateProject","KeepAlive","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
 		$ROUTE_PARAMETERS_FIXED['ExistingProjectTask']['taskOperations']	??=	["ValidateCredentialsFile","StartProject","KeepAlive","Recalculate","ActivateMeasure","OutputServices","DeleteCredentialsFile","SetTaskComplete","Wait"];
