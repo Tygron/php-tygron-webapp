@@ -89,36 +89,50 @@
 
 		protected function getDefaultParameters($parameterSetName = null) {
 			global $ROUTE_PARAMETERS_DEFAULT;
-			$parameterSetName ??= $this->getParameterSetName();
-			if ( array_key_exists( $parameterSetName, $ROUTE_PARAMETERS_DEFAULT ?? [] ) ) {
-				return $ROUTE_PARAMETERS_DEFAULT[$parameterSetName];
-			}
-			return [];
+
+			return $this->getRulesSetForParameters($ROUTE_PARAMETERS_DEFAULT);
 		}
 		protected function getFixedParameters($parameterSetName = null) {
 			global $ROUTE_PARAMETERS_FIXED;
-			$parameterSetName ??= $this->getParameterSetName();
-			if ( array_key_exists( $parameterSetName, $ROUTE_PARAMETERS_FIXED ?? [] ) ) {
-				return $ROUTE_PARAMETERS_FIXED[$parameterSetName];
-			}
-			return [];
+
+			return $this->getRulesSetForParameters($ROUTE_PARAMETERS_FIXED);
 		}
 		protected function getInjectedParameters($parameterSetName = null) {
 			global $ROUTE_PARAMETERS_INJECTION;
-			$parameterSetName ??= $this->getParameterSetName();
-			if ( !array_key_exists($parameterSetName, $ROUTE_PARAMETERS_INJECTION ?? [] ) ) {
-				return [];
-			}
-			$injectionRules = $ROUTE_PARAMETERS_INJECTION[$parameterSetName];
+
+			$rulesSet = $this->getRulesSetForParameters($ROUTE_PARAMETERS_INJECTION);
 
 			$injections = [];
-			foreach ($injectionRules as $key => $rulesForKey) {
+			foreach ( $rulesSet as $key => $rules ) {
 				$inputValue = $this->getInputForInjection($key);
-				if ( array_key_exists($inputValue, $rulesForKey) ) {
-					$injections = array_merge($injections, $rulesForKey[$inputValue]);
+				if ( array_key_exists($inputValue, $rules) ) {
+					$injections = array_merge($injections, $rules[$inputValue]);
 				}
 			}
+
 			return $injections;
+		}
+
+		private function getRulesSetForParameters ( array $parameterSet, string $parameterSetName = null ) {
+			$parameterSetName ??= $this->getParameterSetName();
+			$reservedParameterKeys = ['*',$parameterSetName];
+
+			$foundParameterRules = [];
+			$foundParameterRules['*'] = $parameterSet['*'] ?? null;
+
+			foreach ( $parameterSet as $key => $value ) {
+				if ( in_array($key, $reservedParameterKeys) ) {
+					continue;
+				}
+				if ( preg_match('/'.$key.'/', $parameterSetName) ) {
+					$foundParameterRules[$key] = $parameterSet[$key];
+				}
+			}
+
+			$foundParameterRules[$parameterSetName] = $parameterSet[$parameterSetName] ?? null;
+
+			$foundParameterRules = array_filter( $foundParameterRules, 'is_array' );
+			return array_merge( [], ...array_values($foundParameterRules) );
 		}
 
 		private function getInputForInjection( string $key ) {
