@@ -124,7 +124,10 @@
 				if ( in_array($key, $reservedParameterKeys) ) {
 					continue;
 				}
-				if ( preg_match('/'.$key.'/', $parameterSetName) ) {
+
+				$pattern = '/'.$key.'/';
+				\Utils\Strings::isValidRegex($pattern);
+				if ( preg_match($pattern, $parameterSetName) ) {
 					$foundParameterRules[$key] = $parameterSet[$key];
 				}
 			}
