@@ -922,8 +922,14 @@ class LocationSelector {
 		let $elY	= $(this.inputs[elY]);
 
 		if ( $el.length > 0 ) {
-			if ( ($el.attr('type') == 'number') && ( keyX in data ) ) {
-				$el.val(data[keyX]);
+			if ( ($el.attr('type') == 'number') ) {
+				if ( (typeof data === 'object') && ( keyX in data ) ) {
+					$el.val(data[keyX]);
+				} else if ( (typeof data === 'number') || (typeof data === 'string') ) {
+					$el.val(data);
+				} else {
+					console.error('Input/output parsing error in location selector');
+				}
 			} else {
 				try {
 					if (data instanceof Object) {
