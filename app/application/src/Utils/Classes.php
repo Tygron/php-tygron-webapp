@@ -5,9 +5,14 @@
 	class Classes {
 
 		public static function getClassesInFolder( string|array $path) {
-			$path = \Utils\Files::makePath($path);
-			$files = \Utils\Files::getContentsOfDirectory( $path );
 			$classes = [];
+			$path = \Utils\Files::makePath($path);
+			$files = [];
+			try {
+				$files = \Utils\Files::getContentsOfDirectory( $path );
+			} catch ( \Throwable $e ) {
+				return $classes;
+			}
 			$namespacePattern =  '/namespace[\s]*([^;\s]+)[\s]*[^;]*;/';
 			$classPattern =  '/class[\s]*([^;\s]+)[\s]*/';
 			foreach ( $files as $key => $value ) {
