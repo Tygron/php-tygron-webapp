@@ -37,8 +37,6 @@
 				} );
 			$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $taskFileNamesFull);
 
-			//$fileNamesFull = glob($tasksDir . DIRECTORY_SEPARATOR .'*'.\Tasks\Task::$TASKFILE_POSTFIX);
-			//$fileNames = str_replace($tasksDir . DIRECTORY_SEPARATOR, '', $fileNamesFull);
 			return $fileNames;
 		}
 
@@ -66,8 +64,10 @@
 		protected function runTask( $taskFileName ) {
 			$operated = false;
 			try {
-				$taskRunner = new TaskRunner();
-				$taskRunner->setTask($taskFileName);
+				$taskRunner = new SyncModeTaskRunner();
+				$taskRunner->setSkipIncompatibleSync(true);
+				$taskRunner->setSyncMode(\Tasks\Task::SYNC_MODE_ASYNC, true);
+				$taskRunner->setTaskFileName($taskFileName);
 				$taskRunner->setStandOffTimeInSeconds($this->standOffTimeInSeconds);
 				$taskRunner->run();
 				$operated = $taskRunner->getHasOperated();

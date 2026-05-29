@@ -10,6 +10,7 @@
 
 			'taskName'=>'',
 			'contextName'=>null,
+			'syncMode'=>Task::SYNC_MODE_ASYNC,
 			'credentials'=>[],
 			'templateName'=>'',
 			'platform'=>'engine',

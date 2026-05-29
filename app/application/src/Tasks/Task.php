@@ -7,11 +7,17 @@
 		public static string $TASKFILE_POSTFIX = '-task.json';
 		public static string $CREDENTIALSFILE_POSTFIX = '-credentials.json';
 
+		public const SYNC_MODE_ASYNC = 'async';
+		public const SYNC_MODE_SYNC = 'sync';
+
+		public const SYNC_MODES = [self::SYNC_MODE_ASYNC, self::SYNC_MODE_SYNC];
+
 		private array $data = [];
 
 		public static array $DEFAULT_DATA = [
 				'taskName'		=>	'',
 				'contextName'		=>	null,
+				'syncMode'		=>	self::SYNC_MODE_ASYNC,
 
 				'credentialsFile'	=>	'',
 				'templateName'		=>	'',
@@ -61,6 +67,9 @@
 						break;
 					case 'contextName':
 						$this->setContextName($value);
+						break;
+					case 'syncMode':
+						$this->setSyncMode($value);
 						break;
 					case 'credentialsFile':
 						$this->setCredentialsFile($value);
@@ -134,6 +143,15 @@
 		}
 		public function setContextName( string $contextName = null ) {
 			$this->data['contextName'] = $contextName;
+		}
+		public function setSyncMode( string $syncMode = null ) {
+			if ( is_null($syncMode) ) {
+				return;
+			}
+			if ( !in_array($syncMode, self::SYNC_MODES) ) {
+				throw new \Exception('Invalid sync mode: '.$syncMode);
+			}
+			$this->data['syncMode'] = $syncMode;
 		}
 		public function setCredentialsFile( string $credentialsFile ) {
 			$this->data['credentialsFile'] = $credentialsFile;
@@ -234,6 +252,7 @@
 			if ($completed) {
 				$this->setCompletionTime( \Utils\Time::getCurrentTimestamp() );
 			}
+			$this->setSyncMode(self::SYNC_MODE_ASYNC);
 		}
 		public function setCompleted( string|bool $completed ) {
 			if ( is_string($completed) ) {
@@ -312,6 +331,9 @@
 		}
 		public function getContextName() {
 			return $this->data['contextName'];
+		}
+		public function getSyncMode() {
+			return $this->data['syncMode'];
 		}
 		public function getTaskFileName() {
 			return self::generateTaskFileName($this->getTaskName(), $this->getContextName());

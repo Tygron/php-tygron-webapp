@@ -12,6 +12,9 @@
 			];
 		}
 
+		public function skipWhenNotAsync() {
+			return true;
+		}
 
 		public function run( \Tasks\Task $task ) {
 			$waitTime = $task->getData()['waitTime'] ?? self::$WAIT_TIME;

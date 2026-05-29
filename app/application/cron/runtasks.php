@@ -5,12 +5,16 @@
 			throw new \Exception('');
 		}
 
-		$runSpecificTask = get_clean_user_input('task');
+		//$runSpecificTask = get_clean_user_input('task');
+		$runSpecificTask = get_clean_user_input('task', '[a-zA-Z0-9\/\-\_]');
 
 		if ($runSpecificTask) {
-			$taskRunner = new \Tasks\Runners\TaskRunner();
+			$taskRunner = new \Tasks\Runners\SyncModeTaskRunner();
 			try {
-				$taskRunner->setTask($runSpecificTask);
+
+				$taskRunner->setSkipIncompatibleSync(true);
+				$taskRunner->setSyncMode(\Tasks\Task::SYNC_MODE_ASYNC, true);
+				$taskRunner->setTaskFileName($runSpecificTask);
 				$taskRunner->run();
 				foreach ($taskRunner->getLogs() as $key => $value) {
 					log_message($value);

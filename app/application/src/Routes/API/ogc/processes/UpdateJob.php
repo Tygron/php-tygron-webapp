@@ -55,6 +55,7 @@
 		}
 
 		public function runPost( array $parameters = [] ) {
+			global $TASKS_STANDOFF_IN_SECONDS;
 			$taskName = $parameters['jobId'] ?? null;
                         try {
                                 $task = \Tasks\Task::load($taskName, $this->getRequestContext());
@@ -65,8 +66,10 @@
 			$result = 'null';
 
 			try {
-				$taskRunner = new \Tasks\Runners\TaskRunner();
-				$taskRunner->setTask($task->getTaskFileName());
+				$taskRunner = new \Tasks\Runners\SyncModeTaskRunner();
+				$taskRunner->setSyncMode(\Tasks\Task::SYNC_MODE_ASYNC, true);
+				$taskRunner->setStandOffTimeInSeconds( $TASKS_STANDOFF_IN_SECONDS );
+				$taskRunner->setTaskFileName($task->getTaskFileName());
 				$result = $taskRunner->run();
 				$result = $taskRunner->getLogs();
 			} catch ( \Throwable $e ) {

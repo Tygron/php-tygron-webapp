@@ -27,6 +27,10 @@
 		public function getInputParameters( ) {
 			return [];
 		}
+		public function skipWhenNotAsync() {
+			return false;
+		}
+
 
 
 		public function setTask( \Tasks\Task $task ) {
