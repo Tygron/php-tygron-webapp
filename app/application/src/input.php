@@ -3,6 +3,8 @@
 	$_INPUTS = [];
 	$_INPUTS_CLEANED = [];
 
+	$HEADERS = null;
+
 	if ( !function_exists('get_clean_user_input') ) {
 		function get_clean_user_input( $key, string $whitelist = null ) {
 			global $_INPUTS, $SAFE_CHARACTERS;
@@ -27,6 +29,17 @@
 				return implode('',$matches[0]);
 			}
 			return null;
+		}
+	}
+
+	if ( !function_exists('get_clean_header_input') ) {
+		function get_clean_header_input( $key, string $whitelist = null ) {
+			global $_HEADERS, $SAFE_CHARACTERS;
+			$whitelist = $whitelist ?? $SAFE_CHARACTERS;
+
+			$_HEADERS = $_HEADERS ?? array_change_key_case(getallheaders(), CASE_LOWER);
+			$headerValue = $_HEADERS[ strtolower($key) ] ?? null;
+			return $headerValue;
 		}
 	}
 
