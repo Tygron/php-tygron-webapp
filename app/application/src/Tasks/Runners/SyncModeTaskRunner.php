@@ -6,6 +6,7 @@
 
 		private $taskFileName = null;
 		private $hasOperated = false;
+		private $hasCompleted = false;
 		private $standOffTimeInSeconds = 0;
 
 		public const RUN_MODE_ASYNC = \Tasks\Task::SYNC_MODE_ASYNC;
@@ -69,6 +70,12 @@
 		}
 		public function addHasOperated ( bool $operated = true ) {
 			$this->setHasOperated( $operated || $this->getHasOperated() );
+		}
+		public function setHasCompleted( bool $completed = true ) {
+			$this->hasCompleted = $completed;
+		}
+		public function getHasCompleted() {
+			return $this->hasCompleted;
 		}
 
 
@@ -137,6 +144,7 @@
 			}
 
 			if ( $this->getTaskCleanupCompleted($task) ) {
+				$this->setHasCompleted();
 				return false;
 			}
 
@@ -151,6 +159,7 @@
 			}
 
 			if ( $this->getTaskCleanupCompleted($task) ) {
+				$this->setHasCompleted();
 				return false;
 			}
 
@@ -169,6 +178,7 @@
 				$result = $this->runAsSingle( $task );
 
 				if ( $this->getOperationsOfTaskCompleted( $task ) ) {
+					$this->setHasCompleted();
 					return $task->getOutput();
 				}
 
