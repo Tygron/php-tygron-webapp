@@ -4,12 +4,22 @@
 
 	abstract class AbstractRoute {
 
+		//Request Method
 		private ?string $routeMethod = null;
+
+		//Route from the application base url to this url
 		private ?string $routeRelativeBaseUrl = null;
+
+		//Path to Route class handling the request
 		private ?string $routePath = null;
+
+		//For given RouteEndpoint handling the request, what subpath is found
 		private ?string $routeSubPath = null;
+
+		//HTML, JSON, etc
 		private ?string $routeFormat = null;
 
+		//What data to see/request, or folder, or to use for differentiation.
 		private ?string $requestContext = null;
 
 		public function name() {
@@ -22,7 +32,6 @@
 			$this->routePath = $parameters['path'] ?? null;
 			$this->routeSubPath = $parameters['subPath'] ?? null;
 			$this->routeFormat = $parameters['format'] ?? null;
-
 			$this->requestContext = $parameters['requestContext'] ?? null;
 		}
 
