@@ -30,7 +30,7 @@
 		}
 
 		public static function clean( string $asset ) {
-			$asset = preg_replace('/{{(\s)*(.*)(\s)*}}/','',$asset);
+			$asset = preg_replace('/{{(\s)*(.+?)(\s)*}}/','',$asset);
 			return $asset;
 		}
 
