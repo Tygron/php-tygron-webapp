@@ -168,17 +168,8 @@
 			return $outputs;
 		}
 
-		public function runPost( array $parameters = [] ) {
-			try {
-				$task = \Tasks\TaskGenerator::generate($parameters);
-				$task->validate();
-			} catch ( \Throwable $e ) {
-				return $this->returnError(null, $e);
-			}
-
-			$task->save();
-
-			return $this->returnSuccess(['jobId' => $task->getTaskName()]);
+		public function getJobControlOptions() {
+			return [self::CONTROL_MODE_ASYNC];
 		}
 
 		protected function getMiscInputs() {

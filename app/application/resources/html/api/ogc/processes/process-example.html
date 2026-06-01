@@ -1,5 +1,11 @@
 		<hr>
 		<h4>Example</h4>
+		<ul>
+			<li>Preferred control option: {{ controlOption }}</li>
+				<ul>
+				{% for item in controlOptions %}{% include 'api/ogc/processes/process-example-controlmode.html' with item %}{% endfor %}
+				</ul>
+		</ul>
 		<form method='POST'>
 			<table>
 				{{inputs}}

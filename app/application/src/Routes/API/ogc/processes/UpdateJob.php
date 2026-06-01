@@ -25,7 +25,7 @@
 		}
 
 		public function getJobControlOptions() {
-			return ['async-execute'];
+			return [self::CONTROL_MODE_SYNC];
 		}
 
 		public function getParameterDefinitions() {
@@ -76,7 +76,14 @@
 				return $this->returnError(null, $e);
 			}
 
-			return $this->returnSuccess(['message' => $result]);
+			return $this->returnSuccess([
+					'jobId' => $task->getTaskName(),
+					'results' => [
+							'operated' => $taskRunner->getHasOperated(),
+							'completed' => $taskRunner->getHasCompleted(),
+						],
+					'logs' => [ $result ],
+				]);
 		}
 
 	}
