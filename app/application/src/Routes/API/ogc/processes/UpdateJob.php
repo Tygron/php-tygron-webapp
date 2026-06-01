@@ -71,7 +71,7 @@
 				$taskRunner->setStandOffTimeInSeconds( $TASKS_STANDOFF_IN_SECONDS );
 				$taskRunner->setTaskFileName($task->getTaskFileName());
 				$result = $taskRunner->run();
-				$result = $taskRunner->getLogs();
+				$logs = $taskRunner->getLogs();
 			} catch ( \Throwable $e ) {
 				return $this->returnError(null, $e);
 			}
@@ -82,7 +82,7 @@
 							'operated' => $taskRunner->getHasOperated(),
 							'completed' => $taskRunner->getHasCompleted(),
 						],
-					'logs' => [ $result ],
+					'logs' => $logs,
 				]);
 		}
 
